@@ -7,14 +7,18 @@ in vec3 Normal;
 in vec3 FragPos;
 
 uniform sampler2D tex0;
+
 uniform vec3 lightColor;
 uniform vec3 lightPos;
+
+uniform float ambientStr;
+uniform float specularStr;
+
 uniform vec3 viewPos;
 
 void main()
 {
     // ambient
-    float ambientStr = 0.2;
     vec3 ambient = ambientStr * lightColor;
 
     // diffuse
@@ -24,7 +28,6 @@ void main()
     vec3 diffuse = diff * lightColor;
 
     // specular
-    float specularStr = 0.5;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);

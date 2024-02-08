@@ -1,7 +1,13 @@
 #include <iostream>
+#include <stb/stb_image.h>
+
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stb/stb_image.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -14,6 +20,7 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void showGuiWindow();
 
 float vertices[] = 
 {
@@ -74,11 +81,15 @@ glm::vec3 cubePositions[] =
 	glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-const unsigned int WIN_WIDTH = 640;
-const unsigned int WIN_HEIGHT = 480;
+const unsigned int WIN_WIDTH = 1280;
+const unsigned int WIN_HEIGHT = 720;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+glm::vec3 objectScale(1.0f, 1.0f, 1.0f);
+float lightAmbient = 0.2f;
+float lightSpec = 0.5f;
 
 float FOV = 45.0f;
 
@@ -108,6 +119,16 @@ int main()
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	gladLoadGL();
+
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
 
 	// SHADERS
 	Shader shaderProgram("res/shaders/default.vs", "res/shaders/default.fs");
@@ -150,6 +171,14 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
+		glfwPollEvents();
+
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		showGuiWindow();
+
 		float curFrame = (float)glfwGetTime();
 		deltaTime = curFrame - lastFrame;
 		lastFrame = curFrame;
@@ -175,6 +204,9 @@ int main()
 		shaderProgram.setVec3("lightPos", lightPos);
 		shaderProgram.setVec3("viewPos", cam.Position);
 
+		shaderProgram.setFloat("ambientStr", lightAmbient);
+		shaderProgram.setFloat("specularStr", lightSpec);
+
 		shaderProgram.setMat4("projection", proj);
 		shaderProgram.setMat4("view", view);
 
@@ -184,8 +216,7 @@ int main()
 
 			model = glm::translate(model, cubePositions[i]);
 			model = glm::rotate(model, glm::radians(curFrame * i), glm::vec3(1.0f, 0.3f, 0.5f));
-			if (i % 2 == 0)
-				model = glm::scale(model, glm::vec3(sin(curFrame), sin(curFrame), sin(curFrame)));
+			model = glm::scale(model, objectScale);
 
 			shaderProgram.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -206,21 +237,33 @@ int main()
 		lightCubeShader.setMat4("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
+		// Rendering
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		glfwSwapBuffers(window);
-		glfwPollEvents();
 	}
 
 	// CLEAN UP
 
+	//VBOs
 	VBO1.Delete();
-
+	
+	// VAOs
 	cubeVAO.Delete();
 	lightVAO.Delete();
 	
+	// Shaders
 	shaderProgram.Delete();
 	lightCubeShader.Delete();
 	
+	// Textures
 	pepe.Delete();
+
+	// ImGui
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -241,4 +284,22 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 
 	glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
+}
+
+void showGuiWindow()
+{
+	ImGui::Begin("Stuff");
+
+	ImGui::SliderFloat3("Object Scale", (float*)&objectScale, 0.0f, 3.0f);
+
+	ImGui::SeparatorText("Light");
+	ImGui::ColorEdit3("Light Color", (float*)&lightColor);
+	ImGui::SliderFloat("Ambient Strength", &lightAmbient, 0.0f, 1.0f);
+	ImGui::SliderFloat("Specular Strength", &lightSpec, 0.0f, 1.0f);
+
+	ImGui::SeparatorText("Screen");
+	ImGui::SliderFloat("FOV", &FOV, 0.0f, 120.0f);
+	// TODO: ms + FPS
+
+	ImGui::End();
 }
