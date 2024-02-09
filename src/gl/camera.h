@@ -29,6 +29,7 @@ public:
 
 	glm::mat4 getViewMatrix();
 	void Inputs(GLFWwindow* window, float dt);
+	void UpdateSize(int w, int h);
 };
 
 #endif

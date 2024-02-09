@@ -19,6 +19,7 @@
 #include "gl/VBO.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow* window);
 void showGuiWindow();
 
@@ -87,14 +88,22 @@ const unsigned int WIN_HEIGHT = 720;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-glm::vec3 objectScale(1.0f, 1.0f, 1.0f);
-float lightAmbient = 0.2f;
-float lightSpec = 0.5f;
+bool shouldDrawGui = false;
 
 float FOV = 45.0f;
 
-glm::vec3 lightPos(1.2f, 1.0f, 1.0f);
+glm::vec3 objectScale(1.0f, 1.0f, 1.0f);
+
+glm::vec3 materialAmbient(0.1f, 0.1f, 0.1f);
+glm::vec3 materialDiffuse(0.55f, 0.55f, 0.55f);
+glm::vec3 materialSpecular(0.7f, 0.7f, 0.7f);
+float materialShininess = 32.0f;
+
+glm::vec3 lightPos;
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+glm::vec3 lightAmbient(1.0f, 1.0f, 1.0f);
+glm::vec3 lightDiffuse(1.0f, 1.0f, 1.0f);
+glm::vec3 lightSpecular(1.0f, 1.0f, 1.0f);
 
 Camera cam(WIN_WIDTH, WIN_HEIGHT, glm::vec3(0.0f, 0.0f, 5.0f));
 
@@ -110,13 +119,14 @@ int main()
 
 	if (window == NULL)
 	{
-		std::cout << "No window :(" << std::endl;
+		std::cout << "can't create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
 
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetKeyCallback(window, key_callback);
 
 	gladLoadGL();
 
@@ -131,6 +141,7 @@ int main()
 	ImGui_ImplOpenGL3_Init();
 
 	// SHADERS
+
 	Shader shaderProgram("res/shaders/default.vs", "res/shaders/default.fs");
 	Shader lightCubeShader("res/shaders/light.vs", "res/shaders/light.fs");
 
@@ -177,7 +188,11 @@ int main()
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		showGuiWindow();
+
+		if (shouldDrawGui)
+		{
+			showGuiWindow();
+		}
 
 		float curFrame = (float)glfwGetTime();
 		deltaTime = curFrame - lastFrame;
@@ -200,12 +215,17 @@ int main()
 		glm::mat4 proj = glm::perspective(glm::radians(FOV), (float)WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = cam.getViewMatrix();
 
-		shaderProgram.setVec3("lightColor", lightColor);
-		shaderProgram.setVec3("lightPos", lightPos);
 		shaderProgram.setVec3("viewPos", cam.Position);
 
-		shaderProgram.setFloat("ambientStr", lightAmbient);
-		shaderProgram.setFloat("specularStr", lightSpec);
+		shaderProgram.setVec3("light.position", lightPos);
+		shaderProgram.setVec3("light.ambient", lightAmbient);
+		shaderProgram.setVec3("light.diffuse", lightDiffuse);
+		shaderProgram.setVec3("light.specular", lightSpecular);
+
+		shaderProgram.setVec3("material.ambient", materialAmbient);
+		shaderProgram.setVec3("material.diffuse", materialDiffuse);
+		shaderProgram.setVec3("material.specular", materialSpecular);
+		shaderProgram.setFloat("material.shininess", materialShininess);
 
 		shaderProgram.setMat4("projection", proj);
 		shaderProgram.setMat4("view", view);
@@ -274,6 +294,13 @@ int main()
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+	cam.UpdateSize(width, height);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_0 && action == GLFW_PRESS)
+		shouldDrawGui = !shouldDrawGui;
 }
 
 void processInput(GLFWwindow* window)
@@ -294,12 +321,20 @@ void showGuiWindow()
 
 	ImGui::SeparatorText("Light");
 	ImGui::ColorEdit3("Light Color", (float*)&lightColor);
-	ImGui::SliderFloat("Ambient Strength", &lightAmbient, 0.0f, 1.0f);
-	ImGui::SliderFloat("Specular Strength", &lightSpec, 0.0f, 1.0f);
+	ImGui::ColorEdit3("Light Ambient", (float*)&lightAmbient);
+	ImGui::ColorEdit3("Light Diffuse", (float*)&lightDiffuse);
+	ImGui::ColorEdit3("Light Specular", (float*)&lightSpecular);
+
+	ImGui::SeparatorText("Material");
+	ImGui::ColorEdit3("Material Ambient", (float*)&materialAmbient);
+	ImGui::ColorEdit3("Material Diffuse", (float*)&materialDiffuse);
+	ImGui::ColorEdit3("Material Specular", (float*)&materialSpecular);
+	ImGui::SliderFloat("Material Shininess", (float*)&materialShininess, 1.0f, 256.0f);
 
 	ImGui::SeparatorText("Screen");
 	ImGui::SliderFloat("FOV", &FOV, 0.0f, 120.0f);
-	// TODO: ms + FPS
+
+	ImGui::Text("%.3f ms (%.1f FPS)", deltaTime * 1000.0f, 1.0f / deltaTime);
 
 	ImGui::End();
 }
