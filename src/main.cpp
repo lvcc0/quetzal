@@ -24,7 +24,7 @@ void processInput(GLFWwindow* window);
 void showGuiWindow();
 
 float vertices[] = 
-{
+{    // positions         // texture    // normals
 	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.0f, -1.0f,
 	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, -1.0f,
 	 0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.0f, -1.0f,
@@ -94,12 +94,9 @@ float FOV = 45.0f;
 
 glm::vec3 objectScale(1.0f, 1.0f, 1.0f);
 
-glm::vec3 materialAmbient(0.1f, 0.1f, 0.1f);
-glm::vec3 materialDiffuse(0.55f, 0.55f, 0.55f);
-glm::vec3 materialSpecular(0.7f, 0.7f, 0.7f);
 float materialShininess = 32.0f;
 
-glm::vec3 lightPos;
+glm::vec3 lightPos(3.0f, 1.0f, 3.0f);
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 glm::vec3 lightAmbient(1.0f, 1.0f, 1.0f);
 glm::vec3 lightDiffuse(1.0f, 1.0f, 1.0f);
@@ -142,8 +139,8 @@ int main()
 
 	// SHADERS
 
-	Shader shaderProgram("res/shaders/default.vs", "res/shaders/default.fs");
-	Shader lightCubeShader("res/shaders/light.vs", "res/shaders/light.fs");
+	Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag");
+	Shader lightCubeShader("res/shaders/light.vert", "res/shaders/light.frag");
 
 	VBO VBO1(vertices, sizeof(vertices));
 
@@ -173,8 +170,13 @@ int main()
 	
 	// TEXTURES
 
-	Texture pepe("res/textures/pepe.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	pepe.texUnit(shaderProgram, "tex0", 0);
+	Texture diffuseMap("res/textures/container.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture specularMap("res/textures/container_spec.png", GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
+
+	// SHADER CONFIG
+	shaderProgram.Activate();
+	shaderProgram.setInt("material.diffuse", 0);
+	shaderProgram.setInt("material.specular", 1);
 
 	// MAIN LOOP
 
@@ -203,11 +205,12 @@ int main()
 
 		processInput(window);
 		
-		pepe.Bind();
+		// lightPos.x = sin(curFrame) * 3.0f;
+		// lightPos.y = sin(curFrame) * 1.0f;
+		// lightPos.z = cos(curFrame) * 3.0f;
 
-		lightPos.x = sin(curFrame) * 3.0f;
-		lightPos.y = sin(curFrame) * 1.0f;
-		lightPos.z = cos(curFrame) * 3.0f;
+		diffuseMap.Bind();
+		specularMap.Bind();
 
 		cubeVAO.Bind();
 		shaderProgram.Activate();
@@ -217,14 +220,20 @@ int main()
 
 		shaderProgram.setVec3("viewPos", cam.Position);
 
-		shaderProgram.setVec3("light.position", lightPos);
+		shaderProgram.setVec3("light.position", cam.Position);
+		shaderProgram.setVec3("light.direction", cam.Orientation);
+
 		shaderProgram.setVec3("light.ambient", lightAmbient);
 		shaderProgram.setVec3("light.diffuse", lightDiffuse);
 		shaderProgram.setVec3("light.specular", lightSpecular);
 
-		shaderProgram.setVec3("material.ambient", materialAmbient);
-		shaderProgram.setVec3("material.diffuse", materialDiffuse);
-		shaderProgram.setVec3("material.specular", materialSpecular);
+		shaderProgram.setFloat("light.constant", 1.0f);
+		shaderProgram.setFloat("light.linear", 0.14f);
+		shaderProgram.setFloat("light.quad", 0.07f);
+
+		shaderProgram.setFloat("light.innerCutoff", glm::cos(glm::radians(12.5f)));
+		shaderProgram.setFloat("light.outerCutoff", glm::cos(glm::radians(17.5f)));
+
 		shaderProgram.setFloat("material.shininess", materialShininess);
 
 		shaderProgram.setMat4("projection", proj);
@@ -278,7 +287,8 @@ int main()
 	lightCubeShader.Delete();
 	
 	// Textures
-	pepe.Delete();
+	diffuseMap.Delete();
+	specularMap.Delete();
 
 	// ImGui
 	ImGui_ImplOpenGL3_Shutdown();
@@ -326,9 +336,6 @@ void showGuiWindow()
 	ImGui::ColorEdit3("Light Specular", (float*)&lightSpecular);
 
 	ImGui::SeparatorText("Material");
-	ImGui::ColorEdit3("Material Ambient", (float*)&materialAmbient);
-	ImGui::ColorEdit3("Material Diffuse", (float*)&materialDiffuse);
-	ImGui::ColorEdit3("Material Specular", (float*)&materialSpecular);
 	ImGui::SliderFloat("Material Shininess", (float*)&materialShininess, 1.0f, 256.0f);
 
 	ImGui::SeparatorText("Screen");

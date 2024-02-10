@@ -1,10 +1,11 @@
 #include "texture.h"
 
-Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, GLenum pixelType)
+Texture::Texture(const char* image, GLenum texType, GLenum texSlot, GLenum format, GLenum pixelType)
 {
 	stbi_set_flip_vertically_on_load(true);
 
 	type = texType;
+	slot = texSlot;
 
 	int imgW, imgH, numColCh;
 	unsigned char* bytes = stbi_load(image, &imgW, &imgH, &numColCh, 0);
@@ -27,15 +28,9 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 	glBindTexture(texType, 0);
 }
 
-void Texture::texUnit(Shader& shader, const char* uniform, GLuint unit)
-{
-	GLuint texUni = glGetUniformLocation(shader.ID, uniform);
-	shader.Activate();
-	glUniform1i(texUni, unit);
-}
-
 void Texture::Bind()
 {
+	glActiveTexture(slot);
 	glBindTexture(type, ID);
 }
 
