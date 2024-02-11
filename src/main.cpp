@@ -13,11 +13,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "gl/camera.h"
-#include "gl/texture.h"
+#include "gl/model.h"
 #include "gl/lights.h"
 #include "gl/shader.h"
-#include "gl/VAO.h"
-#include "gl/VBO.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -38,65 +36,6 @@ glm::vec3 objectScale(1.0f, 1.0f, 1.0f);
 float materialShininess = 32.0f;
 
 Camera cam(WIN_WIDTH, WIN_HEIGHT, glm::vec3(0.0f, 0.0f, 5.0f));
-
-float vertices[] = 
-{    // positions         // texture    // normals
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.0f, -1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.0f, -1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.0f, -1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, -1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,  0.0f, -1.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  0.0f,  1.0f,
-
-	-0.5f,  0.5f,  0.5f,  1.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  1.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  1.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  1.0f,  0.0f, -1.0f,  0.0f,  0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  1.0f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f,  1.0f,  1.0f,  0.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  1.0f,  0.0f,  0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f,  1.0f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f,  1.0f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, -1.0f,  0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f, -1.0f,  0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f,  1.0f,  0.0f, -1.0f,  0.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f
-};
-
-glm::vec3 cubePositions[] =
-{
-	glm::vec3(4.0f,  -3.0f,  -2.0f),
-	glm::vec3(2.0f,  5.0f, -15.0f),
-	glm::vec3(-1.5f, -2.2f, -2.5f),
-	glm::vec3(-3.8f, -2.0f, -12.3f),
-	glm::vec3(2.4f, -0.4f, -3.5f),
-	glm::vec3(-1.7f,  3.0f, -7.5f),
-	glm::vec3(1.3f, -2.0f, -2.5f),
-	glm::vec3(1.5f,  2.0f, -2.5f),
-	glm::vec3(1.5f,  0.2f, -1.5f),
-	glm::vec3(-1.3f,  1.0f, -1.5f)
-};
 
 DirLight dirLights[] =
 {
@@ -155,7 +94,7 @@ SpotLight spotLights[] =
 		"flashlight",
 		cam.Position,
 		cam.Orientation,
-		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.2f, 0.2f, 0.2f),
 		glm::vec3(1.0f, 1.0f, 1.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f),
 		1.0f,
@@ -169,7 +108,7 @@ SpotLight spotLights[] =
 		true,
 		"spotLight0",
 		glm::vec3(5.0f, 0.0f, -3.5f),
-		glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec3(-1.0f, 0.0f, 0.0f),
 		glm::vec3(0.05f, 0.05f, 0.05f),
 		glm::vec3(0.8f, 0.8f, 0.8f),
 		glm::vec3(1.0f, 1.0f, 1.0f),
@@ -215,47 +154,13 @@ int main()
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
+	stbi_set_flip_vertically_on_load(true);
+
 	// SHADERS
-
 	Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag");
-	Shader lightCubeShader("res/shaders/light.vert", "res/shaders/light.frag");
 
-	VBO VBO1(vertices, sizeof(vertices));
-
-	// Regular cubes
-
-	VAO cubeVAO;
-	cubeVAO.Bind();
-
-	// Position attribute
-	cubeVAO.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-	// Texture coord attribute
-	cubeVAO.LinkAttrib(VBO1, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	// Normal attribute
-	cubeVAO.LinkAttrib(VBO1, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-
-	// Light sources
-
-	VAO lightVAO;
-	lightVAO.Bind();
-
-	// Position attribute
-	lightVAO.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-
-	cubeVAO.Unbind();
-	lightVAO.Unbind();
-	VBO1.Unbind();
-	
-	// TEXTURES
-
-	Texture diffuseMap("res/textures/container.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	Texture specularMap("res/textures/container_spec.png", GL_TEXTURE_2D, GL_TEXTURE1, GL_RGBA, GL_UNSIGNED_BYTE);
-
-	// SHADER CONFIG
-	shaderProgram.Activate();
-
-	shaderProgram.setInt("material.diffuse", 0);
-	shaderProgram.setInt("material.specular", 1);
+	// MODELS
+	Model Backpack("res/objects/backpack/backpack.obj");
 
 	// MAIN LOOP
 
@@ -281,11 +186,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		processInput(window);
-		
-		diffuseMap.Bind();
-		specularMap.Bind();
 
-		cubeVAO.Bind();
 		shaderProgram.Activate();
 
 		glm::mat4 proj = glm::perspective(glm::radians(FOV), (float)WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
@@ -313,60 +214,13 @@ int main()
 		shaderProgram.setMat4("projection", proj);
 		shaderProgram.setMat4("view", view);
 
-		for (unsigned int i = 0; i < 10; i++)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::scale(model, objectScale);
 
-			model = glm::translate(model, cubePositions[i]);
-			model = glm::rotate(model, glm::radians(curFrame * i), glm::vec3(1.0f, 0.3f, 0.5f));
-			model = glm::scale(model, objectScale);
+		shaderProgram.setMat4("model", model);
+		Backpack.Draw(shaderProgram);
 
-			shaderProgram.setMat4("inversed", glm::inverse(model));
-			shaderProgram.setMat4("model", model);
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
-
-		lightVAO.Bind();
-		lightCubeShader.Activate();
-
-		lightCubeShader.setMat4("projection", proj);
-		lightCubeShader.setMat4("view", view);
-
-		// Point Lights
-		for (unsigned int i = 0; i < IM_ARRAYSIZE(pointLights); i++)
-		{
-			if (pointLights[i].Enabled)
-			{
-				glm::mat4 model = glm::mat4(1.0f);
-
-				model = glm::translate(model, pointLights[i].Position);
-				model = glm::scale(model, glm::vec3(0.3f));
-
-				lightCubeShader.setVec3("objectColor", pointLights[i].Color);
-				lightCubeShader.setMat4("model", model);
-
-				glDrawArrays(GL_TRIANGLES, 0, 36);
-			}
-		}
-
-		// Spot Lights
-		for (unsigned int i = 0; i < IM_ARRAYSIZE(spotLights); i++)
-		{
-			if (spotLights[i].Enabled)
-			{
-				glm::mat4 model = glm::mat4(1.0f);
-
-				model = glm::translate(model, spotLights[i].Position);
-				model = glm::scale(model, glm::vec3(0.1f));
-
-				lightCubeShader.setVec3("objectColor", spotLights[i].Color);
-				lightCubeShader.setMat4("model", model);
-
-				glDrawArrays(GL_TRIANGLES, 0, 36);
-			}
-		}
-		
 		// Rendering
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -375,21 +229,9 @@ int main()
 	}
 
 	// CLEAN UP
-
-	//VBOs
-	VBO1.Delete();
-	
-	// VAOs
-	cubeVAO.Delete();
-	lightVAO.Delete();
 	
 	// Shaders
 	shaderProgram.Delete();
-	lightCubeShader.Delete();
-	
-	// Textures
-	diffuseMap.Delete();
-	specularMap.Delete();
 
 	// ImGui
 	ImGui_ImplOpenGL3_Shutdown();
@@ -431,7 +273,7 @@ void showGuiWindow()
 {
 	ImGui::Begin("Stuff");
 
-	ImGui::SliderFloat3("Object Scale", (float*)&objectScale, 0.0f, 3.0f);
+	ImGui::DragFloat3("Object Scale", (float*)&objectScale, 0.1f);
 	
 	if (ImGui::CollapsingHeader("Directional Lights"))
 	{
@@ -521,8 +363,12 @@ void showGuiWindow()
 		}
 
 		ImGui::Checkbox("Enabled", &spotLights[spotComboItem].Enabled);
-		ImGui::DragFloat3("Position", (float*)&spotLights[spotComboItem].Position, 0.1f);
-		ImGui::SliderFloat3("Direction", (float*)&spotLights[spotComboItem].Direction, -1.0f, 1.0f);
+
+		if (spotLights[spotComboItem].Name != "flashlight")
+		{
+		    ImGui::DragFloat3("Position", (float*)&spotLights[spotComboItem].Position, 0.1f);
+		    ImGui::SliderFloat3("Direction", (float*)&spotLights[spotComboItem].Direction, -1.0f, 1.0f);
+		}
 
 		ImGui::Separator();
 		ImGui::ColorEdit3("Ambient", (float*)&spotLights[spotComboItem].Ambient);
@@ -549,6 +395,9 @@ void showGuiWindow()
 
 	ImGui::SeparatorText("Screen");
 	ImGui::SliderFloat("FOV", &FOV, 0.0f, 120.0f);
+
+	ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", cam.Position.x, cam.Position.y, cam.Position.z);
+	ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", cam.Orientation.x, cam.Orientation.y, cam.Orientation.z);
 
 	ImGui::Text("%.3f ms (%.1f FPS)", deltaTime * 1000.0f, 1.0f / deltaTime);
 
