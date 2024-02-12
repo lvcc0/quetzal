@@ -123,6 +123,7 @@ SpotLight spotLights[] =
 
 int main()
 {
+	// --- INITIAL CONFIG --- //
 	glfwInit();
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -144,33 +145,27 @@ int main()
 
 	gladLoadGL();
 
-	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
 	stbi_set_flip_vertically_on_load(true);
+	glEnable(GL_DEPTH_TEST);
+	// --- //
 
-	// SHADERS
 	Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag");
 
-	// MODELS
 	Model Backpack("res/objects/backpack/backpack.obj");
 
-	// MAIN LOOP
-
-	glEnable(GL_DEPTH_TEST);
-
+	// --- MAIN LOOP --- //
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
 
-		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
@@ -195,6 +190,7 @@ int main()
 		shaderProgram.setVec3("viewPos", cam.Position);
 		shaderProgram.setFloat("material.shininess", materialShininess);
 
+		// --- RENDERING LIGHTS' INFLUENCE ON OBJECTS --- //
 		for (unsigned int i = 0; i < IM_ARRAYSIZE(dirLights); i++)
 			dirLights[i].UpdateUni(shaderProgram, i);
 
@@ -210,6 +206,7 @@ int main()
 			}
 			spotLights[i].UpdateUni(shaderProgram, i);
 		}
+		// --- //
 
 		shaderProgram.setMat4("projection", proj);
 		shaderProgram.setMat4("view", view);
@@ -219,21 +216,18 @@ int main()
 		model = glm::scale(model, objectScale);
 
 		shaderProgram.setMat4("model", model);
+		shaderProgram.setMat4("inversed", glm::inverse(model));
+
 		Backpack.Draw(shaderProgram);
 
-		// Rendering
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwSwapBuffers(window);
 	}
 
-	// CLEAN UP
-	
-	// Shaders
 	shaderProgram.Delete();
 
-	// ImGui
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
@@ -244,12 +238,14 @@ int main()
 	return 0;
 }
 
+// Gets called upon window resize
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
 	cam.UpdateSize(width, height);
 }
 
+// Gets called upon key press
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_0 && action == GLFW_PRESS)
@@ -259,6 +255,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		spotLights[0].Enabled = !spotLights[0].Enabled;
 }
 
+// Gets called every frame
 void processInput(GLFWwindow* window)
 {
 	cam.Inputs(window, deltaTime);
@@ -269,6 +266,7 @@ void processInput(GLFWwindow* window)
 	glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
 
+// Shows custom gui window for configuration and stuff
 void showGuiWindow()
 {
 	ImGui::Begin("Stuff");
