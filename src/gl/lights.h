@@ -14,109 +14,106 @@
 class DirLight
 {
 public:
-	bool Enabled;
-	const char* Name;
+	bool m_enabled;
+	const char* m_name;
+	
+	glm::vec3 m_dir;
 
-	glm::vec3 Direction;
+	glm::vec3 m_ambient;
+	glm::vec3 m_diffuse;
+	glm::vec3 m_specular;
 
-	glm::vec3 Ambient;
-	glm::vec3 Diffuse;
-	glm::vec3 Specular;
+	glm::vec3 m_color;
 
-	glm::vec3 Color;
+	// Constructor
+	DirLight( bool enabled, const char* name, glm::vec3 dir,
+              glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+              glm::vec3 color) :
+        m_enabled(enabled), m_name(name), m_dir(dir),
+        m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
+        m_color(color) { /* empty */ }
 
-	DirLight(
-		bool enabled,
-		const char* name,
-		glm::vec3 dir,
-		glm::vec3 ambient,
-		glm::vec3 diffuse,
-		glm::vec3 specular,
-		glm::vec3 color
-	);
+	// Updates all corresponging fragment shader uniforms
+	void UpdateUni(Shader& shader, int index);
 
-	void UpdateUni(Shader shader, int index);
-
-	operator const char* () { return Name; }
+	// (const char*) cast operator
+	operator const char* () { return m_name; }
 };
 
 class PointLight
 {
 public:
-	bool Enabled;
-	const char* Name;
+	bool m_enabled;
+	const char* m_name;
 
-	glm::vec3 Position;
+	glm::vec3 m_pos;
 
-	glm::vec3 Ambient;
-	glm::vec3 Diffuse;
-	glm::vec3 Specular;
+	glm::vec3 m_ambient;
+	glm::vec3 m_diffuse;
+	glm::vec3 m_specular;
 
-	float Constant;
-	float Linear;
-	float Quad;
+	float m_constant;
+	float m_linear;
+	float m_quad;
 
-	glm::vec3 Color;
+	glm::vec3 m_color;
 
-	PointLight(
-		bool enabled,
-		const char* name,
-		glm::vec3 pos,
-		glm::vec3 ambient,
-		glm::vec3 diffuse,
-		glm::vec3 specular,
-		float constant,
-		float linear,
-		float quad,
-		glm::vec3 color
-	);
+	// Constructor
+	PointLight( bool enabled, const char* name, glm::vec3 pos, 
+                glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+		        float constant, float linear, float quad,
+		        glm::vec3 color ) :
+		m_enabled(enabled), m_name(name), m_pos(pos),
+		m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
+		m_constant(constant), m_linear(linear), m_quad(quad),
+		m_color(color) { /* empty */ }
 
-	void UpdateUni(Shader shader, int index);
+	// Updates all corresponging fragment shader uniforms
+	void UpdateUni(Shader& shader, int index);
 
-	operator const char* () { return Name; }
+	// (const char*) cast operator
+	operator const char* () { return m_name; }
 };
 
 class SpotLight
 {
 public:
-	bool Enabled;
-	const char* Name;
+	bool m_enabled;
+	const char* m_name;
 
-	glm::vec3 Position;
-	glm::vec3 Direction;
+	glm::vec3 m_pos;
+	glm::vec3 m_dir;
 
-	glm::vec3 Ambient;
-	glm::vec3 Diffuse;
-	glm::vec3 Specular;
+	glm::vec3 m_ambient;
+	glm::vec3 m_diffuse;
+	glm::vec3 m_specular;
 
-	float Constant;
-	float Linear;
-	float Quad;
+	float m_constant;
+	float m_linear;
+	float m_quad;
 
-	float InnerCutoff;
-	float OuterCutoff;
+	float m_innerCutoff;
+	float m_outerCutoff;
 
-	glm::vec3 Color;
+	glm::vec3 m_color;
 
-	SpotLight(
-		bool enabled,
-		const char* name,
-		glm::vec3 pos,
-		glm::vec3 dir,
-		glm::vec3 ambient,
-		glm::vec3 diffuse,
-		glm::vec3 specular,
-		float constant,
-		float linear,
-		float quad,
-		float innerCutoff,
-		float outerCutoff,
-		glm::vec3 color
-	);
+	// Constructor
+	SpotLight( bool enabled, const char* name, glm::vec3 pos, glm::vec3 dir,
+               glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+               float constant, float linear, float quad,
+               float innerCutoff, float outerCutoff,
+               glm::vec3 color ) :
+		m_enabled(enabled), m_name(name), m_pos(pos), m_dir(dir),
+		m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
+		m_constant(constant), m_linear(linear), m_quad(quad),
+		m_innerCutoff(innerCutoff), m_outerCutoff(outerCutoff),
+		m_color(color) { /* empty */ }
 
-	void UpdateUni(Shader shader, int index);
+	// Updates all corresponging fragment shader uniforms
+	void UpdateUni(Shader& shader, int index);
 
-	operator const char* () { return Name; }
+	// (const char*) cast operator
+	operator const char* () { return m_name; }
 };
 
 #endif

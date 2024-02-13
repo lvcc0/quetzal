@@ -92,8 +92,8 @@ SpotLight spotLights[] =
 	SpotLight(
 		true,
 		"flashlight",
-		cam.Position,
-		cam.Orientation,
+		cam.m_pos,
+		cam.m_orientation,
 		glm::vec3(0.2f, 0.2f, 0.2f),
 		glm::vec3(1.0f, 1.0f, 1.0f),
 		glm::vec3(1.0f, 1.0f, 1.0f),
@@ -123,7 +123,7 @@ SpotLight spotLights[] =
 
 int main()
 {
-	// --- INITIAL CONFIG --- //
+	// --- Initial Config --- //
 	glfwInit();
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -157,11 +157,11 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	// --- //
 
-	Shader shaderProgram("res/shaders/default.vert", "res/shaders/default.frag");
+	Shader shader("res/shaders/default.vert", "res/shaders/default.frag");
 
 	Model Backpack("res/objects/backpack/backpack.obj");
 
-	// --- MAIN LOOP --- //
+	// --- Main Loop --- //
 	while (!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
@@ -182,51 +182,53 @@ int main()
 
 		processInput(window);
 
-		shaderProgram.Activate();
+		shader.Activate();
 
 		glm::mat4 proj = glm::perspective(glm::radians(FOV), (float)WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = cam.getViewMatrix();
 
-		shaderProgram.setVec3("viewPos", cam.Position);
-		shaderProgram.setFloat("material.shininess", materialShininess);
+		shader.setVec3("viewPos", cam.m_pos);
+		shader.setFloat("material.shininess", materialShininess);
 
-		// --- RENDERING LIGHTS' INFLUENCE ON OBJECTS --- //
+		// --- Rendering Lights' Influence On Objects --- //
 		for (unsigned int i = 0; i < IM_ARRAYSIZE(dirLights); i++)
-			dirLights[i].UpdateUni(shaderProgram, i);
+			dirLights[i].UpdateUni(shader, i);
 
 		for (unsigned int i = 0; i < IM_ARRAYSIZE(pointLights); i++)
-			pointLights[i].UpdateUni(shaderProgram, i);
+			pointLights[i].UpdateUni(shader, i);
 
 		for (unsigned int i = 0; i < IM_ARRAYSIZE(spotLights); i++)
 		{
-			if (spotLights[i].Name == "flashlight")
+			if (spotLights[i].m_name == "flashlight")
 			{
-				spotLights[i].Position = cam.Position;
-				spotLights[i].Direction = cam.Orientation;
+				spotLights[i].m_pos = cam.m_pos;
+				spotLights[i].m_dir = cam.m_orientation;
 			}
-			spotLights[i].UpdateUni(shaderProgram, i);
+			spotLights[i].UpdateUni(shader, i);
 		}
 		// --- //
 
-		shaderProgram.setMat4("projection", proj);
-		shaderProgram.setMat4("view", view);
+		shader.setMat4("projection", proj);
+		shader.setMat4("view", view);
 
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		model = glm::scale(model, objectScale);
 
-		shaderProgram.setMat4("model", model);
-		shaderProgram.setMat4("inversed", glm::inverse(model));
+		shader.setMat4("model", model);
+		shader.setMat4("inversed", glm::inverse(model));
 
-		Backpack.Draw(shaderProgram);
+		Backpack.Draw(shader);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwSwapBuffers(window);
 	}
+	// --- //
 
-	shaderProgram.Delete();
+	// --- Cleaning up --- //
+	shader.Delete();
 
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
@@ -234,6 +236,7 @@ int main()
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
+	// --- //
 
 	return 0;
 }
@@ -252,7 +255,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		shouldDrawGui = !shouldDrawGui;
 
 	if (key == GLFW_KEY_G && action == GLFW_PRESS)
-		spotLights[0].Enabled = !spotLights[0].Enabled;
+		spotLights[0].m_enabled = !spotLights[0].m_enabled;
 }
 
 // Gets called every frame
@@ -291,16 +294,16 @@ void showGuiWindow()
 			ImGui::EndCombo();
 		}
 		
-		ImGui::Checkbox("Enabled", &dirLights[dirComboItem].Enabled);
-		ImGui::SliderFloat3("Direction", (float*)&dirLights[dirComboItem].Direction, -1.0f, 1.0f);
+		ImGui::Checkbox("Enabled", &dirLights[dirComboItem].m_enabled);
+		ImGui::SliderFloat3("Direction", (float*)&dirLights[dirComboItem].m_dir, -1.0f, 1.0f);
 
 		ImGui::Separator();
-		ImGui::ColorEdit3("Ambient", (float*)&dirLights[dirComboItem].Ambient);
-		ImGui::ColorEdit3("Diffuse", (float*)&dirLights[dirComboItem].Diffuse);
-		ImGui::ColorEdit3("Specular", (float*)&dirLights[dirComboItem].Specular);
+		ImGui::ColorEdit3("Ambient", (float*)&dirLights[dirComboItem].m_ambient);
+		ImGui::ColorEdit3("Diffuse", (float*)&dirLights[dirComboItem].m_diffuse);
+		ImGui::ColorEdit3("Specular", (float*)&dirLights[dirComboItem].m_specular);
 
 		ImGui::Separator();
-		ImGui::ColorEdit3("Color", (float*)&dirLights[dirComboItem].Color);
+		ImGui::ColorEdit3("Color", (float*)&dirLights[dirComboItem].m_color);
 		
 		ImGui::Separator();
 	}
@@ -323,21 +326,21 @@ void showGuiWindow()
 			ImGui::EndCombo();
 		}
 
-		ImGui::Checkbox("Enabled", &pointLights[pointComboItem].Enabled);
-		ImGui::DragFloat3("Position", (float*)&pointLights[pointComboItem].Position, 0.1f);
+		ImGui::Checkbox("Enabled", &pointLights[pointComboItem].m_enabled);
+		ImGui::DragFloat3("Position", (float*)&pointLights[pointComboItem].m_pos, 0.1f);
 
 		ImGui::Separator();
-		ImGui::ColorEdit3("Ambient", (float*)&pointLights[pointComboItem].Ambient);
-		ImGui::ColorEdit3("Diffuse", (float*)&pointLights[pointComboItem].Diffuse);
-		ImGui::ColorEdit3("Specular", (float*)&pointLights[pointComboItem].Specular);
+		ImGui::ColorEdit3("Ambient", (float*)&pointLights[pointComboItem].m_ambient);
+		ImGui::ColorEdit3("Diffuse", (float*)&pointLights[pointComboItem].m_diffuse);
+		ImGui::ColorEdit3("Specular", (float*)&pointLights[pointComboItem].m_specular);
 
 		ImGui::Separator();
-		ImGui::InputFloat("Constant", (float*)&pointLights[pointComboItem].Constant, 0.1f, 1.0f);
-		ImGui::InputFloat("Linear", (float*)&pointLights[pointComboItem].Linear, 0.01f, 0.1f);
-		ImGui::InputFloat("Quadratic", (float*)&pointLights[pointComboItem].Quad, 0.001f, 0.01f);
+		ImGui::InputFloat("Constant", (float*)&pointLights[pointComboItem].m_constant, 0.1f, 1.0f);
+		ImGui::InputFloat("Linear", (float*)&pointLights[pointComboItem].m_linear, 0.01f, 0.1f);
+		ImGui::InputFloat("Quadratic", (float*)&pointLights[pointComboItem].m_quad, 0.001f, 0.01f);
 
 		ImGui::Separator();
-		ImGui::ColorEdit3("Color", (float*)&pointLights[pointComboItem].Color);
+		ImGui::ColorEdit3("Color", (float*)&pointLights[pointComboItem].m_color);
 
 		ImGui::Separator();
 	}
@@ -360,30 +363,30 @@ void showGuiWindow()
 			ImGui::EndCombo();
 		}
 
-		ImGui::Checkbox("Enabled", &spotLights[spotComboItem].Enabled);
+		ImGui::Checkbox("Enabled", &spotLights[spotComboItem].m_enabled);
 
-		if (spotLights[spotComboItem].Name != "flashlight")
+		if (spotLights[spotComboItem].m_name != "flashlight")
 		{
-		    ImGui::DragFloat3("Position", (float*)&spotLights[spotComboItem].Position, 0.1f);
-		    ImGui::SliderFloat3("Direction", (float*)&spotLights[spotComboItem].Direction, -1.0f, 1.0f);
+		    ImGui::DragFloat3("Position", (float*)&spotLights[spotComboItem].m_pos, 0.1f);
+		    ImGui::SliderFloat3("Direction", (float*)&spotLights[spotComboItem].m_dir, -1.0f, 1.0f);
 		}
 
 		ImGui::Separator();
-		ImGui::ColorEdit3("Ambient", (float*)&spotLights[spotComboItem].Ambient);
-		ImGui::ColorEdit3("Diffuse", (float*)&spotLights[spotComboItem].Diffuse);
-		ImGui::ColorEdit3("Specular", (float*)&spotLights[spotComboItem].Specular);
+		ImGui::ColorEdit3("Ambient", (float*)&spotLights[spotComboItem].m_ambient);
+		ImGui::ColorEdit3("Diffuse", (float*)&spotLights[spotComboItem].m_diffuse);
+		ImGui::ColorEdit3("Specular", (float*)&spotLights[spotComboItem].m_specular);
 
 		ImGui::Separator();
-		ImGui::InputFloat("Constant", (float*)&spotLights[spotComboItem].Constant, 0.1f, 1.0f);
-		ImGui::InputFloat("Linear", (float*)&spotLights[spotComboItem].Linear, 0.01f, 0.1f);
-		ImGui::InputFloat("Quadratic", (float*)&spotLights[spotComboItem].Quad, 0.001f, 0.01f);
+		ImGui::InputFloat("Constant", (float*)&spotLights[spotComboItem].m_constant, 0.1f, 1.0f);
+		ImGui::InputFloat("Linear", (float*)&spotLights[spotComboItem].m_linear, 0.01f, 0.1f);
+		ImGui::InputFloat("Quadratic", (float*)&spotLights[spotComboItem].m_quad, 0.001f, 0.01f);
 
 		ImGui::Separator();
-		ImGui::DragFloat("Inner Angle", (float*)&spotLights[spotComboItem].InnerCutoff, 0.5f, 0.0f, 90.0f);
-		ImGui::DragFloat("Outer Angle", (float*)&spotLights[spotComboItem].OuterCutoff, 0.5f, 0.0f, 90.0f);
+		ImGui::DragFloat("Inner Angle", (float*)&spotLights[spotComboItem].m_innerCutoff, 0.5f, 0.0f, 90.0f);
+		ImGui::DragFloat("Outer Angle", (float*)&spotLights[spotComboItem].m_outerCutoff, 0.5f, 0.0f, 90.0f);
 
 		ImGui::Separator();
-		ImGui::ColorEdit3("Color", (float*)&spotLights[spotComboItem].Color);
+		ImGui::ColorEdit3("Color", (float*)&spotLights[spotComboItem].m_color);
 
 		ImGui::Separator();
 	}
@@ -394,8 +397,8 @@ void showGuiWindow()
 	ImGui::SeparatorText("Screen");
 	ImGui::SliderFloat("FOV", &FOV, 0.0f, 120.0f);
 
-	ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", cam.Position.x, cam.Position.y, cam.Position.z);
-	ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", cam.Orientation.x, cam.Orientation.y, cam.Orientation.z);
+	ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", cam.m_pos.x, cam.m_pos.y, cam.m_pos.z);
+	ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", cam.m_orientation.x, cam.m_orientation.y, cam.m_orientation.z);
 
 	ImGui::Text("%.3f ms (%.1f FPS)", deltaTime * 1000.0f, 1.0f / deltaTime);
 

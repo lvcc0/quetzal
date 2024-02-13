@@ -14,21 +14,29 @@
 class Camera
 {
 public:
-	glm::vec3 Position;
-	glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 m_pos;
+	glm::vec3 m_orientation = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	bool firstClick = true;
+	bool m_firstClick = true;
 
-	int width, height;
+	int m_width;
+	int m_height;
 
-	float speed = 3.0f;
-	float sens = 100.0f;
+	float m_speed = 3.0f;
+	float m_sens = 100.0f;
 
-	Camera(int width, int height, glm::vec3 position);
+	// Constructor
+	Camera( int width, int height, glm::vec3 pos ) :
+		m_width(width), m_height(height), m_pos(pos) { /* empty */ }
 
+	// Returns current view matrix
 	glm::mat4 getViewMatrix();
+	
+	// Handles keyboard and mouse inputs
 	void Inputs(GLFWwindow* window, float dt);
+	
+	// Updates camera's width and height
 	void UpdateSize(int w, int h);
 };
 
