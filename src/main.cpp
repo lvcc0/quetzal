@@ -159,7 +159,7 @@ int main()
 
 	Shader shader("res/shaders/default.vert", "res/shaders/default.frag");
 
-	Model Backpack("res/objects/backpack/backpack.obj");
+	Model Catcube("res/objects/catcube/catcube.obj");
 
 	// --- Main Loop --- //
 	while (!glfwWindowShouldClose(window))
@@ -218,7 +218,7 @@ int main()
 		shader.setMat4("model", model);
 		shader.setMat4("inversed", glm::inverse(model));
 
-		Backpack.Draw(shader);
+		Catcube.Draw(shader);
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

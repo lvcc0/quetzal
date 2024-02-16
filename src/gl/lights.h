@@ -26,7 +26,7 @@ public:
 	glm::vec3 m_color;
 
 	// Constructor
-	DirLight( bool enabled, const char* name, glm::vec3 dir,
+    DirLight( bool enabled, const char* name, glm::vec3 dir,
               glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
               glm::vec3 color) :
         m_enabled(enabled), m_name(name), m_dir(dir),
@@ -59,14 +59,14 @@ public:
 	glm::vec3 m_color;
 
 	// Constructor
-	PointLight( bool enabled, const char* name, glm::vec3 pos, 
+    PointLight( bool enabled, const char* name, glm::vec3 pos, 
                 glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
-		        float constant, float linear, float quad,
-		        glm::vec3 color ) :
-		m_enabled(enabled), m_name(name), m_pos(pos),
-		m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
-		m_constant(constant), m_linear(linear), m_quad(quad),
-		m_color(color) { /* empty */ }
+                float constant, float linear, float quad,
+                glm::vec3 color ) :
+        m_enabled(enabled), m_name(name), m_pos(pos),
+        m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
+        m_constant(constant), m_linear(linear), m_quad(quad),
+        m_color(color) { /* empty */ }
 
 	// Updates all corresponging fragment shader uniforms
 	void UpdateUni(Shader& shader, int index);
@@ -103,11 +103,11 @@ public:
                float constant, float linear, float quad,
                float innerCutoff, float outerCutoff,
                glm::vec3 color ) :
-		m_enabled(enabled), m_name(name), m_pos(pos), m_dir(dir),
-		m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
-		m_constant(constant), m_linear(linear), m_quad(quad),
-		m_innerCutoff(innerCutoff), m_outerCutoff(outerCutoff),
-		m_color(color) { /* empty */ }
+        m_enabled(enabled), m_name(name), m_pos(pos), m_dir(dir),
+        m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
+        m_constant(constant), m_linear(linear), m_quad(quad),
+        m_innerCutoff(innerCutoff), m_outerCutoff(outerCutoff),
+        m_color(color) { /* empty */ }
 
 	// Updates all corresponging fragment shader uniforms
 	void UpdateUni(Shader& shader, int index);
