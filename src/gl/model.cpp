@@ -3,257 +3,252 @@
 
 Model::Model(std::string const& path)
 {
-	loadModel(path);
-	setupModel();
+    loadModel(path); // read obj file
+    setupModel();    // setup VAO, VBO, EBO
 }
 
 void Model::Draw(Shader& shader)
 {
-	unsigned int diffuseNum = 1;
-	unsigned int specularNum = 1;
+    unsigned int diffuseNum = 1;
+    unsigned int specularNum = 1;
 
-	for (unsigned int i = 0; i < textures.size(); i++)
-	{
-		glActiveTexture(GL_TEXTURE0 + i);
+    // Assign all texture fragment shader uniforms
+    for (unsigned int i = 0; i < m_textures.size(); i++)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
 
-		std::string number;
-		std::string name = textures[i].type;
+        std::string number;
+        std::string name = m_textures[i].type;
 
-		if (name == "texture_diffuse")
-			number = std::to_string(diffuseNum++);
-		else if (name == "texture_specular")
-			number = std::to_string(specularNum++);
+        if (name == "texture_diffuse")
+            number = std::to_string(diffuseNum++);
+        else if (name == "texture_specular")
+            number = std::to_string(specularNum++);
 
-		shader.setInt(("material." + name + number).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
-	}
+        shader.setInt(("material." + name + number).c_str(), i);
+        glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
+    }
 
-	glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);
 
-	// Draw mesh
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    // Draw via indices
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
 
-	glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
 void Model::setupModel()
 {
-	glGenVertexArrays(1, &VAO);
+    glGenVertexArrays(1, &VAO);
 
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
-	glBindVertexArray(VAO);
+    glBindVertexArray(VAO);
 
-	// Vertex Array Buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+    // Vertex Array Buffer
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
 
-	// Element Array Buffer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+    // Element Array Buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
 
-	// Vertex positions
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	// Vertex texture coords
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
-	// vertex normals
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+    // Vertex positions
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    // Vertex texture coords
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
+    // vertex normals
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
 
-	glBindVertexArray(0);
+    glBindVertexArray(0);
 }
 
 void Model::loadModel(std::string const& path)
 {
-	directory = path.substr(0, path.find_last_of('/'));
+    m_directory = path.substr(0, path.find_last_of('/'));
 
-	std::ifstream file(path);
+    std::ifstream file(path);
 
-	std::vector<glm::vec3> positions;
-	std::vector<glm::vec3> normals;
-	std::vector<glm::vec2> texCoords;
+    std::vector<glm::vec3> positions;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> texCoords;
 
-	std::vector<std::string> triplets;
-	std::string line;
+    std::vector<std::string> triplets; // vector for face vertices ("v/vt/vn")
+    glm::vec3 vector3;                 // vec3 for v, vn
+    glm::vec2 vector2;                 // vec2 for vt
+    Vertex vertex;                     // vertex for storing face data and pushing it to vertices vector
 
-	while (std::getline(file, line))
-	{
-		std::string linetype = line.substr(0, 2);
+    std::string line;
 
-		if (linetype ==  "# ") // comment
-			continue;
+    while (std::getline(file, line))
+    {
+        std::string linetype = line.substr(0, line.find(" "));
 
-		if (linetype == "mt") // mtllib (material file)
-		{
-			std::istringstream v(line.substr(7));
-			loadMaterial(v.str());
-		}
+        if (linetype ==  "#") // comment
+            continue;
 
-		if (linetype == "o ") // object (mesh)
-		{
-			// think something
-		}
+        if (linetype == "mtllib") // material file
+        {
+            std::istringstream v(line.substr(line.find(" ") + 1));
+            loadMaterial(v.str());
+        }
 
-		if (linetype == "v ") // vertex
-		{
-			std::istringstream v(line.substr(2));
-			glm::vec3 vector;
+        if (linetype == "o") // object (mesh)
+        {
+            // think something
+        }
 
-			v >> vector.x;
-			v >> vector.y;
-			v >> vector.z;
+        if (linetype == "v") // vertex
+        {
+            std::istringstream v(line.substr(line.find(" ")));
 
-			positions.push_back(vector);
-		}
+            v >> vector3.x;
+            v >> vector3.y;
+            v >> vector3.z;
 
-		if (linetype == "vt") // texture
-		{
-			std::istringstream v(line.substr(2));
-			glm::vec2 vector;
+            positions.push_back(vector3);
+        }
 
-			v >> vector.x;
-			v >> vector.y;
+        if (linetype == "vt") // texture
+        {
+            std::istringstream v(line.substr(line.find(" ")));
 
-			texCoords.push_back(vector);
-		}
+            v >> vector2.x;
+            v >> vector2.y;
 
-		if (linetype == "vn") // normal
-		{
-			std::istringstream v(line.substr(2));
-			glm::vec3 vector;
+            texCoords.push_back(vector2);
+        }
 
-			v >> vector.x;
-			v >> vector.y;
-			v >> vector.z;
+        if (linetype == "vn") // normal
+        {
+            std::istringstream v(line.substr(line.find(" ")));
 
-			normals.push_back(vector);
-		}
+            v >> vector3.x;
+            v >> vector3.y;
+            v >> vector3.z;
 
-		if (linetype == "f ") // face
-		{
-			std::istringstream v(line.substr(2));
+            normals.push_back(vector3);
+        }
 
-			std::string points[3], token;
-			
-			std::vector<int> tokens;
-			Vertex vertex;
+        if (linetype == "f") // face
+        {
+            /**
+             *  v - "v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3"
+             *  points - {"v1/vt1/vn1", "v2/vt2/vn2", "v3/vt3/vn3"}
+             *  token - temporal string to get point's v, vt, vn
+             *  tokens - temporal vector to store point's v, vt, vn and push them to vertex 
+             */
 
-			v >> points[0];
-			v >> points[1];
-			v >> points[2];
+            std::istringstream v(line.substr(line.find(" ")));
 
-			for (unsigned int i = 0; i < 3; i++)
-			{
-				std::stringstream ss(points[i]);
+            std::string points[3];
+            std::string token;
+            std::vector<int> tokens;
 
-				triplets.push_back(ss.str());
-				indices.push_back(std::find(triplets.begin(), triplets.end(), ss.str()) - triplets.begin());
+            v >> points[0];
+            v >> points[1];
+            v >> points[2];
 
-				while (getline(ss, token, '/'))
-					tokens.push_back(std::stoi(token));
+            for (unsigned int i = 0; i < 3; i++)
+            {
+                std::stringstream point(points[i]);
 
-				vertex.Position = positions[tokens[0] - 1];
-				vertex.TexCoord = texCoords[tokens[1] - 1];
-				vertex.Normal = normals[tokens[2] - 1];
+                // Check for already existing triplets (v/vt/vn) and push index of the first mention of them to indices
+                triplets.push_back(point.str());
+                m_indices.push_back(std::find(triplets.begin(), triplets.end(), point.str()) - triplets.begin());
 
-				vertices.push_back(vertex);
-				tokens.clear();
+                // "v/vt/vn" -> {v, vt, vn}
+                while (getline(point, token, '/'))
+                    tokens.push_back(std::stoi(token));
 
-				std::cout << indices[indices.size() - 1] << " ";
-			}
-			
-			std::cout << "\n";
-		}
-	}
-	
-	/*
-	for (Vertex const i : vertices)
-		std::cout << "Vertices: " << glm::to_string(i.Position) << glm::to_string(i.TexCoord) << glm::to_string(i.Normal) << std::endl;
-	*/
+                vertex.Position = positions[--tokens[0]];
+                vertex.TexCoord = texCoords[--tokens[1]];
+                vertex.Normal = normals[--tokens[2]];
+
+                m_vertices.push_back(vertex);
+                tokens.clear();
+            }
+        }
+    }
 }
 
 void Model::loadMaterial(std::string const& path)
 {
-	std::string filename = std::string(path);
-	filename = directory + '/' + filename;
+    std::ifstream file(m_directory + '/' + path);
+    std::string line;
 
-	std::ifstream file(filename);
-	std::string line;
+    while (std::getline(file, line))
+    {
+        std::string linetype = line.substr(0, line.find(" "));
 
-	while (std::getline(file, line))
-	{
-		std::string linetype = line.substr(0, 6);
+        if (linetype == "map_Kd")
+        {
+            std::string str = line.substr(line.find(" ") + 1);
+            bool skip = false;
+            
+            for (unsigned int j = 0; j < m_textures_loaded.size(); j++)
+            {
+                if (std::strcmp(m_textures_loaded[j].path.data(), str.c_str()) == 0)
+                {
+                    m_textures.push_back(m_textures_loaded[j]);
+                    skip = true;
+                    break;
+                }
+            }
 
-		if (linetype == "map_Kd")
-		{
-			std::istringstream v(line.substr(7));
+            if (!skip)
+            {
+                Texture texture;
+                texture.id = TextureFromFile(str.c_str(), m_directory);
+                texture.type = "texture_diffusal";
+                texture.path = str.c_str();
 
-			std::string str = v.str();
-			bool skip = false;
-			
-			for (unsigned int j = 0; j < textures_loaded.size(); j++)
-			{
-				if (std::strcmp(textures_loaded[j].path.data(), str.c_str()) == 0)
-				{
-					textures.push_back(textures_loaded[j]);
-					skip = true;
-					break;
-				}
-			}
-
-			if (!skip)
-			{
-				Texture texture;
-				texture.id = TextureFromFile(str.c_str(), directory);
-				texture.type = "texture_diffusal";
-				texture.path = str.c_str();
-
-				textures.push_back(texture);
-				textures_loaded.push_back(texture);
-			}
-		}
-	}
+                m_textures.push_back(texture);
+                m_textures_loaded.push_back(texture);
+            }
+        }
+    }
 }
 
 unsigned int TextureFromFile(const char* path, const std::string& directory)
 {
-	std::string filename = std::string(path);
-	filename = directory + '/' + filename;
+    std::string filename = directory + '/' + path;
 
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
 
-	int width, height, numComponents;
-	unsigned char* bytes = stbi_load(filename.c_str(), &width, &height, &numComponents, 0);
+    int width, height, numComponents;
+    unsigned char* bytes = stbi_load(filename.c_str(), &width, &height, &numComponents, 0);
 
-	if (bytes)
-	{
-		GLenum format;
+    if (bytes)
+    {
+        GLenum format;
 
-		if (numComponents == 1)
-			format = GL_RED;
-		else if (numComponents == 3)
-			format = GL_RGB;
-		else if (numComponents == 4)
-			format = GL_RGBA;
+        if (numComponents == 1)
+            format = GL_RED;
+        else if (numComponents == 3)
+            format = GL_RGB;
+        else if (numComponents == 4)
+            format = GL_RGBA;
 
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, bytes);
-		glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, bytes);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-	else
-		std::cout << "Texture failed to load at: " << path << std::endl;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+    else
+        std::cout << "Texture failed to load at: " << path << std::endl;
 
-	stbi_image_free(bytes);
-	return textureID;
+    stbi_image_free(bytes);
+    return textureID;
 }
