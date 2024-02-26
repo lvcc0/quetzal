@@ -161,6 +161,8 @@ int main()
 
     Model Catcube("res/objects/catcube/catcube.obj");
 
+    Billboard billboard(glm::vec3(10.0f, 10.0f, 10.0f), glm::vec2(5.0f, 5.0f), "res/textures/pepe.png");
+
     // --- Main Loop --- //
     while (!glfwWindowShouldClose(window))
     {
@@ -220,6 +222,8 @@ int main()
         shader.setMat4("inversed", glm::inverse(model));
 
         Catcube.Draw(shader);
+
+        billboard.Draw(shader, cam.m_pos);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

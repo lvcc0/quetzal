@@ -21,6 +21,10 @@ struct Vertex {
     glm::vec3 Position;
     glm::vec2 TexCoord;
     glm::vec3 Normal;
+
+    // Constructor
+    Vertex( glm::vec3 pos, glm::vec2 texCoord, glm::vec3 norm) :
+        Position(pos), TexCoord(texCoord), Normal(norm) { /* empty */ }
 };
 
 struct Texture {
@@ -44,7 +48,7 @@ public:
 
     // Constructor
     Model(std::string const& path);
-
+    
     // Draw model
     void Draw(Shader& shader);
 
@@ -59,6 +63,31 @@ private:
     
     // Setup VAO, VBO, EBO
     void setupModel();
+};
+
+class Billboard
+{
+public:
+    std::vector<Vertex> m_vertices;
+    std::vector<unsigned int> m_indices;
+    
+    Texture m_texture;
+    
+    glm::vec3 m_pos;
+    glm::vec2 m_size;
+    glm::mat4 m_transform;
+
+    // Constructor
+    Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_path);
+
+    // Draw billboard + update transform matrix
+    void Draw(Shader& shader, glm::vec3 camPos);
+
+private:
+    unsigned int VAO, VBO, EBO;
+
+    // Setup VAO, VBO, EBO
+    void setupBillboard();
 };
 
 #endif
