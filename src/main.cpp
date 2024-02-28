@@ -159,7 +159,8 @@ int main()
 
     Shader shader("res/shaders/default.vert", "res/shaders/default.frag");
 
-    Model Catcube("res/objects/catcube/catcube.obj");
+    Model catcube("res/objects/catcube/catcube.obj");
+    Model anothercat("res/objects/catcube/catcube.obj");
 
     Billboard billboard(glm::vec3(10.0f, 10.0f, 10.0f), glm::vec2(5.0f, 5.0f), "res/textures/pepe.png");
 
@@ -213,15 +214,14 @@ int main()
         shader.setMat4("projection", proj);
         shader.setMat4("view", view);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::scale(model, objectScale);
-        model = glm::rotate(model, glm::radians(curFrame * 10), glm::vec3(0.0f, 1.0f, 0.0f));
+        catcube.translate(glm::vec3(7.0f, 8.0f, 0.0f));
+        anothercat.translate(glm::vec3(-5.0f, 2.0f, -8.0f));
 
-        shader.setMat4("model", model);
-        shader.setMat4("inversed", glm::inverse(model));
+        catcube.rotate(curFrame * 10, glm::vec3(0.0f, 1.0f, 0.0f));
+        anothercat.scale(glm::vec3(0.5f + sin(curFrame), 0.5f + cos(curFrame), 1.0f));
 
-        Catcube.Draw(shader);
+        catcube.Draw(shader);
+        anothercat.Draw(shader);
 
         billboard.Draw(shader, cam.m_pos);
 

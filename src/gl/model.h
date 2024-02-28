@@ -40,6 +40,8 @@ class Model
 public:
     std::string m_directory;
     
+    glm::mat4 m_model_matrix = glm::mat4(1.0f);
+
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
 
@@ -51,6 +53,11 @@ public:
     
     // Draw model
     void Draw(Shader& shader);
+
+    // Moving in world space
+    void translate(glm::vec3 vector);
+    void scale(glm::vec3 vector);
+    void rotate(float degrees, glm::vec3 vector);
 
 private:
     unsigned int VAO, VBO, EBO;
@@ -71,6 +78,8 @@ public:
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
     
+    glm::mat4 m_model_matrix = glm::mat4(1.0f);
+
     Texture m_texture;
     
     glm::vec3 m_pos;
@@ -82,6 +91,10 @@ public:
 
     // Draw billboard + update transform matrix
     void Draw(Shader& shader, glm::vec3 camPos);
+
+    // moving in world space
+    void translate(glm::vec3 vector);
+    void scale(glm::vec2 vector);
 
 private:
     unsigned int VAO, VBO, EBO;

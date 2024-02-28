@@ -31,11 +31,32 @@ void Model::Draw(Shader& shader)
 
     glActiveTexture(GL_TEXTURE0);
 
+    // Convert local coordinates to world coordinates
+    shader.setMat4("model", m_model_matrix);
+    shader.setMat4("inversed", glm::inverse(m_model_matrix));
+
+    m_model_matrix = glm::mat4(1.0f);
+
     // Draw via indices
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
+}
+
+void Model::translate(glm::vec3 vector)
+{
+    m_model_matrix = glm::translate(m_model_matrix, vector);
+}
+
+void Model::scale(glm::vec3 vector)
+{
+    m_model_matrix = glm::scale(m_model_matrix, vector);
+}
+
+void Model::rotate(float degrees, glm::vec3 vector)
+{
+    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(degrees), vector);
 }
 
 void Model::setupModel()
@@ -282,6 +303,12 @@ void Billboard::setupBillboard()
 
 void Billboard::Draw(Shader& shader, glm::vec3 camPos)
 {
+    // Convert local coordinates to world coordinates
+    shader.setMat4("model", m_model_matrix);
+    shader.setMat4("inversed", glm::inverse(m_model_matrix));
+
+    m_model_matrix = glm::mat4(1.0f);
+
     glActiveTexture(GL_TEXTURE0);
     shader.setInt("material.texture_diffuse1", 0);
     glBindTexture(GL_TEXTURE_2D, m_texture.id);
@@ -290,6 +317,16 @@ void Billboard::Draw(Shader& shader, glm::vec3 camPos)
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
 
     glBindVertexArray(0);
+}
+
+void Billboard::translate(glm::vec3 vector)
+{
+    m_model_matrix = glm::translate(m_model_matrix, vector);
+}
+
+void Billboard::scale(glm::vec2 vector)
+{
+    m_model_matrix = glm::scale(m_model_matrix, glm::vec3(vector, 1.0f));
 }
 
 unsigned int TextureFromFile(const char* path, const std::string& directory)
