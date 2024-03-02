@@ -1,12 +1,9 @@
 #include "billboard.h"
 
-Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_path)
+Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_path) :
+    m_pos(pos), m_size(size)
 {
-    m_pos = pos;
-    m_size = size;
-    m_transform = glm::mat4(1.0f);
-
-    m_edges =
+    m_local_vertices =
     {
         Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // upper left
         Vertex(glm::vec3(-m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // lower left
@@ -14,25 +11,22 @@ Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_p
         Vertex(glm::vec3( m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // upper right
     };
 
-    m_vertices = m_edges;
-
     m_indices =
     {
         0, 1, 2,
         2, 3, 0
     };
 
-    Texture texture;
-    texture.id = TextureFromFile(texture_path.c_str(), "");
-    texture.type = "texture_diffuse";
-    texture.path = texture_path.c_str();
+    m_vertices = m_local_vertices;
 
-    m_texture = texture;
+    m_texture.ID = TextureFromFile(texture_path.c_str(), "");
+    m_texture.Type = "texture_diffuse";
+    m_texture.Path = texture_path.c_str();
 
-    setupBillboard();
+    updateBuffers();
 }
 
-void Billboard::setupBillboard()
+void Billboard::updateBuffers()
 {
     glGenVertexArrays(1, &VAO);
 
@@ -62,19 +56,18 @@ void Billboard::setupBillboard()
     glBindVertexArray(0);
 }
 
-void Billboard::Draw(Shader& shader, Camera cam)
+void Billboard::Draw(Shader& shader, glm::mat4 viewMatrix)
 {
+    // update vertices positions based on camera rotation (up and right vectors)
     for (unsigned int i = 0; i < m_vertices.size(); i++)
-    {
         m_vertices[i].Position = m_pos
-            + glm::vec3(cam.getViewMatrix()[0][0], cam.getViewMatrix()[1][0], cam.getViewMatrix()[2][0]) * m_edges[i].Position.x
-            + glm::vec3(cam.getViewMatrix()[0][1], cam.getViewMatrix()[1][1], cam.getViewMatrix()[2][1]) * m_edges[i].Position.y;
-    }
-    
-    setupBillboard();
+        + glm::vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]) * m_local_vertices[i].Position.x
+        + glm::vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]) * m_local_vertices[i].Position.y;
+
+    updateBuffers();
 
     shader.setInt("material.texture_diffuse1", 0);
-    glBindTexture(GL_TEXTURE_2D, m_texture.id);
+    glBindTexture(GL_TEXTURE_2D, m_texture.ID);
 
     glActiveTexture(GL_TEXTURE0);
 

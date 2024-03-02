@@ -33,7 +33,6 @@ bool shouldDrawGui = false;
 
 float FOV = 45.0f;
 
-glm::vec3 objectScale(1.0f, 1.0f, 1.0f);
 float materialShininess = 32.0f;
 
 Camera cam(WIN_WIDTH, WIN_HEIGHT, glm::vec3(0.0f, 0.0f, 5.0f));
@@ -163,7 +162,7 @@ int main()
     Model catcube("res/objects/catcube/catcube.obj");
     Model anothercat("res/objects/catcube/catcube.obj");
 
-    Billboard billboard(glm::vec3(-3.0f, 5.0f, 0.0f), glm::vec2(5.0f, 5.0f), "res/textures/pepe.png");
+    Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), "res/textures/pepe.png");
 
     // --- Main Loop --- //
     while (!glfwWindowShouldClose(window))
@@ -217,6 +216,7 @@ int main()
 
         catcube.translate(glm::vec3(7.0f, 8.0f, 0.0f));
         anothercat.translate(glm::vec3(-5.0f, 2.0f, -8.0f));
+        billboard.translate(glm::vec3(cos(curFrame) * 3, 0.0f, sin(curFrame) * 3));
 
         catcube.rotate(curFrame * 10, glm::vec3(0.0f, 1.0f, 0.0f));
         anothercat.scale(glm::vec3(0.5f + sin(curFrame), 0.5f + cos(curFrame), 1.0f));
@@ -224,7 +224,7 @@ int main()
         catcube.Draw(defaultShader);
         anothercat.Draw(defaultShader);
 
-        billboard.Draw(defaultShader, cam);
+        billboard.Draw(defaultShader, cam.getViewMatrix());
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -279,8 +279,6 @@ void processInput(GLFWwindow* window)
 void showGuiWindow()
 {
     ImGui::Begin("Stuff");
-
-    ImGui::DragFloat3("Object Scale", (float*)&objectScale, 0.1f);
     
     if (ImGui::CollapsingHeader("Directional Lights"))
     {

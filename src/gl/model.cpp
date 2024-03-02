@@ -17,7 +17,7 @@ void Model::Draw(Shader& shader)
         glActiveTexture(GL_TEXTURE0 + i);
 
         std::string number;
-        std::string name = m_textures[i].type;
+        std::string name = m_textures[i].Type;
 
         if (name == "texture_diffuse")
             number = std::to_string(diffuseNum++);
@@ -25,7 +25,7 @@ void Model::Draw(Shader& shader)
             number = std::to_string(specularNum++);
 
         shader.setInt(("material." + name + number).c_str(), i);
-        glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
+        glBindTexture(GL_TEXTURE_2D, m_textures[i].ID);
     }
 
     glActiveTexture(GL_TEXTURE0);
@@ -213,7 +213,7 @@ void Model::loadMaterial(std::string const& path)
             
             for (unsigned int j = 0; j < m_textures_loaded.size(); j++)
             {
-                if (std::strcmp(m_textures_loaded[j].path.data(), str.c_str()) == 0)
+                if (std::strcmp(m_textures_loaded[j].Path.data(), str.c_str()) == 0)
                 {
                     m_textures.push_back(m_textures_loaded[j]);
                     skip = true;
@@ -224,9 +224,9 @@ void Model::loadMaterial(std::string const& path)
             if (!skip)
             {
                 Texture texture;
-                texture.id = TextureFromFile(str.c_str(), m_directory);
-                texture.type = "texture_diffusal";
-                texture.path = str.c_str();
+                texture.ID = TextureFromFile(str.c_str(), m_directory);
+                texture.Type = "texture_diffusal";
+                texture.Path = str.c_str();
 
                 m_textures.push_back(texture);
                 m_textures_loaded.push_back(texture);

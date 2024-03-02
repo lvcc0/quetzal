@@ -29,9 +29,9 @@ struct Vertex {
 };
 
 struct Texture {
-    unsigned int id;
-    std::string type;
-    std::string path;
+    unsigned int ID;
+    std::string Type;
+    std::string Path;
 };
 
 unsigned int TextureFromFile(const char* path, const std::string& directory);
