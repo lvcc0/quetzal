@@ -98,7 +98,7 @@ public:
 	glm::vec3 m_color;
 
 	// Constructor
-	SpotLight( bool enabled, const char* name, glm::vec3 pos, glm::vec3 dir,
+    SpotLight( bool enabled, const char* name, glm::vec3 pos, glm::vec3 dir,
                glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
                float constant, float linear, float quad,
                float innerCutoff, float outerCutoff,
