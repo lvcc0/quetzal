@@ -1,5 +1,4 @@
 #include "model.h"
-#include <glm/gtx/string_cast.hpp>
 
 Model::Model(std::string const& path)
 {
@@ -234,99 +233,6 @@ void Model::loadMaterial(std::string const& path)
             }
         }
     }
-}
-
-Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_path)
-{
-    m_pos = pos;
-    m_size = size;
-    m_transform = glm::mat4(1.0f);
-
-    m_vertices =
-    {
-        Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-        Vertex(glm::vec3(-m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-        Vertex(glm::vec3( m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-        Vertex(glm::vec3( m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-    };
-
-    for (Vertex vertex : m_vertices)
-    {
-        vertex.Position += m_pos;
-    }
-
-    m_indices =
-    {
-        0, 1, 2,
-        2, 3, 0
-    };
-
-    Texture texture;
-    texture.id = TextureFromFile(texture_path.c_str(), "");
-    texture.type = "texture_diffuse";
-    texture.path = texture_path.c_str();
-
-    m_texture = texture;
-
-    setupBillboard();
-}
-
-void Billboard::setupBillboard()
-{
-    glGenVertexArrays(1, &VAO);
-
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    // Vertex Array Buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
-
-    // Element Array Buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
-
-    // Vertex positions
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-    // Vertex texture coords
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
-    // Vertex normals
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-
-    glBindVertexArray(0);
-}
-
-void Billboard::Draw(Shader& shader, glm::vec3 camPos)
-{
-    // Convert local coordinates to world coordinates
-    shader.setMat4("model", m_model_matrix);
-    shader.setMat4("inversed", glm::inverse(m_model_matrix));
-
-    m_model_matrix = glm::mat4(1.0f);
-
-    glActiveTexture(GL_TEXTURE0);
-    shader.setInt("material.texture_diffuse1", 0);
-    glBindTexture(GL_TEXTURE_2D, m_texture.id);
-
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
-
-    glBindVertexArray(0);
-}
-
-void Billboard::translate(glm::vec3 vector)
-{
-    m_model_matrix = glm::translate(m_model_matrix, vector);
-}
-
-void Billboard::scale(glm::vec2 vector)
-{
-    m_model_matrix = glm::scale(m_model_matrix, glm::vec3(vector, 1.0f));
 }
 
 unsigned int TextureFromFile(const char* path, const std::string& directory)

@@ -14,6 +14,7 @@
 
 #include "gl/camera.h"
 #include "gl/model.h"
+#include "gl/billboard.h"
 #include "gl/lights.h"
 #include "gl/shader.h"
 
@@ -46,7 +47,7 @@ DirLight dirLights[] =
         glm::vec3(0.05f, 0.05f, 0.05f),
         glm::vec3(0.4f, 0.4f, 0.4f),
         glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(1.0f, 0.0f, 0.0f)
+        glm::vec3(1.0f, 1.0f, 1.0f)
     ),
     DirLight(
         true,
@@ -55,7 +56,7 @@ DirLight dirLights[] =
         glm::vec3(0.05f, 0.05f, 0.05f),
         glm::vec3(0.4f, 0.4f, 0.4f),
         glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(1.0f, 0.0f, 0.0f)
+        glm::vec3(1.0f, 1.0f, 1.0f)
     )
 };
 
@@ -157,12 +158,12 @@ int main()
     glEnable(GL_DEPTH_TEST);
     // --- //
 
-    Shader shader("res/shaders/default.vert", "res/shaders/default.frag");
+    Shader defaultShader("res/shaders/default.vert", "res/shaders/default.frag");
 
     Model catcube("res/objects/catcube/catcube.obj");
     Model anothercat("res/objects/catcube/catcube.obj");
 
-    Billboard billboard(glm::vec3(10.0f, 10.0f, 10.0f), glm::vec2(5.0f, 5.0f), "res/textures/pepe.png");
+    Billboard billboard(glm::vec3(-3.0f, 5.0f, 0.0f), glm::vec2(5.0f, 5.0f), "res/textures/pepe.png");
 
     // --- Main Loop --- //
     while (!glfwWindowShouldClose(window))
@@ -185,20 +186,20 @@ int main()
 
         processInput(window);
 
-        shader.Activate();
+        defaultShader.Activate();
 
         glm::mat4 proj = glm::perspective(glm::radians(FOV), (float)WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = cam.getViewMatrix();
 
-        shader.setVec3("viewPos", cam.m_pos);
-        shader.setFloat("material.shininess", materialShininess);
+        defaultShader.setVec3("viewPos", cam.m_pos);
+        defaultShader.setFloat("material.shininess", materialShininess);
 
         // --- Rendering Lights' Influence On Objects --- //
         for (unsigned int i = 0; i < IM_ARRAYSIZE(dirLights); i++)
-            dirLights[i].UpdateUni(shader, i);
+            dirLights[i].UpdateUni(defaultShader, i);
 
         for (unsigned int i = 0; i < IM_ARRAYSIZE(pointLights); i++)
-            pointLights[i].UpdateUni(shader, i);
+            pointLights[i].UpdateUni(defaultShader, i);
 
         for (unsigned int i = 0; i < IM_ARRAYSIZE(spotLights); i++)
         {
@@ -207,12 +208,12 @@ int main()
                 spotLights[i].m_pos = cam.m_pos;
                 spotLights[i].m_dir = cam.m_orientation;
             }
-            spotLights[i].UpdateUni(shader, i);
+            spotLights[i].UpdateUni(defaultShader, i);
         }
         // --- //
 
-        shader.setMat4("projection", proj);
-        shader.setMat4("view", view);
+        defaultShader.setMat4("projection", proj);
+        defaultShader.setMat4("view", view);
 
         catcube.translate(glm::vec3(7.0f, 8.0f, 0.0f));
         anothercat.translate(glm::vec3(-5.0f, 2.0f, -8.0f));
@@ -220,10 +221,10 @@ int main()
         catcube.rotate(curFrame * 10, glm::vec3(0.0f, 1.0f, 0.0f));
         anothercat.scale(glm::vec3(0.5f + sin(curFrame), 0.5f + cos(curFrame), 1.0f));
 
-        catcube.Draw(shader);
-        anothercat.Draw(shader);
+        catcube.Draw(defaultShader);
+        anothercat.Draw(defaultShader);
 
-        billboard.Draw(shader, cam.m_pos);
+        billboard.Draw(defaultShader, cam);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -233,7 +234,7 @@ int main()
     // --- //
 
     // --- Cleaning up --- //
-    shader.Delete();
+    defaultShader.Delete();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
