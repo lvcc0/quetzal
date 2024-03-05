@@ -37,7 +37,7 @@ float materialShininess = 32.0f;
 
 Camera cam(WIN_WIDTH, WIN_HEIGHT, glm::vec3(0.0f, 0.0f, 5.0f));
 
-DirLight dirLights[] =
+std::vector<DirLight> dirLights =
 {
     DirLight(
         true,
@@ -59,7 +59,7 @@ DirLight dirLights[] =
     )
 };
 
-PointLight pointLights[] =
+std::vector<PointLight> pointLights =
 {
     PointLight(
         true,
@@ -87,7 +87,7 @@ PointLight pointLights[] =
     )
 };
 
-SpotLight spotLights[] =
+std::vector<SpotLight> spotLights =
 {
     SpotLight(
         true,
@@ -120,6 +120,9 @@ SpotLight spotLights[] =
         glm::vec3(0.0f, 0.0f, 1.0f)
     )
 };
+
+std::vector<Billboard> pointBillboards;
+std::vector<Billboard> spotBillboards;
 
 int main()
 {
@@ -155,12 +158,21 @@ int main()
 
     stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // --- //
+
+    for (unsigned int i = 0; i < pointLights.size(); i++)
+        pointBillboards.push_back(Billboard(pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), "res/textures/lightbulb.png"));
+    
+    for (unsigned int i = 0; i < spotLights.size(); i++)
+        spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), "res/textures/highlight.png"));
 
     Shader defaultShader("res/shaders/default.vert", "res/shaders/default.frag");
 
     Model catcube("res/objects/catcube/catcube.obj");
     Model anothercat("res/objects/catcube/catcube.obj");
+    Model catsphere("res/objects/catsphere/catsphere.obj");
 
     Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), "res/textures/pepe.png");
 
@@ -180,7 +192,7 @@ int main()
         deltaTime = curFrame - lastFrame;
         lastFrame = curFrame;
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         processInput(window);
@@ -193,21 +205,36 @@ int main()
         defaultShader.setVec3("viewPos", cam.m_pos);
         defaultShader.setFloat("material.shininess", materialShininess);
 
-        // --- Rendering Lights' Influence On Objects --- //
-        for (unsigned int i = 0; i < IM_ARRAYSIZE(dirLights); i++)
+        // --- Rendering Lights' Influence On Objects + Billboards --- //
+        for (unsigned int i = 0; i < dirLights.size(); i++)
             dirLights[i].UpdateUni(defaultShader, i);
 
-        for (unsigned int i = 0; i < IM_ARRAYSIZE(pointLights); i++)
+        for (unsigned int i = 0; i < pointLights.size(); i++)
+        {
             pointLights[i].UpdateUni(defaultShader, i);
 
-        for (unsigned int i = 0; i < IM_ARRAYSIZE(spotLights); i++)
+            if (pointLights[i].m_draw_billboard)
+            {
+                pointBillboards[i].Draw(defaultShader, cam.getViewMatrix());
+                pointBillboards[i].m_pos = pointLights[i].m_pos;
+            }
+        }
+
+        for (unsigned int i = 0; i < spotLights.size(); i++)
         {
             if (spotLights[i].m_name == "flashlight")
             {
                 spotLights[i].m_pos = cam.m_pos;
                 spotLights[i].m_dir = cam.m_orientation;
             }
+
             spotLights[i].UpdateUni(defaultShader, i);
+
+            if (spotLights[i].m_draw_billboard && spotLights[i].m_name != "flashlight")
+            {
+                spotBillboards[i].Draw(defaultShader, cam.getViewMatrix());
+                spotBillboards[i].m_pos = spotLights[i].m_pos;
+            }
         }
         // --- //
 
@@ -216,13 +243,17 @@ int main()
 
         catcube.translate(glm::vec3(7.0f, 8.0f, 0.0f));
         anothercat.translate(glm::vec3(-5.0f, 2.0f, -8.0f));
+        catsphere.translate(glm::vec3(4.0f, -2.0f, -2.0f));
+
         billboard.translate(glm::vec3(cos(curFrame) * 3, 0.0f, sin(curFrame) * 3));
 
         catcube.rotate(curFrame * 10, glm::vec3(0.0f, 1.0f, 0.0f));
         anothercat.scale(glm::vec3(0.5f + sin(curFrame), 0.5f + cos(curFrame), 1.0f));
+        catsphere.rotate(curFrame * 50, glm::vec3(0.0f, 1.0f, 0.0f));
 
         catcube.Draw(defaultShader);
         anothercat.Draw(defaultShader);
+        catsphere.Draw(defaultShader);
 
         billboard.Draw(defaultShader, cam.getViewMatrix());
 
@@ -286,7 +317,7 @@ void showGuiWindow()
 
         if (ImGui::BeginCombo("Source", dirLights[dirComboItem]))
         {
-            for (int i = 0; i < IM_ARRAYSIZE(dirLights); i++)
+            for (int i = 0; i < dirLights.size(); i++)
             {
                 const bool is_selected = (dirComboItem == i);
                 if (ImGui::Selectable(dirLights[i], is_selected))
@@ -318,7 +349,7 @@ void showGuiWindow()
 
         if (ImGui::BeginCombo("Source", pointLights[pointComboItem]))
         {
-            for (int i = 0; i < IM_ARRAYSIZE(pointLights); i++)
+            for (int i = 0; i < pointLights.size(); i++)
             {
                 const bool is_selected = (pointComboItem == i);
                 if (ImGui::Selectable(pointLights[i], is_selected))
@@ -331,6 +362,7 @@ void showGuiWindow()
         }
 
         ImGui::Checkbox("Enabled", &pointLights[pointComboItem].m_enabled);
+        ImGui::Checkbox("Billboard", &pointLights[pointComboItem].m_draw_billboard);
         ImGui::DragFloat3("Position", (float*)&pointLights[pointComboItem].m_pos, 0.1f);
 
         ImGui::Separator();
@@ -355,7 +387,7 @@ void showGuiWindow()
 
         if (ImGui::BeginCombo("Source", spotLights[spotComboItem]))
         {
-            for (int i = 0; i < IM_ARRAYSIZE(spotLights); i++)
+            for (int i = 0; i < spotLights.size(); i++)
             {
                 const bool is_selected = (spotComboItem == i);
                 if (ImGui::Selectable(spotLights[i], is_selected))
@@ -368,6 +400,7 @@ void showGuiWindow()
         }
 
         ImGui::Checkbox("Enabled", &spotLights[spotComboItem].m_enabled);
+        ImGui::Checkbox("Billboard", &spotLights[spotComboItem].m_draw_billboard);
 
         if (spotLights[spotComboItem].m_name != "flashlight")
         {
