@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stb/stb_image.h>
+#include <stb_image/stb_image.h>
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -12,11 +12,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "gl/camera.h"
-#include "gl/model.h"
-#include "gl/billboard.h"
-#include "gl/lights.h"
-#include "gl/shader.h"
+#include "camera.h"
+#include "model.h"
+#include "billboard.h"
+#include "lights.h"
+#include "shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -163,18 +163,18 @@ int main()
     // --- //
 
     for (unsigned int i = 0; i < pointLights.size(); i++)
-        pointBillboards.push_back(Billboard(pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), "res/textures/lightbulb.png"));
+        pointBillboards.push_back(Billboard(pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), RES_PATH "textures/lightbulb.png"));
     
     for (unsigned int i = 0; i < spotLights.size(); i++)
-        spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), "res/textures/highlight.png"));
+        spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), RES_PATH "textures/highlight.png"));
 
-    Shader defaultShader("res/shaders/default.vert", "res/shaders/default.frag");
+    Shader defaultShader(RES_PATH "shaders/default.vert", RES_PATH "shaders/default.frag");
 
-    Model catcube("res/objects/catcube/catcube.obj");
-    Model anothercat("res/objects/catcube/catcube.obj");
-    Model catsphere("res/objects/catsphere/catsphere.obj");
+    Model catcube(RES_PATH "objects/catcube/catcube.obj");
+    Model anothercat(RES_PATH "objects/catcube/catcube.obj");
+    Model catsphere(RES_PATH "objects/catsphere/catsphere.obj");
 
-    Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), "res/textures/pepe.png");
+    Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), RES_PATH "textures/pepe.png");
 
     // --- Main Loop --- //
     while (!glfwWindowShouldClose(window))

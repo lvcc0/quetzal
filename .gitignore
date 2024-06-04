@@ -1,14 +1,9 @@
-# Visual Studio
 .vs/
-gl-learning.sln
-gl-learning.vcxproj
-gl-learning.vcxproj.filters
-gl-learning.vcxproj.user
-
-# External libs and stuff
-Libraries/
 x64/
-glad.c
-stb.cpp
+out/
+bin/
+build/
+
+CMakeSettings.json
 imgui.ini
 *.dll
