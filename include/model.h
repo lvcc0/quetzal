@@ -53,7 +53,7 @@ public:
     Model(std::string const& path);
     
     // Draw model
-    void Draw(Shader& shader);
+    void Draw(std::shared_ptr<Shader> shader);
 
     // Moving in world space
     void translate(glm::vec3 vector);

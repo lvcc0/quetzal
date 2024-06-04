@@ -10,14 +10,12 @@
 #include <iostream>
 #include <cerrno>
 
-std::string get_file_contents(const char* filename);
-
 class Shader
 {
 public:
 	GLuint ID;
 
-	Shader(const char* vShaderFile, const char* fShaderFile);
+	Shader(std::string vertexCode, std::string fragmentCode);
 
 	void setBool(const std::string& name, bool value);
 	void setInt(const std::string& name, int value);

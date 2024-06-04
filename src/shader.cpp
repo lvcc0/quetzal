@@ -1,28 +1,8 @@
 #include "shader.h"
 
-std::string get_file_contents(const char* filename)
+
+Shader::Shader(std::string vertexCode, std::string fragmentCode)
 {
-	std::ifstream in(filename, std::ios::binary | std::ios::ate);
-	if (in)
-	{
-		std::string contents;
-
-		contents.resize(in.tellg());
-		in.seekg(0, std::ios::beg);
-
-		in.read(&contents[0], contents.size());
-		in.close();
-		
-		return(contents);
-	}
-	throw(errno);
-}
-
-Shader::Shader(const char* vShaderFile, const char* fShaderFile)
-{
-	std::string vertexCode = get_file_contents(vShaderFile);
-	std::string fragmentCode = get_file_contents(fShaderFile);
-
 	const char* vShaderSrc = vertexCode.c_str();
 	const char* fShaderSrc = fragmentCode.c_str();
 

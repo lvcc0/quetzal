@@ -30,7 +30,7 @@ public:
     Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_path);
 
     // Draw billboard + update transform matrix
-    void Draw(Shader& shader, glm::mat4 viewMatrix);
+    void Draw(std::shared_ptr<Shader> shader, glm::mat4 viewMatrix);
 
     // moving in world space
     void translate(glm::vec3 vector);

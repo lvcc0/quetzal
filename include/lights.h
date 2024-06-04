@@ -35,7 +35,7 @@ public:
         m_color(color) { /* empty */ }
 
     // Updates all corresponging fragment shader uniforms
-    void UpdateUni(Shader& shader, int index);
+    void UpdateUni(std::shared_ptr<Shader> shader, int index);
 
     // (const char*) cast operator
     operator const char* () { return m_name; }
@@ -73,7 +73,7 @@ public:
         m_color(color) { /* empty */ }
 
     // Updates all corresponging fragment shader uniforms
-    void UpdateUni(Shader& shader, int index);
+    void UpdateUni(std::shared_ptr<Shader> shader, int index);
 
     // (const char*) cast operator
     operator const char* () { return m_name; }
@@ -120,7 +120,7 @@ public:
         m_color(color) { /* empty */ }
 
     // Updates all corresponging fragment shader uniforms
-    void UpdateUni(Shader& shader, int index);
+    void UpdateUni(std::shared_ptr<Shader> shader, int index);
 
     // (const char*) cast operator
     operator const char* () { return m_name; }

@@ -6,7 +6,7 @@ Model::Model(std::string const& path)
     setupModel();    // setup VAO, VBO, EBO
 }
 
-void Model::Draw(Shader& shader)
+void Model::Draw(std::shared_ptr<Shader> shader)
 {
     unsigned int diffuseNum = 1;
     unsigned int specularNum = 1;
@@ -24,15 +24,15 @@ void Model::Draw(Shader& shader)
         else if (name == "texture_specular")
             number = std::to_string(specularNum++);
 
-        shader.setInt(("material." + name + number).c_str(), i);
+        shader->setInt(("material." + name + number).c_str(), i);
         glBindTexture(GL_TEXTURE_2D, m_textures[i].ID);
     }
 
     glActiveTexture(GL_TEXTURE0);
 
     // Convert local coordinates to world coordinates
-    shader.setMat4("model", m_model_matrix);
-    shader.setMat4("inversed", glm::inverse(m_model_matrix));
+    shader->setMat4("model", m_model_matrix);
+    shader->setMat4("inversed", glm::inverse(m_model_matrix));
 
     m_model_matrix = glm::mat4(1.0f);
 

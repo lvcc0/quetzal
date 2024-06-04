@@ -56,7 +56,7 @@ void Billboard::updateBuffers()
     glBindVertexArray(0);
 }
 
-void Billboard::Draw(Shader& shader, glm::mat4 viewMatrix)
+void Billboard::Draw(std::shared_ptr<Shader> shader, glm::mat4 viewMatrix)
 {
     // update vertices positions based on camera rotation (up and right vectors)
     for (unsigned int i = 0; i < m_vertices.size(); i++)
@@ -66,14 +66,14 @@ void Billboard::Draw(Shader& shader, glm::mat4 viewMatrix)
 
     updateBuffers();
 
-    shader.setInt("material.texture_diffuse1", 0);
+    shader->setInt("material.texture_diffuse1", 0);
     glBindTexture(GL_TEXTURE_2D, m_texture.ID);
 
     glActiveTexture(GL_TEXTURE0);
 
     // Convert local coordinates to world coordinates
-    shader.setMat4("model", m_model_matrix);
-    shader.setMat4("inversed", glm::inverse(m_model_matrix));
+    shader->setMat4("model", m_model_matrix);
+    shader->setMat4("inversed", glm::inverse(m_model_matrix));
 
     m_model_matrix = glm::mat4(1.0f);
 
