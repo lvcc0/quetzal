@@ -1,5 +1,4 @@
 #include "resource_manager.h"
-#include "resource_manager.h"
 
 
 /*init res object, put full path to res folder into variable*/
