@@ -1,10 +1,5 @@
 #include "debugger.h"
 
-Debugger::Debugger()
-{
-    
-}
-
 long Debugger::getPrivateWorkingSet(const wchar_t* process)
 {
     PDH_HQUERY query;
