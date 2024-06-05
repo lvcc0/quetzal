@@ -18,6 +18,7 @@
 #include "lights.h"
 #include "shader.h"
 #include "resource_manager.h"
+#include "debugger.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -168,6 +169,8 @@ int main()
     
     for (unsigned int i = 0; i < spotLights.size(); i++)
         spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), RES_PATH "textures/highlight.png"));
+
+    Debugger debugger;
 
     ResourceManager resourceManager(RES_PATH);
     auto defaultShader = resourceManager.make_shader_program("default_shader", "shaders/default.vert", "shaders/default.frag");
