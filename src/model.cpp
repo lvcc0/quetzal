@@ -1,8 +1,9 @@
 #include "model.h"
 
-Model::Model(std::string const& path)
+Model::Model(const std::string& objfile, const std::vector<std::shared_ptr<Texture>>& m_textures)
 {
-    loadModel(path); // read obj file
+    //loadModel(objfile); // obj file
+    this->m_textures = m_textures; // taking from mtl file
     setupModel();    // setup VAO, VBO, EBO
 }
 
@@ -17,7 +18,7 @@ void Model::Draw(std::shared_ptr<Shader> shader)
         glActiveTexture(GL_TEXTURE0 + i);
 
         std::string number;
-        std::string name = m_textures[i].Type;
+        std::string name = m_textures[i]->Type;
 
         if (name == "texture_diffuse")
             number = std::to_string(diffuseNum++);
@@ -25,7 +26,7 @@ void Model::Draw(std::shared_ptr<Shader> shader)
             number = std::to_string(specularNum++);
 
         shader->setInt(("material." + name + number).c_str(), i);
-        glBindTexture(GL_TEXTURE_2D, m_textures[i].ID);
+        glBindTexture(GL_TEXTURE_2D, m_textures[i]->ID);
     }
 
     glActiveTexture(GL_TEXTURE0);
@@ -85,15 +86,14 @@ void Model::setupModel()
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
 
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+
     glBindVertexArray(0);
 }
 
-void Model::loadModel(std::string const& path)
+void Model::loadModel(std::ifstream file)
 {
-    m_directory = path.substr(0, path.find_last_of('/'));
-
-    std::ifstream file(path);
-
     std::vector<glm::vec3> positions;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> texCoords;
@@ -110,12 +110,6 @@ void Model::loadModel(std::string const& path)
 
         if (linetype ==  "#") // comment
             continue;
-
-        if (linetype == "mtllib") // material file
-        {
-            std::istringstream v(line.substr(line.find(" ") + 1));
-            loadMaterial(v.str());
-        }
 
         if (linetype == "o") // object (mesh)
         {
@@ -195,80 +189,4 @@ void Model::loadModel(std::string const& path)
             }
         }
     }
-}
-
-void Model::loadMaterial(std::string const& path)
-{
-    std::ifstream file(m_directory + '/' + path);
-    std::string line;
-
-    while (std::getline(file, line))
-    {
-        std::string linetype = line.substr(0, line.find(" "));
-
-        if (linetype == "map_Kd")
-        {
-            std::string str = line.substr(line.find(" ") + 1);
-            bool skip = false;
-            
-            for (unsigned int j = 0; j < m_textures_loaded.size(); j++)
-            {
-                if (std::strcmp(m_textures_loaded[j].Path.data(), str.c_str()) == 0)
-                {
-                    m_textures.push_back(m_textures_loaded[j]);
-                    skip = true;
-                    break;
-                }
-            }
-
-            if (!skip)
-            {
-                Texture texture;
-                texture.ID = TextureFromFile(str.c_str(), m_directory);
-                texture.Type = "texture_diffusal";
-                texture.Path = str.c_str();
-
-                m_textures.push_back(texture);
-                m_textures_loaded.push_back(texture);
-            }
-        }
-    }
-}
-
-unsigned int TextureFromFile(const char* path, const std::string& directory)
-{
-    std::string filename = !directory.empty() ? directory + '/' + path : path;
-
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, numComponents;
-    unsigned char* bytes = stbi_load(filename.c_str(), &width, &height, &numComponents, 0);
-
-    if (bytes)
-    {
-        GLenum format;
-
-        if (numComponents == 1)
-            format = GL_RED;
-        else if (numComponents == 3)
-            format = GL_RGB;
-        else if (numComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, bytes);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    }
-    else
-        std::cout << "Texture failed to load at: " << path << std::endl;
-
-    stbi_image_free(bytes);
-    return textureID;
 }

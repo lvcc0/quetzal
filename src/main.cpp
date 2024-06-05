@@ -163,23 +163,23 @@ int main()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // --- //
+    ResourceManager resourceManager(RES_PATH);
 
     for (unsigned int i = 0; i < pointLights.size(); i++)
-        pointBillboards.push_back(Billboard(pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), RES_PATH "textures/lightbulb.png"));
+        pointBillboards.push_back(Billboard(pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), resourceManager.make_texture_from_jpg("lightbulb", "texture_diffusal", "textures/lightbulb.png")));
     
     for (unsigned int i = 0; i < spotLights.size(); i++)
-        spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), RES_PATH "textures/highlight.png"));
+        spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), resourceManager.make_texture_from_jpg("highlight", "texture_diffusal", "textures/highlight.png")));
 
     Debugger debugger;
 
-    ResourceManager resourceManager(RES_PATH);
     auto defaultShader = resourceManager.make_shader_program("default_shader", "shaders/default.vert", "shaders/default.frag");
 
     auto catcube = resourceManager.make_model("catcube", "objects/catcube/catcube.obj");
     auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
     auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
 
-    Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), RES_PATH "textures/pepe.png");
+    Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), resourceManager.make_texture_from_jpg("pepe", "none", "textures/pepe.png"));
 
     // --- Main Loop --- //
     while (!glfwWindowShouldClose(window))

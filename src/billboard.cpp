@@ -1,8 +1,9 @@
 #include "billboard.h"
 
-Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_path) :
+Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture) :
     m_pos(pos), m_size(size)
 {
+    this->m_texture = texture;
     m_local_vertices =
     {
         Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // upper left
@@ -18,10 +19,6 @@ Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_p
     };
 
     m_vertices = m_local_vertices;
-
-    m_texture.ID = TextureFromFile(texture_path.c_str(), "");
-    m_texture.Type = "texture_diffuse";
-    m_texture.Path = texture_path.c_str();
 
     updateBuffers();
 }
@@ -67,7 +64,7 @@ void Billboard::Draw(std::shared_ptr<Shader> shader, glm::mat4 viewMatrix)
     updateBuffers();
 
     shader->setInt("material.texture_diffuse1", 0);
-    glBindTexture(GL_TEXTURE_2D, m_texture.ID);
+    glBindTexture(GL_TEXTURE_2D, m_texture->ID);
 
     glActiveTexture(GL_TEXTURE0);
 
