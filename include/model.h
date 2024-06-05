@@ -40,7 +40,7 @@ public:
     std::vector<std::shared_ptr<Texture>> m_textures;
 
     // Constructor
-    Model(const std::string& objfile, const std::vector<std::shared_ptr<Texture>>& m_textures);
+    Model(std::ifstream& objfile, const std::vector<std::shared_ptr<Texture>>& m_textures);
     
     // Draw model
     void Draw(std::shared_ptr<Shader> shader);
@@ -54,7 +54,7 @@ private:
     unsigned int VAO, VBO, EBO;
 
     // works on obj file
-    void loadModel(std::ifstream file);
+    void loadModel(std::ifstream& file);
     
     // Setup VAO, VBO, EBO
     void setupModel();

@@ -1,8 +1,8 @@
 #include "model.h"
 
-Model::Model(const std::string& objfile, const std::vector<std::shared_ptr<Texture>>& m_textures)
+Model::Model(std::ifstream& objfile, const std::vector<std::shared_ptr<Texture>>& m_textures)
 {
-    //loadModel(objfile); // obj file
+    loadModel(objfile); // obj file
     this->m_textures = m_textures; // taking from mtl file
     setupModel();    // setup VAO, VBO, EBO
 }
@@ -92,8 +92,14 @@ void Model::setupModel()
     glBindVertexArray(0);
 }
 
-void Model::loadModel(std::ifstream file)
-{
+void Model::loadModel(std::ifstream& file)
+{   
+    /*It works*/
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::cout << buffer.str();
+    /*-----------*/
+
     std::vector<glm::vec3> positions;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> texCoords;

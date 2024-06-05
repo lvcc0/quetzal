@@ -91,8 +91,9 @@ std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::
 
     std::string line;
     std::vector<std::shared_ptr<Texture>> m_textures;
-	std::stringstream buffer;
-	buffer << auxobjfile.rdbuf();
+
+	/*std::stringstream buffer;
+	buffer << auxobjfile.rdbuf();*/
 
 	/*searching for mtl file*/
     while (std::getline(objfile, line))
@@ -106,7 +107,7 @@ std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::
         }
     }
 	/*-------------------------------------------*/
-	std::shared_ptr<Model>& retmodel = std::make_shared<Model>(buffer.str(), m_textures);
+	std::shared_ptr<Model>& retmodel = std::make_shared<Model>(auxobjfile, m_textures);
 	modelMap.emplace(name, retmodel);
 
 	return retmodel;
