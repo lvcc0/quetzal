@@ -4,9 +4,9 @@ Model::Model(std::vector<Vertex> vertices,
              std::vector<unsigned int> indices,
              std::vector<std::shared_ptr<Texture>>& textures)
 {
-    m_vertices = vertices;
-    m_indices = indices;
-    this->m_textures = textures;
+    m_vertices.swap(vertices);
+    m_indices.swap(indices);
+    m_textures = textures;
 
     setupModel(); // setup VAO, VBO, EBO
 }
@@ -23,7 +23,7 @@ void Model::Draw(std::shared_ptr<Shader>& shader)
 
         std::string number;
         std::string name = m_textures[i]->m_type;
-
+        
         if (name == "texture_diffuse")
             number = std::to_string(diffuseNum++);
         else if (name == "texture_specular")
@@ -87,9 +87,6 @@ void Model::setupModel()
     // Vertex normals
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
 
     glBindVertexArray(0);
 }

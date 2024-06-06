@@ -51,10 +51,8 @@ public:
     void rotate(float degrees, glm::vec3 vector);
 
 private:
-    GLuint VAO;
-    GLuint VBO;
-    GLuint EBO;
-    
+    GLuint VAO, VBO, EBO;
+
     // Setup VAO, VBO, EBO
     void setupModel();
 };

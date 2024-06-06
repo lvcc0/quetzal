@@ -53,7 +53,7 @@ void Billboard::updateBuffers()
     glBindVertexArray(0);
 }
 
-void Billboard::Draw(std::shared_ptr<Shader> shader, glm::mat4 viewMatrix)
+void Billboard::Draw(std::shared_ptr<Shader>& shader, glm::mat4 viewMatrix)
 {
     // update vertices positions based on camera rotation (up and right vectors)
     for (unsigned int i = 0; i < m_vertices.size(); i++)
@@ -61,7 +61,7 @@ void Billboard::Draw(std::shared_ptr<Shader> shader, glm::mat4 viewMatrix)
         + glm::vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]) * m_local_vertices[i].Position.x
         + glm::vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]) * m_local_vertices[i].Position.y;
 
-    updateBuffers();
+    updateBuffers(); // TODO: memory leak here!
 
     shader->setInt("material.texture_diffuse1", 0);
     glBindTexture(GL_TEXTURE_2D, m_texture->ID);

@@ -84,14 +84,16 @@ std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::
     std::vector<std::shared_ptr<Texture>> textures;
 
     std::vector<glm::vec3> positions;
-    std::vector<glm::vec3> normals;
     std::vector<glm::vec2> texCoords;
+    std::vector<glm::vec3> normals;
 
     std::vector<std::string> triplets; // vector for face vertices ("v/vt/vn")
     glm::vec3 vector3;                 // vec3 for v, vn
     glm::vec2 vector2;                 // vec2 for vt
 
     std::string line;
+
+    // TODO: do something like reserve() or similar with these big ass vectors
 
     while (std::getline(file, line))
     {

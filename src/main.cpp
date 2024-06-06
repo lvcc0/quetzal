@@ -214,7 +214,7 @@ int main()
         for (unsigned int i = 0; i < dirLights.size(); i++)
             dirLights[i].UpdateUni(defaultShader, i);
 
-        for (unsigned int i = 0; i < pointLights.size(); i++)
+        for (auto i = 0; i < pointLights.size(); i++)
         {
             pointLights[i].UpdateUni(defaultShader, i);
 
@@ -225,7 +225,7 @@ int main()
             }
         }
 
-        for (unsigned int i = 0; i < spotLights.size(); i++)
+        for (auto i = 0; i < spotLights.size(); i++)
         {
             if (spotLights[i].m_name == "flashlight")
             {
