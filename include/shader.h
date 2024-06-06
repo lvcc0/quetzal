@@ -1,5 +1,4 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -29,8 +28,7 @@ public:
 
 	void Activate();
 	void Delete();
+
 private:
 	void compileErrors(unsigned int shader, const char* type);
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef LIGHTS_H
-#define LIGHTS_H
+#pragma once
 
 #include <sstream>
 
@@ -29,7 +28,7 @@ public:
     // Constructor
     DirLight( bool enabled, const char* name, glm::vec3 dir,
               glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
-              glm::vec3 color) :
+              glm::vec3 color ) :
         m_enabled(enabled), m_name(name), m_dir(dir),
         m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
         m_color(color) { /* empty */ }
@@ -128,5 +127,3 @@ public:
 private:
     void enableBillboard();
 };
-
-#endif

@@ -27,7 +27,7 @@ Shader::Shader(std::string vertexCode, std::string fragmentCode)
 	compileErrors(ID, "PROGRAM");
 
 	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	glDeleteShader(fragmentShader);	
 }
 
 void Shader::Activate()

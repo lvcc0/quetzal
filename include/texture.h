@@ -1,13 +1,17 @@
 #pragma once
+
 #include <string>
-#include<iostream>
+#include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-class Texture {
+class Texture
+{
 public:
     unsigned int ID;
-    std::string Type;
+    std::string m_type;
 
-    Texture(std::string type, unsigned char* image, const int& width, const int& height, const int& numComponents);
+    // Constructor
+    Texture(std::string type, unsigned char* image, int width, int height, int numComponents);
 };

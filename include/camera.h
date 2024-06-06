@@ -1,5 +1,4 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -39,5 +38,3 @@ public:
 	// Updates camera's width and height
 	void UpdateSize(int w, int h);
 };
-
-#endif

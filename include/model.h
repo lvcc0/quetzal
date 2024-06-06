@@ -1,5 +1,4 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -36,14 +35,15 @@ public:
 
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
-
     std::vector<std::shared_ptr<Texture>> m_textures;
 
     // Constructor
-    Model(std::ifstream& objfile, const std::vector<std::shared_ptr<Texture>>& m_textures);
+    Model(std::vector<Vertex> vertices,
+          std::vector<unsigned int> indices,
+          std::vector<std::shared_ptr<Texture>>& textures);
     
     // Draw model
-    void Draw(std::shared_ptr<Shader> shader);
+    void Draw(std::shared_ptr<Shader>& shader);
 
     // Moving in world space
     void translate(glm::vec3 vector);
@@ -51,13 +51,10 @@ public:
     void rotate(float degrees, glm::vec3 vector);
 
 private:
-    unsigned int VAO, VBO, EBO;
-
-    // works on obj file
-    void loadModel(std::ifstream& file);
+    GLuint VAO;
+    GLuint VBO;
+    GLuint EBO;
     
     // Setup VAO, VBO, EBO
     void setupModel();
 };
-
-#endif

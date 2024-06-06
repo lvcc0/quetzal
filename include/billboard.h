@@ -1,5 +1,4 @@
-#ifndef BILLBOARD_H
-#define BILLBOARD_H
+#pragma once
 
 #include <glad/glad.h>
 #include <stb_image/stb_image.h>
@@ -43,5 +42,3 @@ private:
     // Setup VAO, VBO, EBO
     void updateBuffers();
 };
-
-#endif
