@@ -19,6 +19,7 @@
 #include "shader.h"
 #include "resource_manager.h"
 #include "debugger.h"
+#include "post_processing.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -160,7 +161,11 @@ int main()
 
     stbi_set_flip_vertically_on_load(true);
 
+    // Depth test
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    // idk how to summarize this
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

@@ -6,6 +6,8 @@ Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> tex
     this->m_size = size;
     this->m_texture = texture;
 
+    // TODO: with culling back faces billboards aren`t working, except changing glFrontFace(GL_CCW) to glFrontFace(CW)
+    // It means that billboard considered as back face
     m_vertices =
     {
         Vertex(glm::vec3(0.0f, -m_size[0] / 2.0f,  m_size[1] / 2.0f), glm::vec2(0.0f,  1.0f), glm::vec3(-1.0f, 0.0f, 0.0f)), // upper left
