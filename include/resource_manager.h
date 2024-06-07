@@ -42,7 +42,7 @@ public:
 	std::shared_ptr<Model> make_model(std::string name, const std::string& model_rel_path);
 
 	// Print objects in maps
-	void ResourceManager::getObjectsInMaps(ObjectType objectType);
+	void getObjectsInMaps(ObjectType objectType);
 private:
 	std::string relResPath; // full path to res directory
 

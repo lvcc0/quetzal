@@ -159,18 +159,20 @@ int main()
     ImGui_ImplOpenGL3_Init();
 
     stbi_set_flip_vertically_on_load(true);
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    /*set stencil shader*/
+    // Stencil shader
     glEnable(GL_STENCIL);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    /*Culling faces*/
+    // Culling faces
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
+
     // --- //
 
     ResourceManager resourceManager(RES_PATH);
@@ -188,7 +190,7 @@ int main()
     auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
     auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
 
-    Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), resourceManager.make_texture("pepe", "none", "textures/pepe.png"));
+    Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), resourceManager.make_texture("pepe", "texture_diffuse", "textures/pepe.png"));
     
     resourceManager.getObjectsInMaps(ObjectType::TEXTURE);
 
@@ -231,7 +233,7 @@ int main()
 
             if (pointLights[i].m_draw_billboard)
             {
-                pointBillboards[i].Draw(defaultShader, cam.getViewMatrix());
+                pointBillboards[i].Draw(defaultShader, cam.m_pos);
                 pointBillboards[i].m_pos = pointLights[i].m_pos;
             }
         }
@@ -248,7 +250,7 @@ int main()
 
             if (spotLights[i].m_draw_billboard && spotLights[i].m_name != "flashlight")
             {
-                spotBillboards[i].Draw(defaultShader, cam.getViewMatrix());
+                spotBillboards[i].Draw(defaultShader, cam.m_pos);
                 spotBillboards[i].m_pos = spotLights[i].m_pos;
             }
         }
@@ -271,7 +273,7 @@ int main()
         anothercat->Draw(defaultShader);
         catsphere->Draw(defaultShader);
 
-        billboard.Draw(defaultShader, cam.getViewMatrix());
+        billboard.Draw(defaultShader, cam.m_pos);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

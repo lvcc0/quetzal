@@ -1,15 +1,17 @@
 #include "billboard.h"
 
-Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture) :
-    m_pos(pos), m_size(size)
+Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture)
 {
+    this->m_pos = pos;
+    this->m_size = size;
     this->m_texture = texture;
-    m_local_vertices =
+
+    m_vertices =
     {
-        Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // upper left
-        Vertex(glm::vec3(-m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // lower left
-        Vertex(glm::vec3( m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // lower right
-        Vertex(glm::vec3( m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // upper right
+        Vertex(glm::vec3(0.0f, -m_size[0] / 2.0f,  m_size[1] / 2.0f), glm::vec2(0.0f,  1.0f), glm::vec3(-1.0f, 0.0f, 0.0f)), // upper left
+        Vertex(glm::vec3(0.0f, -m_size[0] / 2.0f, -m_size[1] / 2.0f), glm::vec2(0.0f,  0.0f), glm::vec3(-1.0f, 0.0f, 0.0f)), // lower left
+        Vertex(glm::vec3(0.0f,  m_size[0] / 2.0f, -m_size[1] / 2.0f), glm::vec2(1.0f,  0.0f), glm::vec3(-1.0f, 0.0f, 0.0f)), // lower right
+        Vertex(glm::vec3(0.0f,  m_size[0] / 2.0f,  m_size[1] / 2.0f), glm::vec2(1.0f,  1.0f), glm::vec3(-1.0f, 0.0f, 0.0f)), // upper right
     };
 
     m_indices =
@@ -18,12 +20,10 @@ Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> tex
         2, 3, 0
     };
 
-    m_vertices = m_local_vertices;
-
-    updateBuffers();
+    setupBillboard();
 }
 
-void Billboard::updateBuffers()
+void Billboard::setupBillboard()
 {
     glGenVertexArrays(1, &VAO);
 
@@ -53,15 +53,20 @@ void Billboard::updateBuffers()
     glBindVertexArray(0);
 }
 
-void Billboard::Draw(std::shared_ptr<Shader>& shader, glm::mat4 viewMatrix)
+void Billboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 player_pos)
 {
-    // update vertices positions based on camera rotation (up and right vectors)
-    for (unsigned int i = 0; i < m_vertices.size(); i++)
-        m_vertices[i].Position = m_pos
-        + glm::vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]) * m_local_vertices[i].Position.x
-        + glm::vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]) * m_local_vertices[i].Position.y;
+    glm::vec3 dir_from_player = m_pos - player_pos;
+    float distance2D = glm::sqrt(dir_from_player.x * dir_from_player.x + dir_from_player.y * dir_from_player.y);
 
-    updateBuffers(); // TODO: memory leak here!
+    float theta = glm::atan(dir_from_player.y, dir_from_player.x); // x, y
+    float phi = glm::atan(-dir_from_player.z, distance2D);         // z, distance
+
+    // this math doesn't work now (apparently it shows the back of the billboard)
+    // can't use transforms outside of here
+
+    m_model_matrix = glm::mat4(1.0f);
+    m_model_matrix = glm::translate(m_model_matrix, m_pos);
+    m_model_matrix = m_model_matrix * glm::eulerAngleXYZ(0.0f, 0.0f, theta) * glm::eulerAngleXYZ(0.0f, phi, 0.0f);
 
     shader->setInt("material.texture_diffuse1", 0);
     glBindTexture(GL_TEXTURE_2D, m_texture->ID);
@@ -71,8 +76,6 @@ void Billboard::Draw(std::shared_ptr<Shader>& shader, glm::mat4 viewMatrix)
     // Convert local coordinates to world coordinates
     shader->setMat4("model", m_model_matrix);
     shader->setMat4("inversed", glm::inverse(m_model_matrix));
-
-    m_model_matrix = glm::mat4(1.0f);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
