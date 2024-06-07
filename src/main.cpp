@@ -162,6 +162,11 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    /*set stencil shader*/
+    glEnable(GL_STENCIL);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
     /*Culling faces*/
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -184,6 +189,8 @@ int main()
     auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
 
     Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), resourceManager.make_texture("pepe", "none", "textures/pepe.png"));
+    
+    resourceManager.getObjectsInMaps(ObjectType::TEXTURE);
 
     // --- Main Loop --- //
     while (!glfwWindowShouldClose(window))
@@ -202,7 +209,7 @@ int main()
         lastFrame = curFrame;
 
         glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         processInput(window);
 

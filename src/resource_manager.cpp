@@ -192,3 +192,28 @@ std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::
 
 	return model;
 }
+
+void ResourceManager::getObjectsInMaps(ObjectType objectType)
+{
+    if (objectType == ObjectType::SHADER) {
+        std::map<std::string, std::shared_ptr<Shader>>::iterator iter = shaderMap.begin();
+        while (iter != shaderMap.end()) {
+            std::cerr << "shader " << iter->first << " with id " << iter->second->ID << std::endl;
+            iter++;
+        }
+    }
+    else if (objectType == ObjectType::TEXTURE) {
+        std::map<std::string, std::shared_ptr<Texture>>::iterator iter = textureMap.begin();
+        while (iter != textureMap.end()) {
+            std::cerr << "texture " << iter->first << " with id " << iter->second->ID << std::endl;
+            iter++;
+        }
+    }
+    else if (objectType == ObjectType::MODEL) {
+        std::map<std::string, std::shared_ptr<Model>>::iterator iter = modelMap.begin();
+        while (iter != modelMap.end()) {
+            std::cerr << "model " << iter->first << std::endl;
+            iter++;
+        }
+    }
+}

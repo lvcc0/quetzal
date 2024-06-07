@@ -15,6 +15,7 @@
 #include "shader.h"
 #include "model.h"
 
+enum class ObjectType{SHADER, TEXTURE, MODEL};
 
 class ResourceManager
 {
@@ -40,6 +41,8 @@ public:
 	std::shared_ptr<Texture> make_texture(std::string name, std::string type, const std::string& texture_rel_path);
 	std::shared_ptr<Model> make_model(std::string name, const std::string& model_rel_path);
 
+	// Print objects in maps
+	void ResourceManager::getObjectsInMaps(ObjectType objectType);
 private:
 	std::string relResPath; // full path to res directory
 
