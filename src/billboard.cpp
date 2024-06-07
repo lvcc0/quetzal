@@ -1,8 +1,9 @@
 #include "billboard.h"
 
-Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_path) :
+Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture) :
     m_pos(pos), m_size(size)
 {
+    this->m_texture = texture;
     m_local_vertices =
     {
         Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // upper left
@@ -18,10 +19,6 @@ Billboard::Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_p
     };
 
     m_vertices = m_local_vertices;
-
-    m_texture.ID = TextureFromFile(texture_path.c_str(), "");
-    m_texture.Type = "texture_diffuse";
-    m_texture.Path = texture_path.c_str();
 
     updateBuffers();
 }
@@ -56,7 +53,7 @@ void Billboard::updateBuffers()
     glBindVertexArray(0);
 }
 
-void Billboard::Draw(Shader& shader, glm::mat4 viewMatrix)
+void Billboard::Draw(std::shared_ptr<Shader>& shader, glm::mat4 viewMatrix)
 {
     // update vertices positions based on camera rotation (up and right vectors)
     for (unsigned int i = 0; i < m_vertices.size(); i++)
@@ -64,16 +61,16 @@ void Billboard::Draw(Shader& shader, glm::mat4 viewMatrix)
         + glm::vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]) * m_local_vertices[i].Position.x
         + glm::vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]) * m_local_vertices[i].Position.y;
 
-    updateBuffers();
+    updateBuffers(); // TODO: memory leak here!
 
-    shader.setInt("material.texture_diffuse1", 0);
-    glBindTexture(GL_TEXTURE_2D, m_texture.ID);
+    shader->setInt("material.texture_diffuse1", 0);
+    glBindTexture(GL_TEXTURE_2D, m_texture->ID);
 
     glActiveTexture(GL_TEXTURE0);
 
     // Convert local coordinates to world coordinates
-    shader.setMat4("model", m_model_matrix);
-    shader.setMat4("inversed", glm::inverse(m_model_matrix));
+    shader->setMat4("model", m_model_matrix);
+    shader->setMat4("inversed", glm::inverse(m_model_matrix));
 
     m_model_matrix = glm::mat4(1.0f);
 

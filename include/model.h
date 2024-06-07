@@ -1,5 +1,4 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -17,6 +16,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "shader.h"
+#include "texture.h"
 
 struct Vertex {
     glm::vec3 Position;
@@ -28,32 +28,22 @@ struct Vertex {
         Position(pos), TexCoord(texCoord), Normal(norm) { /* empty */ }
 };
 
-struct Texture {
-    unsigned int ID;
-    std::string Type;
-    std::string Path;
-};
-
-unsigned int TextureFromFile(const char* path, const std::string& directory);
-
 class Model
 {
 public:
-    std::string m_directory;
-    
     glm::mat4 m_model_matrix = glm::mat4(1.0f);
 
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
-
-    std::vector<Texture> m_textures;
-    std::vector<Texture> m_textures_loaded;
+    std::vector<std::shared_ptr<Texture>> m_textures;
 
     // Constructor
-    Model(std::string const& path);
+    Model(std::vector<Vertex> vertices,
+          std::vector<unsigned int> indices,
+          std::vector<std::shared_ptr<Texture>>& textures);
     
     // Draw model
-    void Draw(Shader& shader);
+    void Draw(std::shared_ptr<Shader>& shader);
 
     // Moving in world space
     void translate(glm::vec3 vector);
@@ -61,16 +51,8 @@ public:
     void rotate(float degrees, glm::vec3 vector);
 
 private:
-    unsigned int VAO, VBO, EBO;
+    GLuint VAO, VBO, EBO;
 
-    // Read obj file
-    void loadModel(std::string const& path);
-
-    // Read mtl file
-    void loadMaterial(std::string const& path);
-    
     // Setup VAO, VBO, EBO
     void setupModel();
 };
-
-#endif

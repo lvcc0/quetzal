@@ -1,11 +1,11 @@
-#ifndef BILLBOARD_H
-#define BILLBOARD_H
+#pragma once
 
 #include <glad/glad.h>
 #include <stb_image/stb_image.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <memory>
 
 #include "model.h"
 #include "camera.h"
@@ -20,17 +20,17 @@ public:
 
     glm::mat4 m_model_matrix = glm::mat4(1.0f);
 
-    Texture m_texture;
+    std::shared_ptr<Texture> m_texture;
 
     glm::vec3 m_pos;
     glm::vec2 m_size;
     glm::mat4 m_transform;
 
     // Constructor
-    Billboard(glm::vec3 pos, glm::vec2 size, std::string const& texture_path);
+    Billboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture);
 
     // Draw billboard + update transform matrix
-    void Draw(Shader& shader, glm::mat4 viewMatrix);
+    void Draw(std::shared_ptr<Shader>& shader, glm::mat4 viewMatrix);
 
     // moving in world space
     void translate(glm::vec3 vector);
@@ -42,5 +42,3 @@ private:
     // Setup VAO, VBO, EBO
     void updateBuffers();
 };
-
-#endif

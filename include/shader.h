@@ -1,5 +1,4 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -10,14 +9,12 @@
 #include <iostream>
 #include <cerrno>
 
-std::string get_file_contents(const char* filename);
-
 class Shader
 {
 public:
 	GLuint ID;
 
-	Shader(const char* vShaderFile, const char* fShaderFile);
+	Shader(std::string vertexCode, std::string fragmentCode);
 
 	void setBool(const std::string& name, bool value);
 	void setInt(const std::string& name, int value);
@@ -31,8 +28,7 @@ public:
 
 	void Activate();
 	void Delete();
+
 private:
 	void compileErrors(unsigned int shader, const char* type);
 };
-
-#endif

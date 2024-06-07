@@ -17,6 +17,8 @@
 #include "billboard.h"
 #include "lights.h"
 #include "shader.h"
+#include "resource_manager.h"
+#include "debugger.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -162,19 +164,22 @@ int main()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // --- //
 
+    ResourceManager resourceManager(RES_PATH);
+    Debugger debugger;
+
     for (unsigned int i = 0; i < pointLights.size(); i++)
-        pointBillboards.push_back(Billboard(pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), RES_PATH "textures/lightbulb.png"));
+        pointBillboards.push_back(Billboard(pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), resourceManager.make_texture("lightbulb", "texture_diffuse", "textures/lightbulb.png")));
     
     for (unsigned int i = 0; i < spotLights.size(); i++)
-        spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), RES_PATH "textures/highlight.png"));
+        spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), resourceManager.make_texture("highlight", "texture_diffuse", "textures/highlight.png")));
 
-    Shader defaultShader(RES_PATH "shaders/default.vert", RES_PATH "shaders/default.frag");
+    auto defaultShader = resourceManager.make_shader_program("default_shader", "shaders/default.vert", "shaders/default.frag");
 
-    Model catcube(RES_PATH "objects/catcube/catcube.obj");
-    Model anothercat(RES_PATH "objects/catcube/catcube.obj");
-    Model catsphere(RES_PATH "objects/catsphere/catsphere.obj");
+    auto catcube = resourceManager.make_model("catcube", "objects/catcube/catcube.obj");
+    auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
+    auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
 
-    Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), RES_PATH "textures/pepe.png");
+    Billboard billboard(glm::vec3(-3.0f, -3.0f, 0.0f), glm::vec2(5.0f, 5.0f), resourceManager.make_texture("pepe", "none", "textures/pepe.png"));
 
     // --- Main Loop --- //
     while (!glfwWindowShouldClose(window))
@@ -197,19 +202,19 @@ int main()
 
         processInput(window);
 
-        defaultShader.Activate();
+        defaultShader->Activate();
 
         glm::mat4 proj = glm::perspective(glm::radians(FOV), (float)WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = cam.getViewMatrix();
 
-        defaultShader.setVec3("viewPos", cam.m_pos);
-        defaultShader.setFloat("material.shininess", materialShininess);
+        defaultShader->setVec3("viewPos", cam.m_pos);
+        defaultShader->setFloat("material.shininess", materialShininess);
 
         // --- Rendering Lights' Influence On Objects + Billboards --- //
         for (unsigned int i = 0; i < dirLights.size(); i++)
             dirLights[i].UpdateUni(defaultShader, i);
 
-        for (unsigned int i = 0; i < pointLights.size(); i++)
+        for (auto i = 0; i < pointLights.size(); i++)
         {
             pointLights[i].UpdateUni(defaultShader, i);
 
@@ -220,7 +225,7 @@ int main()
             }
         }
 
-        for (unsigned int i = 0; i < spotLights.size(); i++)
+        for (auto i = 0; i < spotLights.size(); i++)
         {
             if (spotLights[i].m_name == "flashlight")
             {
@@ -238,22 +243,22 @@ int main()
         }
         // --- //
 
-        defaultShader.setMat4("projection", proj);
-        defaultShader.setMat4("view", view);
+        defaultShader->setMat4("projection", proj);
+        defaultShader->setMat4("view", view);
 
-        catcube.translate(glm::vec3(7.0f, 8.0f, 0.0f));
-        anothercat.translate(glm::vec3(-5.0f, 2.0f, -8.0f));
-        catsphere.translate(glm::vec3(4.0f, -2.0f, -2.0f));
+        catcube->translate(glm::vec3(7.0f, 8.0f, 0.0f));
+        anothercat->translate(glm::vec3(-5.0f, 2.0f, -8.0f));
+        catsphere->translate(glm::vec3(4.0f, -2.0f, -2.0f));
 
         billboard.translate(glm::vec3(cos(curFrame) * 3, 0.0f, sin(curFrame) * 3));
 
-        catcube.rotate(curFrame * 10, glm::vec3(0.0f, 1.0f, 0.0f));
-        anothercat.scale(glm::vec3(0.5f + sin(curFrame), 0.5f + cos(curFrame), 1.0f));
-        catsphere.rotate(curFrame * 50, glm::vec3(0.0f, 1.0f, 0.0f));
+        catcube->rotate(curFrame * 10, glm::vec3(0.0f, 1.0f, 0.0f));
+        anothercat->scale(glm::vec3(0.5f + sin(curFrame), 0.5f + cos(curFrame), 1.0f));
+        catsphere->rotate(curFrame * 50, glm::vec3(0.0f, 1.0f, 0.0f));
 
-        catcube.Draw(defaultShader);
-        anothercat.Draw(defaultShader);
-        catsphere.Draw(defaultShader);
+        catcube->Draw(defaultShader);
+        anothercat->Draw(defaultShader);
+        catsphere->Draw(defaultShader);
 
         billboard.Draw(defaultShader, cam.getViewMatrix());
 
@@ -265,7 +270,7 @@ int main()
     // --- //
 
     // --- Cleaning up --- //
-    defaultShader.Delete();
+    defaultShader->Delete();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
