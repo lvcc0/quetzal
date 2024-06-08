@@ -14,7 +14,7 @@
 
 #include "camera.h"
 #include "model.h"
-#include "billboard.h"
+#include "billboards.h"
 #include "lights.h"
 #include "shader.h"
 #include "resource_manager.h"
@@ -124,8 +124,8 @@ std::vector<SpotLight> spotLights =
     )
 };
 
-//std::vector<Billboard> pointBillboards;
-//std::vector<Billboard> spotBillboards;
+std::vector<std::shared_ptr<SphericalBillboard>> pointBillboards;
+std::vector<std::shared_ptr<SphericalBillboard>> spotBillboards;
 
 int main()
 {
@@ -183,11 +183,11 @@ int main()
     ResourceManager resourceManager(RES_PATH);
     Debugger debugger;
 
-    //for (unsigned int i = 0; i < pointLights.size(); i++)
-    //    pointBillboards.push_back(Billboard(pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), resourceManager.make_texture("lightbulb", "texture_diffuse", "textures/lightbulb.png")));
-    //
-    //for (unsigned int i = 0; i < spotLights.size(); i++)
-    //    spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), resourceManager.make_texture("highlight", "texture_diffuse", "textures/highlight.png")));
+    for (unsigned int i = 0; i < pointLights.size(); i++)
+        pointBillboards.push_back(resourceManager.make_sph_billboard("point_light", pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), "textures/lightbulb.png"));
+    
+    for (unsigned int i = 0; i < spotLights.size(); i++)
+        spotBillboards.push_back(resourceManager.make_sph_billboard("spot_light", spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), "textures/highlight.png"));
 
     auto defaultShader = resourceManager.make_shader_program("default_shader", "shaders/default.vert", "shaders/default.frag");
 
@@ -195,8 +195,9 @@ int main()
     auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
     auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
 
-    CylindricalBillboard billboard(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(7.5f, 5.0f), resourceManager.make_texture("pepe", "texture_diffuse", "textures/pepe.png"));
-    
+    auto pepe_billboard = resourceManager.make_cyl_billboard("pepe", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
+    auto container_billboard = resourceManager.make_sph_billboard("container", glm::vec3(0.0f, 5.0f, -10.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
+
     resourceManager.getObjectsInMaps(ObjectType::TEXTURE);
 
     // --- Main Loop --- //
@@ -236,11 +237,11 @@ int main()
         {
             pointLights[i].UpdateUni(defaultShader, i);
 
-            //if (pointLights[i].m_draw_billboard)
-            //{
-            //    pointBillboards[i].Draw(defaultShader, cam.m_pos);
-            //    pointBillboards[i].m_pos = pointLights[i].m_pos;
-            //}
+            if (pointLights[i].m_draw_billboard)
+            {
+                pointBillboards[i]->Draw(defaultShader, cam.m_pos);
+                pointBillboards[i]->m_pos = pointLights[i].m_pos;
+            }
         }
 
         for (auto i = 0; i < spotLights.size(); i++)
@@ -253,11 +254,11 @@ int main()
 
             spotLights[i].UpdateUni(defaultShader, i);
 
-            //if (spotLights[i].m_draw_billboard && spotLights[i].m_name != "flashlight")
-            //{
-            //    spotBillboards[i].Draw(defaultShader, cam.m_pos);
-            //    spotBillboards[i].m_pos = spotLights[i].m_pos;
-            //}
+            if (spotLights[i].m_draw_billboard && spotLights[i].m_name != "flashlight")
+            {
+                spotBillboards[i]->Draw(defaultShader, cam.m_pos);
+                spotBillboards[i]->m_pos = spotLights[i].m_pos;
+            }
         }
         // --- //
 
@@ -268,7 +269,7 @@ int main()
         anothercat->translate(glm::vec3(-5.0f, 2.0f, -8.0f));
         catsphere->translate(glm::vec3(4.0f, -2.0f, -2.0f));
 
-        billboard.translate(glm::vec3(cos(curFrame) * 3, 0.0f, sin(curFrame) * 3));
+        pepe_billboard->translate(glm::vec3(cos(curFrame) * 3, 0.0f, sin(curFrame) * 3));
 
         catcube->rotate(curFrame * 10, glm::vec3(0.0f, 1.0f, 0.0f));
         anothercat->scale(glm::vec3(0.5f + sin(curFrame), 0.5f + cos(curFrame), 1.0f));
@@ -278,7 +279,8 @@ int main()
         anothercat->Draw(defaultShader);
         catsphere->Draw(defaultShader);
 
-        billboard.Draw(defaultShader, cam.m_pos);
+        pepe_billboard->Draw(defaultShader, cam.m_pos);
+        container_billboard->Draw(defaultShader, cam.m_pos);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

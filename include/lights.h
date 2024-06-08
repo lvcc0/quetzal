@@ -8,8 +8,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
-#include "shader.h"
-#include "billboard.h"
+#include "billboards.h"
 
 class DirLight
 {

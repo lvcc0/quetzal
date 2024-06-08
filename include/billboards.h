@@ -11,6 +11,8 @@
 #include "model.h"
 #include "camera.h"
 
+// TODO: technically they're almost the same, so we can do something like inheritance here
+
 class CylindricalBillboard
 {
 public:
@@ -41,7 +43,6 @@ private:
     void setupBillboard();
 };
 
-// TODO
 class SphericalBillboard
 {
 public:
@@ -58,10 +59,10 @@ public:
     // Constructor
     SphericalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture);
 
-    // Draw billboard + update transform matrix
+    // Draw billboard and change it's model matrix
     void Draw(std::shared_ptr<Shader>& shader, glm::vec3 player_pos);
 
-    // moving in world space
+    // Moving in the world space
     void translate(glm::vec3 vector);
     void scale(glm::vec2 vector);
 
