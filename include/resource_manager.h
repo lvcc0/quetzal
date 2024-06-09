@@ -50,9 +50,9 @@ public:
 	std::shared_ptr<Shader> make_shader_program(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
 	std::shared_ptr<Texture> make_texture(std::string name, std::string type, const std::string& texture_rel_path);
 	std::shared_ptr<Model> make_model(std::string name, const std::string& model_rel_path);
-
 	std::shared_ptr<CylindricalBillboard> make_cyl_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 	std::shared_ptr<SphericalBillboard> make_sph_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
+
 private:
 	std::string relResPath; // full path to res directory
 

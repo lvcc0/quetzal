@@ -88,8 +88,8 @@ void main()
 
     for (int i = 0; i < NR_SPOT_LIGHTS; i++)
         result += GetSpotLight(spotLights[i], norm, FragPos, viewDir);
-
-    FragColor = vec4(result, 1.0);
+    
+    FragColor = texture(material.texture_diffuse1, TexCoord); // currently there is no light on the scene, so this works instead of vec4(result, 1.0)
 }
 
 vec3 GetDirLight(DirLight light, vec3 normal, vec3 viewDir)
