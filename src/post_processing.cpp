@@ -1,15 +1,14 @@
 #include "post_processing.h"
 
-void PostProcessing::make_vertexArray(GLuint& VAO)
+void FrameBufferMaker::make_vertexArray(GLuint& VAO, GLuint& VBO)
 {
 	// prepare VAO
-	GLuint VBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, quadVertices.size() * sizeof(float), &quadVertices[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)0);
 	glEnableVertexAttribArray(1);
@@ -19,7 +18,7 @@ void PostProcessing::make_vertexArray(GLuint& VAO)
 	//-----------------------------//
 }
 
-void PostProcessing::make_buffers(GLuint& frameBuffer, GLuint& textureFrameBuffer, GLuint& renderFrameBuffer, GLfloat width, GLfloat height)
+void FrameBufferMaker::make_buffers(GLuint& frameBuffer, GLuint& textureFrameBuffer, GLuint& renderFrameBuffer, GLfloat width, GLfloat height)
 {
 	// making buffers
 	glGenFramebuffers(1, &frameBuffer);
@@ -42,4 +41,41 @@ void PostProcessing::make_buffers(GLuint& frameBuffer, GLuint& textureFrameBuffe
 		std::cerr << "ERROR::FRAMEBUFFER WASN`T COMPLETED::ID " << frameBuffer << std::endl;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+PostProcessing::PostProcessing(GLfloat width, GLfloat height) {
+	FrameBufferMaker::make_vertexArray(VAO, VBO);
+	FrameBufferMaker::make_buffers(frameBuffer, textureFrameBuffer, renderFrameBuffer, width, height);
+}
+
+void PostProcessing::inversion_color(std::shared_ptr<Shader> screen_shader) {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+	// clear all relevant buffers
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	screen_shader->Activate();
+	glBindVertexArray(VAO);
+	glBindTexture(GL_TEXTURE_2D, textureFrameBuffer);	// use the color attachment texture as the texture of the quad plane
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void PostProcessing::deactivate() {
+	// Bind the custom framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+	// Specify the color of the background
+	glClearColor(0.77f, 0.73f, 0.77f, 1.0f);
+	// Clean the back buffers
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	// Enable depth testing since it's disabled when drawing the framebuffer rectangle
+	glEnable(GL_DEPTH_TEST);
+}
+
+PostProcessing::~PostProcessing() {
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &VAO);
+	glDeleteBuffers(1, &frameBuffer);
+	glDeleteBuffers(1, &textureFrameBuffer);
+	glDeleteBuffers(1, &renderFrameBuffer);
 }

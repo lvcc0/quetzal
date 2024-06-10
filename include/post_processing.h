@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <shader.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -13,12 +14,11 @@
 // 2) At least one color attachment must be present.
 // 3) All connections must also be completed(provided with allocated memory).
 // 4) Each buffer must have the same number of samples(now idk what`s this).
-class PostProcessing {
-	
+class FrameBufferMaker {
 	// Quad verts
 	// vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
 		// positions   // texCoords
-	inline static float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+	inline static std::vector<float> quadVertices = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
 		// positions   // texCoords
 		-1.0f,  1.0f,  0.0f, 1.0f,
 		-1.0f, -1.0f,  0.0f, 0.0f,
@@ -31,13 +31,28 @@ class PostProcessing {
 	
 public:
 	//Make VAO
-	static void make_vertexArray(GLuint& VAO);
+	static void make_vertexArray(GLuint& VAO, GLuint& VBO);
 
 	// Make buffers
 	static void make_buffers(GLuint &frameBuffer, GLuint &textureFrameBuffer, GLuint &renderFrameBuffer, GLfloat width, GLfloat height);
 
 	//Deleting all constructors
-	PostProcessing() = delete;
-	PostProcessing(const PostProcessing& obj) = delete;
-	PostProcessing(const PostProcessing&& obj) = delete;
+	FrameBufferMaker() = delete;
+	FrameBufferMaker(const FrameBufferMaker& obj) = delete;
+	FrameBufferMaker(const FrameBufferMaker&& obj) = delete;
+};
+
+class PostProcessing {
+	// buffers
+	GLuint VAO, VBO;
+	GLuint frameBuffer, textureFrameBuffer, renderFrameBuffer;
+public:
+	// constructor
+	PostProcessing(GLfloat width, GLfloat height);
+	//destructor
+	~PostProcessing();
+	// post processing funcs
+	void inversion_color(std::shared_ptr<Shader> screen_shader);
+	// deactivating post processing(must be used BEFORE any post processing funcs)
+	void deactivate();
 };

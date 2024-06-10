@@ -187,11 +187,7 @@ int main()
     auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
     auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
     
-    GLuint frameVAO;
-    GLuint frameBuffer, textureFrameBuffer, renderFrameBuffer;
-    
-    PostProcessing::make_vertexArray(frameVAO);
-    PostProcessing::make_buffers(frameBuffer, textureFrameBuffer, renderFrameBuffer, WIN_WIDTH, WIN_HEIGHT);
+    PostProcessing postProcessing(WIN_WIDTH, WIN_HEIGHT);
 
     screenShader->Activate();
     screenShader->setInt("screenTexture", 0);
@@ -215,25 +211,32 @@ int main()
         // input 
         processInput(window);
 
-        // Bind the custom framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
-        // Specify the color of the background
-        glClearColor(0.77f, 0.73f, 0.77f, 1.0f);
-        // Clean the back buffer and depth buffer
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // Enable depth testing since it's disabled when drawing the framebuffer rectangle
-        glEnable(GL_DEPTH_TEST);
+        postProcessing.deactivate();
         
         defaultShader->Activate();
-        glm::mat4 projection = glm::perspective(glm::radians(FOV), (float)cam.m_width / (float)cam.m_height, 0.1f, 100.0f);
+
+        glm::mat4 proj = glm::perspective(glm::radians(FOV), (float)WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = cam.getViewMatrix();
+
+        defaultShader->setVec3("viewPos", cam.m_pos);
+        defaultShader->setFloat("material.shininess", materialShininess);
+        defaultShader->setMat4("projection", proj);
+        defaultShader->setMat4("view", view);
         
         // --- Rendering Lights' Influence On Objects + Billboards --- //
+        for (unsigned int i = 0; i < dirLights.size(); i++)
+            dirLights[i].UpdateUni(defaultShader, i);
 
+        for (auto i = 0; i < pointLights.size(); i++)
+        {
+            pointLights[i].UpdateUni(defaultShader, i);
+        }
+
+        for (auto i = 0; i < spotLights.size(); i++)
+        {
+            spotLights[i].UpdateUni(defaultShader, i);
+        }
         // --- //
-
-        defaultShader->setMat4("projection", projection);
-        defaultShader->setMat4("view", view);
 
         catcube->translate(glm::vec3(7.0f, 8.0f, 0.0f));
         anothercat->translate(glm::vec3(-5.0f, 2.0f, -8.0f));
@@ -247,17 +250,7 @@ int main()
         anothercat->Draw(defaultShader);
         catsphere->Draw(defaultShader);
 
-        // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-        // clear all relevant buffers
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessary actually, since we won't be able to see behind the quad anyways)
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        screenShader->Activate();
-        glBindVertexArray(frameVAO);
-        glBindTexture(GL_TEXTURE_2D, textureFrameBuffer);	// use the color attachment texture as the texture of the quad plane
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        postProcessing.inversion_color(screenShader);
         
         //ImGui::Render();
         //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -271,7 +264,6 @@ int main()
     //defaultShader->Delete();
     defaultShader->Delete();
     screenShader->Delete();
-    glDeleteBuffers(1, &frameBuffer);
 
     //ImGui_ImplOpenGL3_Shutdown();
     //ImGui_ImplGlfw_Shutdown();
