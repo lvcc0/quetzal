@@ -44,16 +44,30 @@ void FrameBufferMaker::make_buffers(GLuint& frameBuffer, GLuint& textureFrameBuf
 }
 
 
-PostProcessing::PostProcessing(GLfloat width, GLfloat height) {
+PostProcessing::PostProcessing(ShaderMap& shaderMap, GLfloat width, GLfloat height) {
+	this->shaderMap = shaderMap;
 	FrameBufferMaker::make_vertexArray(VAO, VBO);
 	FrameBufferMaker::make_buffers(frameBuffer, textureFrameBuffer, renderFrameBuffer, width, height);
 }
 
-void PostProcessing::inversion_color(std::shared_ptr<Shader> screen_shader) {
+void PostProcessing::post_processing(std::string type_of_processing) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
 	// clear all relevant buffers
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	std::shared_ptr<Shader> screen_shader;
+
+	if (shaderMap.find(type_of_processing) != shaderMap.end()) {
+		screen_shader = shaderMap.find(type_of_processing)->second;
+		if (type_of_processing == "inversion_color") {
+			screen_shader->Activate();
+			screen_shader->setInt("screenTexture", 0);
+		}
+	}
+	else {
+		std::cerr << "post processing shader::" << type_of_processing << " wasnt found" << std::endl;
+	}
 
 	screen_shader->Activate();
 	glBindVertexArray(VAO);
@@ -78,4 +92,9 @@ PostProcessing::~PostProcessing() {
 	glDeleteBuffers(1, &frameBuffer);
 	glDeleteBuffers(1, &textureFrameBuffer);
 	glDeleteBuffers(1, &renderFrameBuffer);
+	std::map<std::string, std::shared_ptr<Shader>>::iterator iter = shaderMap.begin();
+	while (iter != shaderMap.end()) {
+		iter->second->Delete();
+		iter++;
+	}
 }

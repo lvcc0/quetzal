@@ -199,22 +199,18 @@ int main()
 
 
     auto defaultShader = resourceManager.make_shader_program("default_shader", "shaders/default.vert", "shaders/default.frag");
-    auto screenShader = resourceManager.make_shader_program("inversion_shader", "shaders/post_processing.vert", "shaders/inversion_color.frag");
 
     auto catcube = resourceManager.make_model("catcube", "objects/catcube/catcube.obj");
     auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
     auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
   
-    PostProcessing postProcessing(WIN_WIDTH, WIN_HEIGHT);
+    PostProcessing postProcessing(resourceManager.make_post_processing_shaders("screen_shaders"), WIN_WIDTH, WIN_HEIGHT);
 
 
     auto pepe_billboard = resourceManager.make_cyl_billboard("pepe", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
     auto container_billboard = resourceManager.make_sph_billboard("container", glm::vec3(0.0f, 5.0f, -10.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
 
     resourceManager.getObjectsInMaps(ObjectType::TEXTURE);
-
-    screenShader->Activate();
-    screenShader->setInt("screenTexture", 0);
 
     resourceManager.getObjectsInMaps(ObjectType::SHADER);
     // --- Main Loop --- //
@@ -290,7 +286,7 @@ int main()
         anothercat->Draw(defaultShader);
         catsphere->Draw(defaultShader);
 
-        postProcessing.inversion_color(screenShader);
+        postProcessing.post_processing("inversion_color");
         
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -307,7 +303,6 @@ int main()
 
     // --- Cleaning up --- //
     defaultShader->Delete();
-    screenShader->Delete();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

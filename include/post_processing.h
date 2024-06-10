@@ -3,6 +3,8 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <map>
+
 #include <shader.h>
 
 #include <glad/glad.h>
@@ -18,7 +20,7 @@ class FrameBufferMaker {
 	// Quad verts
 	// vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
 		// positions   // texCoords
-	inline static std::vector<float> quadVertices = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+	inline static std::vector<float> quadVertices = { 
 		// positions   // texCoords
 		-1.0f,  1.0f,  0.0f, 1.0f,
 		-1.0f, -1.0f,  0.0f, 0.0f,
@@ -46,13 +48,17 @@ class PostProcessing {
 	// buffers
 	GLuint VAO, VBO;
 	GLuint frameBuffer, textureFrameBuffer, renderFrameBuffer;
+	// map of shaders
+	typedef std::map<const std::string, std::shared_ptr<Shader>> ShaderMap;
+	ShaderMap shaderMap;
+
 public:
 	// constructor
-	PostProcessing(GLfloat width, GLfloat height);
+	PostProcessing(ShaderMap& shaderMap, GLfloat width, GLfloat height);
 	//destructor
 	~PostProcessing();
 	// post processing funcs
-	void inversion_color(std::shared_ptr<Shader> screen_shader);
-	// deactivating post processing(must be used BEFORE any post processing funcs)
+	void post_processing(std::string type_of_processing);
+	// deactivating post processing(must be used BEFORE any post processing funcs and objects drawing)
 	void deactivate();
 };
