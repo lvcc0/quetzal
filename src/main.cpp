@@ -124,55 +124,6 @@ std::vector<SpotLight> spotLights =
     )
 };
 
-std::vector<Billboard> pointBillboards;
-std::vector<Billboard> spotBillboards;
-
-//test code
-float cubeVertices[] = {
-    // positions          // texture Coords
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-
 int main()
 {
     // --- Initial Config --- //
@@ -216,32 +167,25 @@ int main()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Stencil shader
-    //glEnable(GL_STENCIL);
-    //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glEnable(GL_STENCIL);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    ////Culling faces
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    //glFrontFace(GL_CCW);
+    //Culling faces
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
 
     // --- //
 
     ResourceManager resourceManager(RES_PATH);
     Debugger debugger;
 
-    /*for (unsigned int i = 0; i < pointLights.size(); i++)
-        pointBillboards.push_back(Billboard(pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), resourceManager.make_texture("lightbulb", "texture_diffuse", "textures/lightbulb.png")));
-    
-    for (unsigned int i = 0; i < spotLights.size(); i++)
-        spotBillboards.push_back(Billboard(spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), resourceManager.make_texture("highlight", "texture_diffuse", "textures/highlight.png")));*/
-
-    //auto defaultShader = resourceManager.make_shader_program("default_shader", "shaders/default.vert", "shaders/default.frag");
-    auto testShader = resourceManager.make_shader_program("test_shader", "shaders/test.vert", "shaders/test.frag");
+    auto defaultShader = resourceManager.make_shader_program("default_shader", "shaders/default.vert", "shaders/default.frag");
     auto screenShader = resourceManager.make_shader_program("inversion_shader", "shaders/post_processing.vert", "shaders/inversion_color.frag");
 
-    //auto catcube = resourceManager.make_model("catcube", "objects/catcube/catcube.obj");
-    //auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
-    //auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
+    auto catcube = resourceManager.make_model("catcube", "objects/catcube/catcube.obj");
+    auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
+    auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
     
     GLuint frameVAO;
     GLuint frameBuffer, textureFrameBuffer, renderFrameBuffer;
@@ -249,27 +193,9 @@ int main()
     PostProcessing::make_vertexArray(frameVAO);
     PostProcessing::make_buffers(frameBuffer, textureFrameBuffer, renderFrameBuffer, WIN_WIDTH, WIN_HEIGHT);
 
-    //test code
-    // cube VAO
-    unsigned int cubeVAO, cubeVBO;
-    glGenVertexArrays(1, &cubeVAO);
-    glGenBuffers(1, &cubeVBO);
-    glBindVertexArray(cubeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glBindVertexArray(0);
-
-    testShader->Activate();
-    testShader->setInt("texture1", 0);
-
     screenShader->Activate();
     screenShader->setInt("screenTexture", 0);
 
-    auto cubeTexture = resourceManager.make_texture("test", "none", "textures/container.png");
     resourceManager.getObjectsInMaps(ObjectType::SHADER);
     // --- Main Loop --- //
     while (!glfwWindowShouldClose(window))
@@ -298,25 +224,28 @@ int main()
         // Enable depth testing since it's disabled when drawing the framebuffer rectangle
         glEnable(GL_DEPTH_TEST);
         
-
-        testShader->Activate();
+        defaultShader->Activate();
         glm::mat4 projection = glm::perspective(glm::radians(FOV), (float)cam.m_width / (float)cam.m_height, 0.1f, 100.0f);
         glm::mat4 view = cam.getViewMatrix();
-        glm::mat4 model = glm::mat4(1.0f);
-        testShader->setMat4("view", view);
-        testShader->setMat4("projection", projection);
-        // cubes
-        glBindVertexArray(cubeVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, cubeTexture->ID);
-        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-        testShader->setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-        testShader->setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+        
+        // --- Rendering Lights' Influence On Objects + Billboards --- //
+
+        // --- //
+
+        defaultShader->setMat4("projection", projection);
+        defaultShader->setMat4("view", view);
+
+        catcube->translate(glm::vec3(7.0f, 8.0f, 0.0f));
+        anothercat->translate(glm::vec3(-5.0f, 2.0f, -8.0f));
+        catsphere->translate(glm::vec3(4.0f, -2.0f, -2.0f));
+
+        catcube->rotate(curFrame * 10, glm::vec3(0.0f, 1.0f, 0.0f));
+        anothercat->scale(glm::vec3(0.5f + sin(curFrame), 0.5f + cos(curFrame), 1.0f));
+        catsphere->rotate(curFrame * 50, glm::vec3(0.0f, 1.0f, 0.0f));
+
+        catcube->Draw(defaultShader);
+        anothercat->Draw(defaultShader);
+        catsphere->Draw(defaultShader);
 
         // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -340,7 +269,7 @@ int main()
 
     // --- Cleaning up --- //
     //defaultShader->Delete();
-    testShader->Delete();
+    defaultShader->Delete();
     screenShader->Delete();
     glDeleteBuffers(1, &frameBuffer);
 
