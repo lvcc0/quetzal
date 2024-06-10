@@ -43,6 +43,67 @@ std::vector<std::shared_ptr<Texture>> ResourceManager::pull_textures_from_mtl(co
 	return textures;
 }
 
+void ResourceManager::getObjectsInMaps(ObjectType objectType)
+{
+    switch (objectType)
+    {
+    case ObjectType::SHADER: {
+        std::map<std::string, std::shared_ptr<Shader>>::iterator iter = shaderMap.begin();
+        while (iter != shaderMap.end()) {
+            std::cout << "shader \"" << iter->first << "\" with id " << iter->second->ID << std::endl;
+            iter++;
+        }
+        break;
+    }
+    case ObjectType::TEXTURE: {
+        std::map<std::string, std::shared_ptr<Texture>>::iterator iter = textureMap.begin();
+        while (iter != textureMap.end()) {
+            std::cout << "texture \"" << iter->first << "\" with id " << iter->second->ID << std::endl;
+            iter++;
+        }
+        break;
+    }
+    case ObjectType::MODEL: {
+        std::map<std::string, std::shared_ptr<Model>>::iterator iter = modelMap.begin();
+        while (iter != modelMap.end()) {
+            std::cout << "model \"" << iter->first << "\"" << std::endl;
+            iter++;
+        }
+        break;
+    }
+    case ObjectType::CYL_BILLBOARD: {
+        std::map<std::string, std::shared_ptr<CylindricalBillboard>>::iterator iter = cylBillboardMap.begin();
+        while (iter != cylBillboardMap.end()) {
+            std::cout << "cylindrical billboard \"" << iter->first << "\"" << std::endl;
+            iter++;
+        }
+        break;
+    }
+    case ObjectType::SPH_BILLBOARD: {
+        std::map<std::string, std::shared_ptr<SphericalBillboard>>::iterator iter = sphBillboardMap.begin();
+        while (iter != sphBillboardMap.end()) {
+            std::cout << "spherical billboard \"" << iter->first << "\"" << std::endl;
+            iter++;
+        }
+        break;
+    }
+    default:
+        std::cout << "the default output of the switch statement in the getObjectsInMaps() function" << std::endl;
+    }
+}
+
+std::shared_ptr<Shader> ResourceManager::make_shader_program(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
+{
+    // Getting shader files (.vert and .frag)
+    std::string vertex_shader_src = get_file_string(vertex_shader_rel_path);
+    std::string fragment_shader_src = get_file_string(fragment_shader_rel_path);
+
+    std::shared_ptr<Shader>& shader_program = std::make_shared<Shader>(vertex_shader_src, fragment_shader_src);
+    shaderMap.emplace(name, shader_program);
+
+    return shader_program;
+}
+
 std::shared_ptr<Texture> ResourceManager::make_texture(std::string name, std::string type, const std::string& image_rel_path)
 {
     std::string full_path = relResPath + "/" + image_rel_path;
@@ -59,18 +120,6 @@ std::shared_ptr<Texture> ResourceManager::make_texture(std::string name, std::st
 
 	textureMap.emplace(name, texture);
 	return texture;
-}
-
-std::shared_ptr<Shader> ResourceManager::make_shader_program(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
-{
-    // Getting shader files (.vert and .frag)
-    std::string vertex_shader_src = get_file_string(vertex_shader_rel_path);
-    std::string fragment_shader_src = get_file_string(fragment_shader_rel_path);
-
-    std::shared_ptr<Shader>& shader_program = std::make_shared<Shader>(vertex_shader_src, fragment_shader_src);
-    shaderMap.emplace(name, shader_program);
-
-    return shader_program;
 }
 
 std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::string& model_rel_path)
@@ -193,27 +242,18 @@ std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::
 	return model;
 }
 
-void ResourceManager::getObjectsInMaps(ObjectType objectType)
+std::shared_ptr<CylindricalBillboard> ResourceManager::make_cyl_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
 {
-    if (objectType == ObjectType::SHADER) {
-        std::map<std::string, std::shared_ptr<Shader>>::iterator iter = shaderMap.begin();
-        while (iter != shaderMap.end()) {
-            std::cerr << "shader " << iter->first << " with id " << iter->second->ID << std::endl;
-            iter++;
-        }
-    }
-    else if (objectType == ObjectType::TEXTURE) {
-        std::map<std::string, std::shared_ptr<Texture>>::iterator iter = textureMap.begin();
-        while (iter != textureMap.end()) {
-            std::cerr << "texture " << iter->first << " with id " << iter->second->ID << std::endl;
-            iter++;
-        }
-    }
-    else if (objectType == ObjectType::MODEL) {
-        std::map<std::string, std::shared_ptr<Model>>::iterator iter = modelMap.begin();
-        while (iter != modelMap.end()) {
-            std::cerr << "model " << iter->first << std::endl;
-            iter++;
-        }
-    }
+    std::shared_ptr<CylindricalBillboard>& cyl_billboard = std::make_shared<CylindricalBillboard>(pos, size, make_texture(name + "_texture", "texture_diffuse", texture_path));
+    cylBillboardMap.emplace(name, cyl_billboard);
+
+    return cyl_billboard;
+}
+
+std::shared_ptr<SphericalBillboard> ResourceManager::make_sph_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
+{
+    std::shared_ptr<SphericalBillboard>& sph_billboard = std::make_shared<SphericalBillboard>(pos, size, make_texture(name + "_texture", "texture_diffuse", texture_path));
+    sphBillboardMap.emplace(name, sph_billboard);
+
+    return sph_billboard;
 }
