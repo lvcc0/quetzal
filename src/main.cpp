@@ -1,9 +1,9 @@
 #include <iostream>
 #include <stb_image/stb_image.h>
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+//#include "imgui.h"
+//#include "imgui_impl_glfw.h"
+//#include "imgui_impl_opengl3.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -38,7 +38,7 @@ float FOV = 45.0f;
 
 float materialShininess = 32.0f;
 
-Camera cam(WIN_WIDTH, WIN_HEIGHT, glm::vec3(0.0f, 0.0f, 5.0f));
+Camera cam(WIN_WIDTH, WIN_HEIGHT, glm::vec3(0.0f, 0.0f, 0.0f));
 
 std::vector<DirLight> dirLights =
 {
@@ -124,8 +124,11 @@ std::vector<SpotLight> spotLights =
     )
 };
 
+
+
 std::vector<std::shared_ptr<SphericalBillboard>> pointBillboards;
 std::vector<std::shared_ptr<SphericalBillboard>> spotBillboards;
+
 
 int main()
 {
@@ -173,7 +176,10 @@ int main()
     glEnable(GL_STENCIL);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
+
+
     // Face culling
+
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
@@ -183,31 +189,41 @@ int main()
     ResourceManager resourceManager(RES_PATH);
     Debugger debugger;
 
+
+
     for (unsigned int i = 0; i < pointLights.size(); i++)
         pointBillboards.push_back(resourceManager.make_sph_billboard("point_light", pointLights[i].m_pos, glm::vec2(1.0f, 1.0f), "textures/lightbulb.png"));
     
     for (unsigned int i = 0; i < spotLights.size(); i++)
         spotBillboards.push_back(resourceManager.make_sph_billboard("spot_light", spotLights[i].m_pos, glm::vec2(1.0f, 1.0f), "textures/highlight.png"));
 
+
     auto defaultShader = resourceManager.make_shader_program("default_shader", "shaders/default.vert", "shaders/default.frag");
+    auto screenShader = resourceManager.make_shader_program("inversion_shader", "shaders/post_processing.vert", "shaders/inversion_color.frag");
 
     auto catcube = resourceManager.make_model("catcube", "objects/catcube/catcube.obj");
     auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
     auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
+  
+    PostProcessing postProcessing(WIN_WIDTH, WIN_HEIGHT);
+
 
     auto pepe_billboard = resourceManager.make_cyl_billboard("pepe", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
     auto container_billboard = resourceManager.make_sph_billboard("container", glm::vec3(0.0f, 5.0f, -10.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
 
     resourceManager.getObjectsInMaps(ObjectType::TEXTURE);
 
+    screenShader->Activate();
+    screenShader->setInt("screenTexture", 0);
+
+    resourceManager.getObjectsInMaps(ObjectType::SHADER);
     // --- Main Loop --- //
     while (!glfwWindowShouldClose(window))
     {
-        glfwPollEvents();
 
-        ImGui_ImplOpenGL3_NewFrame();
+ /*       ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        ImGui::NewFrame();*/
 
         if (shouldDrawGui)
             showGuiWindow();
@@ -216,11 +232,11 @@ int main()
         deltaTime = curFrame - lastFrame;
         lastFrame = curFrame;
 
-        glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+        // input 
         processInput(window);
 
+        postProcessing.deactivate();
+        
         defaultShader->Activate();
 
         glm::mat4 proj = glm::perspective(glm::radians(FOV), (float)WIN_WIDTH / (float)WIN_HEIGHT, 0.1f, 100.0f);
@@ -228,7 +244,9 @@ int main()
 
         defaultShader->setVec3("viewPos", cam.m_pos);
         defaultShader->setFloat("material.shininess", materialShininess);
-
+        defaultShader->setMat4("projection", proj);
+        defaultShader->setMat4("view", view);
+        
         // --- Rendering Lights' Influence On Objects + Billboards --- //
         for (unsigned int i = 0; i < dirLights.size(); i++)
             dirLights[i].UpdateUni(defaultShader, i);
@@ -242,16 +260,11 @@ int main()
                 pointBillboards[i]->Draw(defaultShader, cam.m_pos);
                 pointBillboards[i]->m_pos = pointLights[i].m_pos;
             }
+
         }
 
         for (auto i = 0; i < spotLights.size(); i++)
         {
-            if (spotLights[i].m_name == "flashlight")
-            {
-                spotLights[i].m_pos = cam.m_pos;
-                spotLights[i].m_dir = cam.m_orientation;
-            }
-
             spotLights[i].UpdateUni(defaultShader, i);
 
             if (spotLights[i].m_draw_billboard && spotLights[i].m_name != "flashlight")
@@ -259,11 +272,9 @@ int main()
                 spotBillboards[i]->Draw(defaultShader, cam.m_pos);
                 spotBillboards[i]->m_pos = spotLights[i].m_pos;
             }
+
         }
         // --- //
-
-        defaultShader->setMat4("projection", proj);
-        defaultShader->setMat4("view", view);
 
         catcube->translate(glm::vec3(7.0f, 8.0f, 0.0f));
         anothercat->translate(glm::vec3(-5.0f, 2.0f, -8.0f));
@@ -279,6 +290,10 @@ int main()
         anothercat->Draw(defaultShader);
         catsphere->Draw(defaultShader);
 
+        postProcessing.inversion_color(screenShader);
+        
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         pepe_billboard->Draw(defaultShader, cam.m_pos);
         container_billboard->Draw(defaultShader, cam.m_pos);
 
@@ -286,11 +301,13 @@ int main()
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
+        glfwPollEvents();
     }
     // --- //
 
     // --- Cleaning up --- //
     defaultShader->Delete();
+    screenShader->Delete();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -385,9 +402,7 @@ void showGuiWindow()
             }
             ImGui::EndCombo();
         }
-
-        ImGui::Checkbox("Enabled", &pointLights[pointComboItem].m_enabled);
-        ImGui::Checkbox("Billboard", &pointLights[pointComboItem].m_draw_billboard);
+        ImGui::Checkbox("Enabled", &pointLights[pointComboItem].m_enabled);//        ImGui::Checkbox("Billboard", &pointLights[pointComboItem].m_draw_billboard);
         ImGui::DragFloat3("Position", (float*)&pointLights[pointComboItem].m_pos, 0.1f);
 
         ImGui::Separator();
