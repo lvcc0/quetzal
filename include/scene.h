@@ -13,8 +13,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "camera.h"
 #include "resource_manager.h"
+#include "post_processing.h"
+#include "camera.h"
+#include "lights.h"
 
 #include "shader.h"
 #include "model.h"
@@ -30,7 +32,8 @@ public:
     // Constructor
     Scene();
 
-    // TODO: make destructor
+    // Destructor
+    ~Scene();
 
     // Gets called every frame in the engine class
     void update();
@@ -42,7 +45,17 @@ public:
     std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
     std::shared_ptr<SphericalBillboard> addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 
+    // Add lights to the scene
+    std::shared_ptr<DirLight> addDirLight(DirLight dir_light);
+    std::shared_ptr<PointLight> addPointLight(PointLight point_light);
+    std::shared_ptr<SpotLight> addSpotLight(SpotLight spot_light);
+
 private:
+    // Vectors with scene lights
+    std::vector<std::shared_ptr<DirLight>> dirLights;
+    std::vector<std::shared_ptr<PointLight>> pointLights;
+    std::vector<std::shared_ptr<SpotLight>> spotLights;
+
     std::shared_ptr<ResourceManager> resourceManager; // every scene has it's own resource manager (may change later)
     std::shared_ptr<Shader> defaultShader; // a default shader to draw stuff with (may get rid of this later (throw an error of some sort if no shaders were added (perhaps add setShader()?)))
 };

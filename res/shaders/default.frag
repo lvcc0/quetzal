@@ -1,8 +1,10 @@
 #version 330 core
 
-#define NR_DIR_LIGHTS 2
-#define NR_POINT_LIGHTS 2
-#define NR_SPOT_LIGHTS 2
+#define NR_DIR_LIGHTS 1
+#define NR_POINT_LIGHTS 1
+#define NR_SPOT_LIGHTS 1
+
+// TODO: ^ remove these ^
 
 out vec4 FragColor;
 
@@ -89,7 +91,8 @@ void main()
     for (int i = 0; i < NR_SPOT_LIGHTS; i++)
         result += GetSpotLight(spotLights[i], norm, FragPos, viewDir);
     
-    FragColor = texture(material.texture_diffuse1, TexCoord); // currently there is no light on the scene, so this works instead of vec4(result, 1.0)
+    FragColor = vec4(result, 1.0); // using light
+    // FragColor = texture(material.texture_diffuse1, TexCoord); // no light
 }
 
 vec3 GetDirLight(DirLight light, vec3 normal, vec3 viewDir)

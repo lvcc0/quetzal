@@ -4,6 +4,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "debugger.h"
 #include "scene.h"
 
 class Engine
@@ -18,7 +19,8 @@ public:
     // Constructor
     Engine(unsigned int width, unsigned int height);
 
-    // TODO: make destructor
+    // Destructor
+    ~Engine();
 
     void createWindow(); // create the glfw window
     void processInput(); // gets called every frame in the process() function below
@@ -30,7 +32,7 @@ public:
     // Main loop function
     void process();
 
-    // Work with scenes
+    // Create a scene, add it to the scenes map and set currentScene to it
     std::shared_ptr<Scene> createScene(std::string name);
 
 private:

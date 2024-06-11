@@ -45,6 +45,18 @@ Engine::Engine(unsigned int width, unsigned int height)
     glFrontFace(GL_CCW);
 }
 
+Engine::~Engine()
+{
+    // ImGui stuff
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    // GLFW stuff
+    glfwDestroyWindow(this->window);
+    glfwTerminate();
+}
+
 void Engine::createWindow()
 {
     this->window = glfwCreateWindow(win_width, win_height, "quetzal", NULL, NULL);
@@ -89,20 +101,18 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
 void Engine::process()
 {
-    glfwPollEvents();
-
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
     float curFrame = (float)glfwGetTime();
-    deltaTime = curFrame - lastFrame;
-    lastFrame = curFrame;
+    this->deltaTime = curFrame - lastFrame;
+    this->lastFrame = curFrame;
+
+    this->processInput();
 
     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    this->processInput();
 
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
@@ -111,7 +121,8 @@ void Engine::process()
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(this->window);
+    glfwPollEvents();
 }
 
 std::shared_ptr<Scene> Engine::createScene(std::string name)
@@ -120,7 +131,6 @@ std::shared_ptr<Scene> Engine::createScene(std::string name)
     scene->camera = this->camera; // i hate this right here
 
     this->currentScene = name; // don't forget to change the current scene
-
     this->scenes.emplace(name, scene);
 
     return scene;
