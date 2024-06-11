@@ -22,7 +22,8 @@ class ResourceManager
 private:
 	//Main vars(constants or semiconstants)
 	std::string relResPath; // full path to res directory
-	const std::string POST_PROCESSING_VERTEX_FILE_NAME = "post_processing.vert";
+	const std::string VERTEX_FILE_EXTENSION = "vert";
+	const std::string FRAGMENT_FILE_EXTENSION = "frag";
 
 public:
 	// --- Maps of loaded objects --- //

@@ -33,6 +33,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 bool shouldDrawGui = false;
+bool usePostProcessing = false;
 
 float FOV = 45.0f;
 
@@ -176,19 +177,20 @@ int main()
     glEnable(GL_STENCIL);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-
-
     // Face culling
-
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
     // --- //
 
+    // Single classes objects inits
+
     ResourceManager resourceManager(RES_PATH);
+    PostProcessing postProcessing(resourceManager.make_post_processing_shaders("screen_shaders"), WIN_WIDTH, WIN_HEIGHT);
     Debugger debugger;
 
+    // --- // 
 
 
     for (unsigned int i = 0; i < pointLights.size(); i++)
@@ -203,8 +205,6 @@ int main()
     auto catcube = resourceManager.make_model("catcube", "objects/catcube/catcube.obj");
     auto anothercat = resourceManager.make_model("anothercat", "objects/catcube/catcube.obj");
     auto catsphere = resourceManager.make_model("catsphere", "objects/catsphere/catsphere.obj");
-  
-    PostProcessing postProcessing(resourceManager.make_post_processing_shaders("screen_shaders"), WIN_WIDTH, WIN_HEIGHT);
 
 
     auto pepe_billboard = resourceManager.make_cyl_billboard("pepe", glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
@@ -231,7 +231,13 @@ int main()
         // input 
         processInput(window);
 
-        postProcessing.deactivate();
+        if (usePostProcessing)
+            postProcessing.deactivate();
+        else {
+            glClearColor(0.77f, 0.73f, 0.77f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            glEnable(GL_DEPTH_TEST);
+        }
         
         defaultShader->Activate();
 
@@ -286,8 +292,9 @@ int main()
         anothercat->Draw(defaultShader);
         catsphere->Draw(defaultShader);
 
-        postProcessing.post_processing("inversion_color");
-        
+        if (usePostProcessing)
+            postProcessing.post_processing("grayscale");
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         pepe_billboard->Draw(defaultShader, cam.m_pos);
@@ -330,6 +337,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     if (key == GLFW_KEY_G && action == GLFW_PRESS)
         spotLights[0].m_enabled = !spotLights[0].m_enabled;
+
+    if (key == GLFW_KEY_9 && action == GLFW_PRESS)
+        usePostProcessing = !usePostProcessing;
 }
 
 // Gets called every frame

@@ -64,6 +64,10 @@ void PostProcessing::post_processing(std::string type_of_processing) {
 			screen_shader->Activate();
 			screen_shader->setInt("screenTexture", 0);
 		}
+		else if (type_of_processing == "grayscale") {
+			screen_shader->Activate();
+			screen_shader->setInt("screenTexture", 0);
+		}
 	}
 	else {
 		std::cerr << "post processing shader::" << type_of_processing << " wasnt found" << std::endl;
