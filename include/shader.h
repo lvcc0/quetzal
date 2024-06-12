@@ -26,8 +26,8 @@ public:
 	void setMat3(const std::string& name, const glm::mat3& value);
 	void setMat4(const std::string& name, const glm::mat4& value);
 
-	void Activate();
-	void Delete();
+	void activateShader();
+	void deleteShader();
 
 private:
 	void compileErrors(unsigned int shader, const char* type);

@@ -27,7 +27,7 @@ class Scene
 {
 public:
     // Camera from the engine class (TODO: think of some more clever way of this later)
-    std::shared_ptr<Camera> camera;
+    std::shared_ptr<Camera> m_Camera;
 
     // Constructor
     Scene();
@@ -37,6 +37,9 @@ public:
 
     // Gets called every frame in the engine class
     void update();
+
+    void setShader(const std::string& name); // set shader to draw stuff with
+    void setScreenShader(const std::string& name); // set postprocessing shader
 
     // Some stuff to add to the scene
     std::shared_ptr<Shader> addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
@@ -52,11 +55,13 @@ public:
 
 private:
     // Vectors with scene lights
-    std::vector<std::shared_ptr<DirLight>> dirLights;
-    std::vector<std::shared_ptr<PointLight>> pointLights;
-    std::vector<std::shared_ptr<SpotLight>> spotLights;
+    std::vector<std::shared_ptr<DirLight>> m_DirLights;
+    std::vector<std::shared_ptr<PointLight>> m_PointLights;
+    std::vector<std::shared_ptr<SpotLight>> m_SpotLights;
 
-    std::shared_ptr<ResourceManager> resourceManager; // every scene has it's own resource manager (may change later)
-    std::shared_ptr<Shader> defaultShader; // a default shader to draw stuff with (may get rid of this later (throw an error of some sort if no shaders were added (perhaps add setShader()?)))
-    std::shared_ptr<PostProcessing> postProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
+    std::shared_ptr<ResourceManager> m_ResourceManager; // every scene has it's own resource manager (may change later)
+    std::shared_ptr<PostProcessing> m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
+    
+    std::shared_ptr<Shader> m_CurrentShader; // a shader to draw stuff with
+    std::shared_ptr<Shader> m_CurrentScreenShader; // a postprocessing shader
 };

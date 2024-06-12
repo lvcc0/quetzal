@@ -116,8 +116,8 @@ void Engine::process()
 
     this->processInput();
 
-    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);                                       // TODO: this stuff is also updating in scene postprocessing
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //
 
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
@@ -133,7 +133,7 @@ void Engine::process()
 std::shared_ptr<Scene> Engine::createScene(std::string name)
 {
     std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-    scene->camera = this->camera; // i hate this right here
+    scene->m_Camera = this->camera; // i hate this right here
 
     this->currentScene = name; // don't forget to change the current scene
     this->scenes.emplace(name, scene);

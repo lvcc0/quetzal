@@ -40,6 +40,9 @@ private:
 class PostProcessing
 {
 public:
+	// Map of shaders
+	std::map<const std::string, std::shared_ptr<Shader>> shaderMap;
+
 	// Constructor
 	PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>& shaderMap, GLfloat width, GLfloat height);
 
@@ -47,7 +50,7 @@ public:
 	~PostProcessing();
 
 	// Postprocessing funcs
-	void activate(std::string type_of_processing);
+	void activate(const std::shared_ptr<Shader>& screen_shader);
 
 	// Deactivating postprocessing (must be used BEFORE any postprocessing funcs and objects drawing)
 	void deactivate();
@@ -56,7 +59,4 @@ private:
 	// Buffers
 	GLuint VAO, VBO;
 	GLuint m_Framebuffer, m_TextureFramebuffer, m_RenderFramebuffer;
-	
-	// Map of shaders
-	std::map<const std::string, std::shared_ptr<Shader>> shaderMap;
 };

@@ -64,34 +64,19 @@ PostProcessing::~PostProcessing() {
 
 	std::map<std::string, std::shared_ptr<Shader>>::iterator iter = shaderMap.begin();
 	while (iter != shaderMap.end()) {
-		iter->second->Delete();
+		iter->second->deleteShader();
 		iter++;
 	}
 }
 
-void PostProcessing::activate(std::string type_of_processing) {
+void PostProcessing::activate(const std::shared_ptr<Shader>& screen_shader) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test
 	glClear(GL_COLOR_BUFFER_BIT); // clear all relevant buffers
 
-	std::shared_ptr<Shader> screen_shader;
+	screen_shader->activateShader();
+	screen_shader->setInt("screenTexture", 0);
 
-	if (shaderMap.find(type_of_processing) != shaderMap.end()) // TODO: almost cartainly rewrite this
-	{
-		screen_shader = shaderMap.find(type_of_processing)->second;
-		if (type_of_processing == "inversion_color") {
-			screen_shader->Activate();
-			screen_shader->setInt("screenTexture", 0);
-		}
-		else if (type_of_processing == "grayscale") {
-			screen_shader->Activate();
-			screen_shader->setInt("screenTexture", 0);
-		}
-	}
-	else
-		std::cerr << "post processing shader::" << type_of_processing << " wasnt found" << std::endl;
-
-	screen_shader->Activate();
 	glBindVertexArray(VAO);
 	glBindTexture(GL_TEXTURE_2D, m_TextureFramebuffer);	// use the color attachment texture as the texture of the quad plane
 	glDrawArrays(GL_TRIANGLES, 0, 6);

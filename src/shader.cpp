@@ -34,12 +34,12 @@ Shader::Shader(std::string vertexCode, std::string fragmentCode)
 	glDeleteShader(fragmentShader);	
 }
 
-void Shader::Activate()
+void Shader::activateShader()
 {
 	glUseProgram(ID);
 }
 
-void Shader::Delete()
+void Shader::deleteShader()
 {
 	glDeleteProgram(ID);
 }
