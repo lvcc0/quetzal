@@ -53,11 +53,8 @@ int main()
     ));
 
     // Main loop
-    while (!glfwWindowShouldClose(engine.window))
+    while (engine.isRunning())
     {
         engine.process();
-
     }
-
-    return 0;
 }

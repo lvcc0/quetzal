@@ -1,10 +1,10 @@
 #include "scene.h"
 
-Scene::Scene()
-{
-    this->resourceManager = std::make_shared<ResourceManager>(RES_PATH);
-    this->defaultShader = this->addShader("default_shader", "shaders/default.vert", "shaders/default.frag");
-}
+Scene::Scene() :
+    resourceManager(std::make_shared<ResourceManager>(RES_PATH)),
+    postProcessing(std::make_shared<PostProcessing>(resourceManager->make_post_processing_shaders("screen_shaders"), 1280, 720)), // TODO: set width and height the normal way
+    defaultShader(this->addShader("default_shader", "shaders/default.vert", "shaders/default.frag"))
+{ /* empty */ }
 
 Scene::~Scene()
 {
@@ -13,6 +13,8 @@ Scene::~Scene()
 
 void Scene::update()
 {
+    this->postProcessing->deactivate();
+
     this->defaultShader->Activate();
 
     glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)this->camera->m_width / (float)this->camera->m_height, 0.1f, 100.0f);
@@ -37,12 +39,6 @@ void Scene::update()
         for (auto i = 0; i < this->pointLights.size(); i++)
         {
             this->pointLights[i]->UpdateUni(this->defaultShader, i);
-
-            //if (pointLights[i]->m_draw_billboard)
-            //{
-            //    pointBillboards[i]->Draw(defaultShader, cam.m_pos);
-            //    pointBillboards[i]->m_pos = pointLights[i].m_pos;
-            //}
         }
     }
     if (!this->spotLights.empty())
@@ -50,12 +46,6 @@ void Scene::update()
         for (auto i = 0; i < this->spotLights.size(); i++)
         {
             this->spotLights[i]->UpdateUni(this->defaultShader, i);
-
-            //if (spotLights[i].m_draw_billboard && spotLights[i].m_name != "flashlight")
-            //{
-            //    spotBillboards[i]->Draw(defaultShader, cam.m_pos);
-            //    spotBillboards[i]->m_pos = spotLights[i].m_pos;
-            //}
         }
     }
 
@@ -65,7 +55,8 @@ void Scene::update()
     if (!this->resourceManager->modelMap.empty())
     {
         std::map<std::string, std::shared_ptr<Model>>::iterator it = this->resourceManager->modelMap.begin();
-        while (it != this->resourceManager->modelMap.end()) {
+        while (it != this->resourceManager->modelMap.end())
+        {
             it->second->Draw(defaultShader);
             it++;
         }
@@ -73,7 +64,8 @@ void Scene::update()
     if (!this->resourceManager->cylBillboardMap.empty())
     {
         std::map<std::string, std::shared_ptr<CylindricalBillboard>>::iterator it = this->resourceManager->cylBillboardMap.begin();
-        while (it != this->resourceManager->cylBillboardMap.end()) {
+        while (it != this->resourceManager->cylBillboardMap.end())
+        {
             it->second->Draw(defaultShader, this->camera->m_pos);
             it++;
         }
@@ -81,11 +73,14 @@ void Scene::update()
     if (!this->resourceManager->sphBillboardMap.empty())
     {
         std::map<std::string, std::shared_ptr<SphericalBillboard>>::iterator it = this->resourceManager->sphBillboardMap.begin();
-        while (it != this->resourceManager->sphBillboardMap.end()) {
+        while (it != this->resourceManager->sphBillboardMap.end())
+        {
             it->second->Draw(defaultShader, this->camera->m_pos);
             it++;
         }
     }
+
+    this->postProcessing->activate("grayscale");
 }
 
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)

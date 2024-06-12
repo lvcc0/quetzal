@@ -86,6 +86,11 @@ void Engine::processInput()
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
 
+bool Engine::isRunning()
+{
+    return !glfwWindowShouldClose(this->window);
+}
+
 // Gets called upon window resize
 void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {

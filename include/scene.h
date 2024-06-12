@@ -58,4 +58,5 @@ private:
 
     std::shared_ptr<ResourceManager> resourceManager; // every scene has it's own resource manager (may change later)
     std::shared_ptr<Shader> defaultShader; // a default shader to draw stuff with (may get rid of this later (throw an error of some sort if no shaders were added (perhaps add setShader()?)))
+    std::shared_ptr<PostProcessing> postProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
 };

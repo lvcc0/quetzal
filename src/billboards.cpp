@@ -1,26 +1,23 @@
 #include "billboards.h"
 
 // --- Cylindrical Billboard --- //
-CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture)
+CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture) :
+    m_pos(pos), m_size(size), m_texture(texture)
 {
-    this->m_pos = pos;
-    this->m_size = size;
-    this->m_texture = texture;
-
     m_vertices =
     {
         Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper left
-        Vertex(glm::vec3( m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
-        Vertex(glm::vec3( m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
+        Vertex(glm::vec3(m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
+        Vertex(glm::vec3(m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
         Vertex(glm::vec3(-m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // lower left
     };
-    
+
     m_indices =
     {
         0, 1, 3,
         3, 1, 2
     };
-    
+
     setupBillboard();
 }
 
@@ -95,26 +92,23 @@ void CylindricalBillboard::scale(glm::vec2 vector)
 // --- //
 
 // --- Spherical Billboard --- //
-SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture)
+SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture) :
+    m_pos(pos), m_size(size), m_texture(texture)
 {
-    this->m_pos = pos;
-    this->m_size = size;
-    this->m_texture = texture;
-
     m_vertices =
     {
         Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper left
-        Vertex(glm::vec3( m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
-        Vertex(glm::vec3( m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
+        Vertex(glm::vec3(m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
+        Vertex(glm::vec3(m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
         Vertex(glm::vec3(-m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // lower left
     };
-    
+
     m_indices =
     {
         0, 1, 3,
         3, 1, 2
     };
-    
+
     setupBillboard();
 }
 

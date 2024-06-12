@@ -2,13 +2,20 @@
 
 Model::Model(std::vector<Vertex> vertices,
              std::vector<unsigned int> indices,
-             std::vector<std::shared_ptr<Texture>>& textures)
+             std::vector<std::shared_ptr<Texture>>& textures) :
+    m_textures(textures)
 {
     m_vertices.swap(vertices);
     m_indices.swap(indices);
-    m_textures = textures;
 
     setupModel(); // setup VAO, VBO, EBO
+}
+
+Model::~Model()
+{
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &VAO);
+    glDeleteBuffers(1, &EBO);
 }
 
 void Model::Draw(std::shared_ptr<Shader>& shader)
@@ -65,6 +72,7 @@ void Model::rotate(float degrees, glm::vec3 vector)
 
 void Model::setupModel()
 {
+    // Vertex Array Object
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 

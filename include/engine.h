@@ -25,6 +25,8 @@ public:
     void createWindow(); // create the glfw window
     void processInput(); // gets called every frame in the process() function below
 
+    bool isRunning();
+
     // Callbacks
     void framebufferSizeCallback(GLFWwindow* window, int width, int height);
     void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);

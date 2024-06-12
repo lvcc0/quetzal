@@ -43,7 +43,7 @@ std::vector<std::shared_ptr<Texture>> ResourceManager::pull_textures_from_mtl(co
 	return textures;
 }
 
-std::map<const std::string, std::shared_ptr<Shader>> ResourceManager::make_post_processing_shaders(std::string path_to_folder)
+std::map<const std::string, std::shared_ptr<Shader>> ResourceManager::make_post_processing_shaders(const std::string& path_to_folder)
 {
     ShaderMap pp_shaderMap;
     std::string vertex_path;

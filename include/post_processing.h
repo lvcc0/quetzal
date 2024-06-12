@@ -10,55 +10,53 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-// main idea: post processing uses custom frame buffers and using them for post processing shaders
-// MAIN RULES FOR EXISTING FRAME BUFFERS::
-// 1) At least one buffer (color, depth or stencil) must be connected.
-// 2) At least one color attachment must be present.
-// 3) All connections must also be completed(provided with allocated memory).
-// 4) Each buffer must have the same number of samples(now idk what`s this).
-class FrameBufferMaker {
-	// Quad verts
-	// vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
-		// positions   // texCoords
-	inline static std::vector<float> quadVertices = { 
-		// positions   // texCoords
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		-1.0f, -1.0f,  0.0f, 0.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
-		 1.0f,  1.0f,  1.0f, 1.0f
-	};
-	
+class FrameBufferMaker
+{	
 public:
-	//Make VAO
-	static void make_vertexArray(GLuint& VAO, GLuint& VBO);
+	// Make VAO
+	static void makeVertexArray(GLuint& VAO, GLuint& VBO);
 
 	// Make buffers
-	static void make_buffers(GLuint &frameBuffer, GLuint &textureFrameBuffer, GLuint &renderFrameBuffer, GLfloat width, GLfloat height);
+	static void makeBuffers(GLuint& frameBuffer, GLuint& textureFrameBuffer, GLuint& renderFrameBuffer, GLfloat width, GLfloat height);
 
-	//Deleting all constructors
+	// Deleting all constructors
 	FrameBufferMaker() = delete;
 	FrameBufferMaker(const FrameBufferMaker& obj) = delete;
 	FrameBufferMaker(const FrameBufferMaker&& obj) = delete;
+
+private:
+	inline static std::vector<float> quadVertices = { // a quad that fills the entire screen
+		// positions   // texCoords
+		-1.0f,  1.0f,  0.0f,  1.0f,
+		-1.0f, -1.0f,  0.0f,  0.0f,
+		 1.0f, -1.0f,  1.0f,  0.0f,
+
+		-1.0f,  1.0f,  0.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,  0.0f,
+		 1.0f,  1.0f,  1.0f,  1.0f
+	};
 };
 
-class PostProcessing {
-	// buffers
-	GLuint VAO, VBO;
-	GLuint frameBuffer, textureFrameBuffer, renderFrameBuffer;
-	// map of shaders
-	typedef std::map<const std::string, std::shared_ptr<Shader>> ShaderMap;
-	ShaderMap shaderMap;
-
+class PostProcessing
+{
 public:
-	// constructor
-	PostProcessing(ShaderMap& shaderMap, GLfloat width, GLfloat height);
-	//destructor
+	// Constructor
+	PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>& shaderMap, GLfloat width, GLfloat height);
+
+	// Destructor
 	~PostProcessing();
-	// post processing funcs
-	void post_processing(std::string type_of_processing);
-	// deactivating post processing(must be used BEFORE any post processing funcs and objects drawing)
+
+	// Postprocessing funcs
+	void activate(std::string type_of_processing);
+
+	// Deactivating postprocessing (must be used BEFORE any postprocessing funcs and objects drawing)
 	void deactivate();
+
+private:
+	// Buffers
+	GLuint VAO, VBO;
+	GLuint m_Framebuffer, m_TextureFramebuffer, m_RenderFramebuffer;
+	
+	// Map of shaders
+	std::map<const std::string, std::shared_ptr<Shader>> shaderMap;
 };

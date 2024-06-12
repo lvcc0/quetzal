@@ -42,6 +42,9 @@ public:
           std::vector<unsigned int> indices,
           std::vector<std::shared_ptr<Texture>>& textures);
     
+    // Destructor
+    ~Model();
+
     // Draw model
     void Draw(std::shared_ptr<Shader>& shader);
 
