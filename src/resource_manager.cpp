@@ -43,6 +43,33 @@ std::vector<std::shared_ptr<Texture>> ResourceManager::pull_textures_from_mtl(co
 	return textures;
 }
 
+std::map<const std::string, std::shared_ptr<Shader>> ResourceManager::make_post_processing_shaders(std::string path_to_folder)
+{
+    ShaderMap pp_shaderMap;
+    std::string vertex_path;
+    std::vector<std::string> fragments_paths; 
+
+    std::string path = relResPath + "/" + path_to_folder;
+    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+        std::string filePath = entry.path().string();
+        std::replace(filePath.begin(), filePath.end(), '\\', '/');
+        std::string file_name_with_extension = filePath.substr(filePath.find_last_of("/") + 1, filePath.size());
+        std::string extension = file_name_with_extension.substr(file_name_with_extension.find(".") + 1, file_name_with_extension.size());
+        if (extension == VERTEX_FILE_EXTENSION) {
+            vertex_path = path_to_folder + "/" + file_name_with_extension;
+        }
+        else {
+            fragments_paths.push_back(path_to_folder + "/" + file_name_with_extension);
+        }
+    }
+    for (GLint i {0}; i < fragments_paths.size(); i++) {
+        std::string full_path = fragments_paths[i];
+        std::string file_name = full_path.substr(full_path.find_last_of("/") + 1, full_path.size() - full_path.find_last_of("/") -(full_path.size()- full_path.find(".") + 1));
+        pp_shaderMap.emplace(file_name, make_shader_program("screen_shader " + file_name, vertex_path, full_path)); // Here shader putting into two maps
+    }
+    return pp_shaderMap;
+}
+
 void ResourceManager::getObjectsInMaps(ObjectType objectType)
 {
     switch (objectType)

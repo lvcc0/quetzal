@@ -56,6 +56,7 @@ int main()
     while (!glfwWindowShouldClose(engine.window))
     {
         engine.process();
+
     }
 
     return 0;

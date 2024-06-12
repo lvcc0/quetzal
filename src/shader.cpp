@@ -12,9 +12,13 @@ Shader::Shader(std::string vertexCode, std::string fragmentCode)
 	glShaderSource(vertexShader, 1, &vShaderSrc, NULL);
 	glCompileShader(vertexShader);
 
+	compileErrors(vertexShader, "");
+
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fShaderSrc, NULL);
 	glCompileShader(fragmentShader);
+
+	compileErrors(fragmentShader, "");
 
 	// SHADER PROGRAM
 
