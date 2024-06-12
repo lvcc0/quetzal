@@ -2,47 +2,54 @@
 
 Engine::Engine(unsigned int width, unsigned int height)
 {
-    this->win_width = width;
-    this->win_height = height;
+    if (!isExist) {
+        isExist = true;
 
-    this->camera = std::make_shared<Camera>(width, height, glm::vec3(0.0f, 0.0f, 5.0f));
+        this->win_width = width;
+        this->win_height = height;
 
-    glfwInit();
+        this->camera = std::make_shared<Camera>(width, height, glm::vec3(0.0f, 0.0f, 5.0f));
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    
-    this->createWindow();
+        glfwInit();
 
-    gladLoadGL();
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        this->createWindow();
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
+        gladLoadGL();
 
-    stbi_set_flip_vertically_on_load(true);
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    // Depth testing
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init();
 
-    // Blending
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        stbi_set_flip_vertically_on_load(true);
 
-    // Stencil testing
-    glEnable(GL_STENCIL);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        // Depth testing
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
 
-    // Face culling
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
+        // Blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        // Stencil testing
+        glEnable(GL_STENCIL);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+        // Face culling
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
+    }
+    else {
+        std::cerr << "ERROR::" << "ENGINE WAS ALREADY INITIATED" << std::endl;
+    }
 }
 
 Engine::~Engine()

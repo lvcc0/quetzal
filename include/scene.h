@@ -23,6 +23,8 @@
 #include "texture.h"
 #include "billboards.h"
 
+enum class ObjectType { SHADER, TEXTURE, MODEL, CYL_BILLBOARD, SPH_BILLBOARD };
+
 class Scene
 {
 public:
@@ -52,6 +54,9 @@ public:
     std::shared_ptr<DirLight> addDirLight(DirLight dir_light);
     std::shared_ptr<PointLight> addPointLight(PointLight point_light);
     std::shared_ptr<SpotLight> addSpotLight(SpotLight spot_light);
+    
+    // Print objects in maps
+    void getObjectsInMaps(ObjectType objectType);
 
 private:
     // Vectors with scene lights
@@ -59,9 +64,25 @@ private:
     std::vector<std::shared_ptr<PointLight>> m_PointLights;
     std::vector<std::shared_ptr<SpotLight>> m_SpotLights;
 
-    std::shared_ptr<ResourceManager> m_ResourceManager; // every scene has it's own resource manager (may change later)
     std::shared_ptr<PostProcessing> m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
     
     std::shared_ptr<Shader> m_CurrentShader; // a shader to draw stuff with
     std::shared_ptr<Shader> m_CurrentScreenShader; // a postprocessing shader
+
+    // --- Maps of loaded objects --- //
+    typedef std::map<const std::string, std::shared_ptr<Shader>> ShaderMap;
+    ShaderMap shaderMap;
+
+    typedef std::map<const std::string, std::shared_ptr<Model>> ModelMap;
+    ModelMap modelMap;
+
+    typedef std::map<const std::string, std::shared_ptr<Texture>> TextureMap;
+    TextureMap textureMap;
+
+    typedef std::map<const std::string, std::shared_ptr<CylindricalBillboard>> CylBillboardMap;
+    CylBillboardMap cylBillboardMap;
+
+    typedef std::map<const std::string, std::shared_ptr<SphericalBillboard>> SphBillboardMap;
+    SphBillboardMap sphBillboardMap;
+    // --- //
 };

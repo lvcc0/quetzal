@@ -19,8 +19,14 @@ public:
     // Constructor
     Engine(unsigned int width, unsigned int height);
 
+    // Delete move and copy constructors
+    Engine(const Engine& obj) = delete;
+    Engine(const Engine&& obj) = delete;
+
     // Destructor
     ~Engine();
+
+    inline static bool isExist = false;
 
     void createWindow(); // create the glfw window
     void processInput(); // gets called every frame in the process() function below

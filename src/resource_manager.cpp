@@ -1,13 +1,8 @@
 #include "resource_manager.h"
 
-ResourceManager::ResourceManager(const std::string& main_path)
-{
-	relResPath = main_path.substr(0, main_path.find_last_of("/\\")); // saving res path
-};
-
 std::string ResourceManager::get_file_string(const std::string& file_rel_path)
 {
-	std::string file_path = relResPath + "/" + file_rel_path.c_str();
+	std::string file_path = relResPath + file_rel_path.c_str();
 	std::ifstream file(file_path, std::ios::in | std::ios::binary);
 
 	if (!file.is_open()) {
@@ -45,11 +40,11 @@ std::vector<std::shared_ptr<Texture>> ResourceManager::pull_textures_from_mtl(co
 
 std::map<const std::string, std::shared_ptr<Shader>> ResourceManager::make_post_processing_shaders(const std::string& path_to_folder)
 {
-    ShaderMap pp_shaderMap;
+    std::map<const std::string, std::shared_ptr<Shader>> pp_shaderMap;
     std::string vertex_path;
     std::vector<std::string> fragments_paths; 
 
-    std::string path = relResPath + "/" + path_to_folder;
+    std::string path = relResPath + path_to_folder;
     for (const auto& entry : std::filesystem::directory_iterator(path)) {
         std::string filePath = entry.path().string();
         std::replace(filePath.begin(), filePath.end(), '\\', '/');
@@ -70,55 +65,6 @@ std::map<const std::string, std::shared_ptr<Shader>> ResourceManager::make_post_
     return pp_shaderMap;
 }
 
-void ResourceManager::getObjectsInMaps(ObjectType objectType)
-{
-    switch (objectType)
-    {
-    case ObjectType::SHADER: {
-        std::map<std::string, std::shared_ptr<Shader>>::iterator iter = shaderMap.begin();
-        while (iter != shaderMap.end()) {
-            std::cout << "shader \"" << iter->first << "\" with id " << iter->second->ID << std::endl;
-            iter++;
-        }
-        break;
-    }
-    case ObjectType::TEXTURE: {
-        std::map<std::string, std::shared_ptr<Texture>>::iterator iter = textureMap.begin();
-        while (iter != textureMap.end()) {
-            std::cout << "texture \"" << iter->first << "\" with id " << iter->second->ID << std::endl;
-            iter++;
-        }
-        break;
-    }
-    case ObjectType::MODEL: {
-        std::map<std::string, std::shared_ptr<Model>>::iterator iter = modelMap.begin();
-        while (iter != modelMap.end()) {
-            std::cout << "model \"" << iter->first << "\"" << std::endl;
-            iter++;
-        }
-        break;
-    }
-    case ObjectType::CYL_BILLBOARD: {
-        std::map<std::string, std::shared_ptr<CylindricalBillboard>>::iterator iter = cylBillboardMap.begin();
-        while (iter != cylBillboardMap.end()) {
-            std::cout << "cylindrical billboard \"" << iter->first << "\"" << std::endl;
-            iter++;
-        }
-        break;
-    }
-    case ObjectType::SPH_BILLBOARD: {
-        std::map<std::string, std::shared_ptr<SphericalBillboard>>::iterator iter = sphBillboardMap.begin();
-        while (iter != sphBillboardMap.end()) {
-            std::cout << "spherical billboard \"" << iter->first << "\"" << std::endl;
-            iter++;
-        }
-        break;
-    }
-    default:
-        std::cout << "the default output of the switch statement in the getObjectsInMaps() function" << std::endl;
-    }
-}
-
 std::shared_ptr<Shader> ResourceManager::make_shader_program(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
 {
     // Getting shader files (.vert and .frag)
@@ -126,14 +72,13 @@ std::shared_ptr<Shader> ResourceManager::make_shader_program(std::string name, c
     std::string fragment_shader_src = get_file_string(fragment_shader_rel_path);
 
     std::shared_ptr<Shader>& shader_program = std::make_shared<Shader>(vertex_shader_src, fragment_shader_src);
-    shaderMap.emplace(name, shader_program);
 
     return shader_program;
 }
 
 std::shared_ptr<Texture> ResourceManager::make_texture(std::string name, std::string type, const std::string& image_rel_path)
 {
-    std::string full_path = relResPath + "/" + image_rel_path;
+    std::string full_path = relResPath + image_rel_path;
 
 	int width, height, numComponents;
 	unsigned char* image = stbi_load(full_path.c_str(), &width, &height, &numComponents, 0);
@@ -145,13 +90,12 @@ std::shared_ptr<Texture> ResourceManager::make_texture(std::string name, std::st
 
 	stbi_image_free(image);
 
-	textureMap.emplace(name, texture);
 	return texture;
 }
 
 std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::string& model_rel_path)
 {
-	std::string full_path = relResPath + "/" + model_rel_path;
+	std::string full_path = relResPath + model_rel_path;
 
 	std::ifstream file(full_path);
 
@@ -264,7 +208,6 @@ std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::
     }
 
 	std::shared_ptr<Model>& model = std::make_shared<Model>(vertices, indices, textures);
-    modelMap.emplace(name, model);
 
 	return model;
 }
@@ -272,7 +215,6 @@ std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::
 std::shared_ptr<CylindricalBillboard> ResourceManager::make_cyl_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
 {
     std::shared_ptr<CylindricalBillboard>& cyl_billboard = std::make_shared<CylindricalBillboard>(pos, size, make_texture(name + "_texture", "texture_diffuse", texture_path));
-    cylBillboardMap.emplace(name, cyl_billboard);
 
     return cyl_billboard;
 }
@@ -280,7 +222,6 @@ std::shared_ptr<CylindricalBillboard> ResourceManager::make_cyl_billboard(std::s
 std::shared_ptr<SphericalBillboard> ResourceManager::make_sph_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
 {
     std::shared_ptr<SphericalBillboard>& sph_billboard = std::make_shared<SphericalBillboard>(pos, size, make_texture(name + "_texture", "texture_diffuse", texture_path));
-    sphBillboardMap.emplace(name, sph_billboard);
 
     return sph_billboard;
 }
