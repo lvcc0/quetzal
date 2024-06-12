@@ -62,6 +62,7 @@ public:
 	std::shared_ptr<Model> make_model(std::string name, const std::string& model_rel_path);
 	std::shared_ptr<CylindricalBillboard> make_cyl_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 	std::shared_ptr<SphericalBillboard> make_sph_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
+
 private:
 	std::string get_file_string(const std::string& file_rel_path); // gets file contents as a string
 	std::vector<std::shared_ptr<Texture>> pull_textures_from_mtl(const std::string& fullfilepath);
