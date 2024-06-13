@@ -1,6 +1,6 @@
 #include "resource_manager.h"
 
-std::string ResourceManager::get_file_string(const std::string& file_rel_path)
+std::string ResourceManager::getFileString(const std::string& file_rel_path)
 {
 	std::string file_path = relResPath + file_rel_path.c_str();
 	std::ifstream file(file_path, std::ios::in | std::ios::binary);
@@ -16,7 +16,7 @@ std::string ResourceManager::get_file_string(const std::string& file_rel_path)
 	return readbuffer.str();
 }
 
-std::vector<std::shared_ptr<Texture>> ResourceManager::pull_textures_from_mtl(const std::string& full_path)
+std::vector<std::shared_ptr<Texture>> ResourceManager::pullTexturesFromMtl(const std::string& full_path)
 {
     std::ifstream file(full_path);
     std::string line;
@@ -30,7 +30,7 @@ std::vector<std::shared_ptr<Texture>> ResourceManager::pull_textures_from_mtl(co
         if (linetype == "map_Kd")
         {
             std::string str = line.substr(line.find(" ") + 1);
-            std::shared_ptr<Texture> texture = make_texture(str, "texture_diffuse", (full_path.substr(0, full_path.find_last_of('/') + 1) + str).erase(0, relResPath.length()));
+            std::shared_ptr<Texture> texture = makeTexture(str, "texture_diffuse", (full_path.substr(0, full_path.find_last_of('/') + 1) + str).erase(0, relResPath.length()));
             textures.push_back(texture);
         }
     }
@@ -38,7 +38,7 @@ std::vector<std::shared_ptr<Texture>> ResourceManager::pull_textures_from_mtl(co
 	return textures;
 }
 
-std::map<const std::string, std::shared_ptr<Shader>> ResourceManager::make_post_processing_shaders(const std::string& path_to_folder)
+std::map<const std::string, std::shared_ptr<Shader>> ResourceManager::makePostProcessingShaders(const std::string& path_to_folder)
 {
     std::map<const std::string, std::shared_ptr<Shader>> pp_shaderMap;
     std::string vertex_path;
@@ -60,23 +60,23 @@ std::map<const std::string, std::shared_ptr<Shader>> ResourceManager::make_post_
     for (GLint i {0}; i < fragments_paths.size(); i++) {
         std::string full_path = fragments_paths[i];
         std::string file_name = full_path.substr(full_path.find_last_of("/") + 1, full_path.size() - full_path.find_last_of("/") -(full_path.size()- full_path.find(".") + 1));
-        pp_shaderMap.emplace(file_name, make_shader_program("screen_shader " + file_name, vertex_path, full_path)); // Here shader putting into two maps
+        pp_shaderMap.emplace(file_name, makeShaderProgram("screen_shader " + file_name, vertex_path, full_path)); // Here shader putting into two maps
     }
     return pp_shaderMap;
 }
 
-std::shared_ptr<Shader> ResourceManager::make_shader_program(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
+std::shared_ptr<Shader> ResourceManager::makeShaderProgram(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
 {
     // Getting shader files (.vert and .frag)
-    std::string vertex_shader_src = get_file_string(vertex_shader_rel_path);
-    std::string fragment_shader_src = get_file_string(fragment_shader_rel_path);
+    std::string vertex_shader_src = getFileString(vertex_shader_rel_path);
+    std::string fragment_shader_src = getFileString(fragment_shader_rel_path);
 
     std::shared_ptr<Shader>& shader_program = std::make_shared<Shader>(vertex_shader_src, fragment_shader_src);
 
     return shader_program;
 }
 
-std::shared_ptr<Texture> ResourceManager::make_texture(std::string name, std::string type, const std::string& image_rel_path)
+std::shared_ptr<Texture> ResourceManager::makeTexture(std::string name, std::string type, const std::string& image_rel_path)
 {
     std::string full_path = relResPath + image_rel_path;
 
@@ -93,7 +93,7 @@ std::shared_ptr<Texture> ResourceManager::make_texture(std::string name, std::st
 	return texture;
 }
 
-std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::string& model_rel_path)
+std::shared_ptr<Model> ResourceManager::makeModel(std::string name, const std::string& model_rel_path)
 {
 	std::string full_path = relResPath + model_rel_path;
 
@@ -201,7 +201,7 @@ std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::
         if (linetype == "mtllib") // corresponding material file
         {
             std::istringstream file_name(line.substr(line.find(" ") + 1));
-            textures = pull_textures_from_mtl(full_path.substr(0, full_path.find_last_of('/') + 1) + file_name.str());
+            textures = pullTexturesFromMtl(full_path.substr(0, full_path.find_last_of('/') + 1) + file_name.str());
 
             continue;
         }
@@ -212,16 +212,16 @@ std::shared_ptr<Model> ResourceManager::make_model(std::string name, const std::
 	return model;
 }
 
-std::shared_ptr<CylindricalBillboard> ResourceManager::make_cyl_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
+std::shared_ptr<CylindricalBillboard> ResourceManager::makeCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
 {
-    std::shared_ptr<CylindricalBillboard>& cyl_billboard = std::make_shared<CylindricalBillboard>(pos, size, make_texture(name + "_texture", "texture_diffuse", texture_path));
+    std::shared_ptr<CylindricalBillboard>& cyl_billboard = std::make_shared<CylindricalBillboard>(pos, size, makeTexture(name + "_texture", "texture_diffuse", texture_path));
 
     return cyl_billboard;
 }
 
-std::shared_ptr<SphericalBillboard> ResourceManager::make_sph_billboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
+std::shared_ptr<SphericalBillboard> ResourceManager::makeSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
 {
-    std::shared_ptr<SphericalBillboard>& sph_billboard = std::make_shared<SphericalBillboard>(pos, size, make_texture(name + "_texture", "texture_diffuse", texture_path));
+    std::shared_ptr<SphericalBillboard>& sph_billboard = std::make_shared<SphericalBillboard>(pos, size, makeTexture(name + "_texture", "texture_diffuse", texture_path));
 
     return sph_billboard;
 }

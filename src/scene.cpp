@@ -1,7 +1,7 @@
 #include "scene.h"
 
 Scene::Scene() :
-    m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::make_post_processing_shaders("screen_shaders"), 1280, 720)) // TODO: set width and height the normal way
+    m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders("screen_shaders"), 1280, 720)) // TODO: set width and height the normal way
 { /* empty */ }
 
 Scene::~Scene()
@@ -100,35 +100,35 @@ void Scene::setScreenShader(const std::string& name)
 
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
 {
-    auto shader = ResourceManager::make_shader_program(name, vertex_shader_rel_path, fragment_shader_rel_path);
+    auto shader = ResourceManager::makeShaderProgram(name, vertex_shader_rel_path, fragment_shader_rel_path);
     shaderMap.emplace(name, shader);
     return shader;
 }
 
 std::shared_ptr<Texture> Scene::addTexture(std::string name, std::string type, const std::string& texture_rel_path)
 {
-    auto texture = ResourceManager::make_texture(name, type, texture_rel_path);
+    auto texture = ResourceManager::makeTexture(name, type, texture_rel_path);
     textureMap.emplace(name, texture);
     return texture;
 }
 
 std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& model_rel_path)
 {
-    auto model = ResourceManager::make_model(name, model_rel_path);
+    auto model = ResourceManager::makeModel(name, model_rel_path);
     modelMap.emplace(name, model);
     return model;
 }
 
 std::shared_ptr<CylindricalBillboard> Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
 {
-    auto cyl_billboard = ResourceManager::make_cyl_billboard(name, pos, size, texture_path);
+    auto cyl_billboard = ResourceManager::makeCylBillboard(name, pos, size, texture_path);
     cylBillboardMap.emplace(name, cyl_billboard);
     return cyl_billboard;
 }
 
 std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
 {
-    auto sph_billboard = ResourceManager::make_sph_billboard(name, pos, size, texture_path);
+    auto sph_billboard = ResourceManager::makeSphBillboard(name, pos, size, texture_path);
     sphBillboardMap.emplace(name, sph_billboard);
     return sph_billboard;
 }
