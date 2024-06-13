@@ -55,7 +55,7 @@ void Scene::update()
 
     // TODO: do something with billboards corresponding to point- and spotlights
 
-    // Draw all the stuff inside all of the maps in corresponding resource manager
+    // Draw all the stuff inside all of the maps 
     if (!this->modelMap.empty())
     {
         std::map<std::string, std::shared_ptr<Model>>::iterator it = this->modelMap.begin();

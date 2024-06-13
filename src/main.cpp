@@ -13,7 +13,7 @@ int main()
 
     first_scene->setShader("default_shader");
     first_scene->setScreenShader("inversion_color");
-    first_scene->addModel("catcube", "objects/catcube/catcube.obj");
+    auto model = first_scene->addModel("catcube", "objects/catcube/catcube.obj");
     first_scene->addModel("catsphere", "objects/catsphere/catsphere.obj");
     first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
     first_scene->addSphBillboard("pepeboard", glm::vec3(5.0f, 4.0f, -2.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
@@ -60,6 +60,8 @@ int main()
     // Main loop
     while (engine.isRunning())
     {
+        model->translate(glm::vec3(5.0, 5.0, 0.0));
+        model->scale(glm::vec3(3.0, 2.0, 3.0));
         engine.process();
     }
 }

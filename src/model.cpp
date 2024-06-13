@@ -11,6 +11,17 @@ Model::Model(std::vector<Vertex> vertices,
     setupModel(); // setup VAO, VBO, EBO
 }
 
+Model::Model(const Model& obj)
+{
+    this->m_vertices = obj.m_vertices;
+    this->m_indices = obj.m_indices;
+    this->m_textures = obj.m_textures;
+    this->m_model_matrix = obj.m_model_matrix;
+    this->VBO = obj.VBO;
+    this->EBO = obj.EBO;
+    this->VAO = obj.VAO;
+}
+
 Model::~Model()
 {
     glDeleteBuffers(1, &VBO);

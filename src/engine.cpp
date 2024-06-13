@@ -124,7 +124,7 @@ void Engine::process()
     this->processInput();
 
     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);                                       // TODO: this stuff is also updating in scene postprocessing
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // COMMENT: IMHO it isn`t a problem
 
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
