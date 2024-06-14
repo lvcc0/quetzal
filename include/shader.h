@@ -14,8 +14,13 @@ class Shader
 public:
 	GLuint ID;
 
-	Shader(std::string vertexCode, std::string fragmentCode);
+	// Constructor
+	Shader(std::string& vertexCode, std::string& fragmentCode);
 
+	// Destructor
+	~Shader();
+
+	// A bunch of functions to set shader uniforms
 	void setBool(const std::string& name, bool value);
 	void setInt(const std::string& name, int value);
 	void setFloat(const std::string& name, float value);

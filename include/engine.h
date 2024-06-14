@@ -11,7 +11,6 @@ class Engine
 {
 public:
     GLFWwindow* window;
-    std::shared_ptr<Camera> camera;
 
     std::map<const std::string, std::shared_ptr<Scene>> scenes;
     std::string currentScene;
@@ -26,12 +25,13 @@ public:
     // Destructor
     ~Engine();
 
-    inline static bool isExist = false;
+    bool isRunning();
+
+    float getDeltaTime();
+    float getLastFrame();
 
     void createWindow(); // create the glfw window
     void processInput(); // gets called every frame in the process() function below
-
-    bool isRunning();
 
     // Callbacks
     void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -44,9 +44,13 @@ public:
     std::shared_ptr<Scene> createScene(std::string name);
 
 private:
-    unsigned int win_width;
-    unsigned int win_height;
+    unsigned int winWidth;
+    unsigned int winHeight;
     
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 };
+
+// Callback static wrappers (because glfw doesn't know objects)
+static void framebufferSizeCallbackWrapper(GLFWwindow* window, int width, int height);
+static void keyCallbackWrapper(GLFWwindow* window, int key, int scancode, int action, int mods);

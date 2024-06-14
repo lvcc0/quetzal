@@ -1,7 +1,8 @@
 #include "scene.h"
 
-Scene::Scene() :
-    m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders("screen_shaders"), 1280, 720)) // TODO: set width and height the normal way
+Scene::Scene(Camera& camera) :
+    m_Camera(std::make_shared<Camera>(camera)),
+    m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders("screen_shaders"), camera.m_width, camera.m_height))
 { /* empty */ }
 
 Scene::~Scene()
@@ -35,21 +36,21 @@ void Scene::update()
     {
         for (auto i = 0; i < this->m_DirLights.size(); i++)
         {
-            this->m_DirLights[i]->UpdateUni(this->m_CurrentShader, i);
+            this->m_DirLights[i]->updateUni(this->m_CurrentShader, i);
         }
     }
     if (!this->m_PointLights.empty())
     {
         for (auto i = 0; i < this->m_PointLights.size(); i++)
         {
-            this->m_PointLights[i]->UpdateUni(this->m_CurrentShader, i);
+            this->m_PointLights[i]->updateUni(this->m_CurrentShader, i);
         }
     }
     if (!this->m_SpotLights.empty())
     {
         for (auto i = 0; i < this->m_SpotLights.size(); i++)
         {
-            this->m_SpotLights[i]->UpdateUni(this->m_CurrentShader, i);
+            this->m_SpotLights[i]->updateUni(this->m_CurrentShader, i);
         }
     }
 
@@ -95,7 +96,7 @@ void Scene::setShader(const std::string& name)
 
 void Scene::setScreenShader(const std::string& name)
 {
-    this->m_CurrentScreenShader = this->m_PostProcessing->shaderMap.at(name);
+    this->m_CurrentScreenShader = this->m_PostProcessing->m_ShaderMap.at(name);
 }
 
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
@@ -133,7 +134,7 @@ std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm
     return sph_billboard;
 }
 
-std::shared_ptr<DirLight> Scene::addDirLight(DirLight dir_light)
+std::shared_ptr<DirLight> Scene::addDirLight(DirLight& dir_light)
 {
     std::shared_ptr<DirLight> light = std::make_shared<DirLight>(dir_light);
     this->m_DirLights.push_back(light);
@@ -141,7 +142,7 @@ std::shared_ptr<DirLight> Scene::addDirLight(DirLight dir_light)
     return light;
 }
 
-std::shared_ptr<PointLight> Scene::addPointLight(PointLight point_light)
+std::shared_ptr<PointLight> Scene::addPointLight(PointLight& point_light)
 {
     std::shared_ptr<PointLight> light = std::make_shared<PointLight>(point_light);
     this->m_PointLights.push_back(light);
@@ -149,7 +150,7 @@ std::shared_ptr<PointLight> Scene::addPointLight(PointLight point_light)
     return light;
 }
 
-std::shared_ptr<SpotLight> Scene::addSpotLight(SpotLight spot_light)
+std::shared_ptr<SpotLight> Scene::addSpotLight(SpotLight& spot_light)
 {
     std::shared_ptr<SpotLight> light = std::make_shared<SpotLight>(spot_light);
     this->m_SpotLights.push_back(light);

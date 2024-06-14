@@ -26,8 +26,10 @@ public:
 	float m_sens = 100.0f;
 
 	// Constructor
-	Camera( int width, int height, glm::vec3 pos ) :
-		m_width(width), m_height(height), m_pos(pos) { /* empty */ }
+	Camera(int width, int height, glm::vec3 pos);
+
+	// Copy constructor
+	Camera(const Camera& obj);
 
 	// Returns current view matrix
 	glm::mat4 getViewMatrix();

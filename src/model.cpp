@@ -1,7 +1,7 @@
 #include "model.h"
 
-Model::Model(std::vector<Vertex> vertices,
-             std::vector<unsigned int> indices,
+Model::Model(std::vector<Vertex>& vertices,
+             std::vector<unsigned int>& indices,
              std::vector<std::shared_ptr<Texture>>& textures) :
     m_textures(textures)
 {
@@ -11,16 +11,15 @@ Model::Model(std::vector<Vertex> vertices,
     setupModel(); // setup VAO, VBO, EBO
 }
 
-Model::Model(const Model& obj)
-{
-    this->m_vertices = obj.m_vertices;
-    this->m_indices = obj.m_indices;
-    this->m_textures = obj.m_textures;
-    this->m_model_matrix = obj.m_model_matrix;
-    this->VBO = obj.VBO;
-    this->EBO = obj.EBO;
-    this->VAO = obj.VAO;
-}
+Model::Model(const Model& obj) :
+    m_vertices(obj.m_vertices),
+    m_indices(obj.m_indices),
+    m_textures(obj.m_textures),
+    m_model_matrix(obj.m_model_matrix),
+    VBO(obj.VBO),
+    EBO(obj.EBO),
+    VAO(obj.VAO)
+{ /* empty */ }
 
 Model::~Model()
 {

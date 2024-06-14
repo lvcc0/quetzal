@@ -1,7 +1,7 @@
 #include "shader.h"
 
 
-Shader::Shader(std::string vertexCode, std::string fragmentCode)
+Shader::Shader(std::string& vertexCode, std::string& fragmentCode)
 {
 	const char* vShaderSrc = vertexCode.c_str();
 	const char* fShaderSrc = fragmentCode.c_str();
@@ -32,6 +32,11 @@ Shader::Shader(std::string vertexCode, std::string fragmentCode)
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);	
+}
+
+Shader::~Shader()
+{
+	deleteShader();
 }
 
 void Shader::activateShader()

@@ -6,17 +6,18 @@ int main()
     const unsigned int WIN_HEIGHT = 720;
 
     Engine engine(WIN_WIDTH, WIN_HEIGHT);
-    
+
     auto first_scene = engine.createScene("first_scene");
 
     first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag");
 
     first_scene->setShader("default_shader");
     first_scene->setScreenShader("inversion_color");
-    auto model = first_scene->addModel("catcube", "objects/catcube/catcube.obj");
-    first_scene->addModel("catsphere", "objects/catsphere/catsphere.obj");
-    first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
-    first_scene->addSphBillboard("pepeboard", glm::vec3(5.0f, 4.0f, -2.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
+
+    auto catCube = first_scene->addModel("catcube", "objects/catcube/catcube.obj");
+    auto catSphere = first_scene->addModel("catsphere", "objects/catsphere/catsphere.obj");
+    auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(5.0f, 4.0f, -2.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
+    auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
 
     first_scene->addDirLight(DirLight(
         true,
@@ -60,8 +61,13 @@ int main()
     // Main loop
     while (engine.isRunning())
     {
-        model->translate(glm::vec3(5.0, 5.0, 0.0));
-        model->scale(glm::vec3(3.0, 2.0, 3.0));
+        catCube->translate(glm::vec3(5.0, 5.0, 0.0));
+        catCube->scale(glm::vec3(3.0, 2.0, 3.0));
+
+        catSphere->rotate(engine.getLastFrame() * 15, glm::vec3(0.0f, 1.0f, 0.0f));
+
+        pepeBoard->translate(glm::vec3(cos(engine.getLastFrame()) * 10.0f, 0.0f, sin(engine.getLastFrame()) * 10.0f)); // TODO: billboard sprite renders somewhat weirdly when camera.y = board.y
+
         engine.process();
     }
 }

@@ -38,8 +38,8 @@ public:
     std::vector<std::shared_ptr<Texture>> m_textures;
 
     // Constructor
-    Model(std::vector<Vertex> vertices,
-          std::vector<unsigned int> indices,
+    Model(std::vector<Vertex>& vertices,
+          std::vector<unsigned int>& indices,
           std::vector<std::shared_ptr<Texture>>& textures);
     
     // Copy constructor

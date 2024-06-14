@@ -28,11 +28,11 @@ enum class ObjectType { SHADER, TEXTURE, MODEL, CYL_BILLBOARD, SPH_BILLBOARD };
 class Scene
 {
 public:
-    // Camera from the engine class (TODO: think of some more clever way of this later)
+    // Camera (TODO: make it just a camera object, not a pointer perhaps)
     std::shared_ptr<Camera> m_Camera;
 
     // Constructor
-    Scene();
+    Scene(Camera& camera);
 
     // Destructor
     ~Scene();
@@ -51,9 +51,9 @@ public:
     std::shared_ptr<SphericalBillboard> addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 
     // Add lights to the scene
-    std::shared_ptr<DirLight> addDirLight(DirLight dir_light);
-    std::shared_ptr<PointLight> addPointLight(PointLight point_light);
-    std::shared_ptr<SpotLight> addSpotLight(SpotLight spot_light);
+    std::shared_ptr<DirLight> addDirLight(DirLight& dir_light);
+    std::shared_ptr<PointLight> addPointLight(PointLight& point_light);
+    std::shared_ptr<SpotLight> addSpotLight(SpotLight& spot_light);
     
     // Print objects in maps
     void getObjectsInMaps(ObjectType objectType);

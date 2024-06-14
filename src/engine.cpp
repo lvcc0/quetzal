@@ -1,55 +1,44 @@
 #include "engine.h"
 
-Engine::Engine(unsigned int width, unsigned int height)
+Engine::Engine(unsigned int width, unsigned int height) :
+    winWidth(width), winHeight(height)
 {
-    if (!isExist) {
-        isExist = true;
+    glfwInit();
 
-        this->win_width = width;
-        this->win_height = height;
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        this->camera = std::make_shared<Camera>(width, height, glm::vec3(0.0f, 0.0f, 5.0f));
+    this->createWindow();
 
-        glfwInit();
+    gladLoadGL();
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-        this->createWindow();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
-        gladLoadGL();
+    stbi_set_flip_vertically_on_load(true);
 
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    // Depth testing
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init();
+    // Blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        stbi_set_flip_vertically_on_load(true);
+    // Stencil testing
+    glEnable(GL_STENCIL);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-        // Depth testing
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-
-        // Blending
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        // Stencil testing
-        glEnable(GL_STENCIL);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-        // Face culling
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glFrontFace(GL_CCW);
-    }
-    else {
-        std::cerr << "ERROR::" << "ENGINE WAS ALREADY INITIATED" << std::endl;
-    }
+    // Face culling
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
 }
 
 Engine::~Engine()
@@ -64,9 +53,24 @@ Engine::~Engine()
     glfwTerminate();
 }
 
+bool Engine::isRunning()
+{
+    return !glfwWindowShouldClose(this->window);
+}
+
+float Engine::getDeltaTime()
+{
+    return this->deltaTime;
+}
+
+float Engine::getLastFrame()
+{
+    return this->lastFrame;
+}
+
 void Engine::createWindow()
 {
-    this->window = glfwCreateWindow(win_width, win_height, "quetzal", NULL, NULL);
+    this->window = glfwCreateWindow(winWidth, winHeight, "quetzal", NULL, NULL);
 
     if (this->window == NULL)
     {
@@ -76,16 +80,17 @@ void Engine::createWindow()
     }
 
     glfwMakeContextCurrent(this->window);
+    glfwSetWindowUserPointer(this->window, reinterpret_cast<void*>(this));
 
-    // TODO: fix these callbacks
-    //glfwSetFramebufferSizeCallback(this->window, framebufferSizeCallback);
-    //glfwSetKeyCallback(this->window, keyCallback);
+    glfwSetFramebufferSizeCallback(this->window, framebufferSizeCallbackWrapper);
+    glfwSetKeyCallback(this->window, keyCallbackWrapper);
 }
 
 // Gets called every frame
 void Engine::processInput()
 {
-    this->camera->Inputs(this->window, deltaTime);
+    if (!this->scenes.empty() && this->scenes.count(this->currentScene))
+        this->scenes.at(this->currentScene)->m_Camera->Inputs(this->window, deltaTime);
 
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(this->window, true);
@@ -93,16 +98,13 @@ void Engine::processInput()
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
 
-bool Engine::isRunning()
-{
-    return !glfwWindowShouldClose(this->window);
-}
-
 // Gets called upon window resize
 void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-    this->camera->UpdateSize(width, height);
+
+    if (!this->scenes.empty() && this->scenes.count(this->currentScene))
+        this->scenes.at(this->currentScene)->m_Camera->UpdateSize(width, height);
 }
 
 // Gets called upon key press
@@ -139,11 +141,26 @@ void Engine::process()
 
 std::shared_ptr<Scene> Engine::createScene(std::string name)
 {
-    std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-    scene->m_Camera = this->camera; // i hate this right here
+    std::shared_ptr<Scene> scene = std::make_shared<Scene>(Camera(this->winWidth, this->winHeight, glm::vec3(0.0f)));
 
     this->currentScene = name; // don't forget to change the current scene
     this->scenes.emplace(name, scene);
 
     return scene;
+}
+
+static void framebufferSizeCallbackWrapper(GLFWwindow* window, int width, int height)
+{
+    Engine* engine = reinterpret_cast<Engine*>(glfwGetWindowUserPointer(window));
+
+    if (engine)
+        engine->framebufferSizeCallback(window, width, height);
+}
+
+static void keyCallbackWrapper(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    Engine* engine = reinterpret_cast<Engine*>(glfwGetWindowUserPointer(window));
+
+    if (engine)
+        engine->keyCallback(window, key, scancode, action, mods);
 }

@@ -1,7 +1,7 @@
 #include "billboards.h"
 
 // --- Cylindrical Billboard --- //
-CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture) :
+CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture>& texture) :
     m_pos(pos), m_size(size), m_texture(texture)
 {
     m_vertices =
@@ -92,7 +92,7 @@ void CylindricalBillboard::scale(glm::vec2 vector)
 // --- //
 
 // --- Spherical Billboard --- //
-SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture) :
+SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture>& texture) :
     m_pos(pos), m_size(size), m_texture(texture)
 {
     m_vertices =

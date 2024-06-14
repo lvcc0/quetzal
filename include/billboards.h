@@ -27,7 +27,7 @@ public:
     glm::vec2 m_size;
     
     // Constructor
-    CylindricalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture);
+    CylindricalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture>& texture);
 
     // Draw billboard and change it's model matrix
     void Draw(std::shared_ptr<Shader>& shader, glm::vec3 object_pos);
@@ -57,7 +57,7 @@ public:
     glm::vec2 m_size;
 
     // Constructor
-    SphericalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture> texture);
+    SphericalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture>& texture);
 
     // Draw billboard and change it's model matrix
     void Draw(std::shared_ptr<Shader>& shader, glm::vec3 player_pos);
