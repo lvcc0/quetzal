@@ -1,4 +1,6 @@
 #include "post_processing.h"
+#include "post_processing.h"
+#include "post_processing.h"
 
 PostProcessing::PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>& shaderMap, GLfloat width, GLfloat height) :
 	m_ShaderMap(shaderMap)
@@ -36,6 +38,32 @@ void PostProcessing::activate(const std::shared_ptr<Shader>& screen_shader)
 	glBindTexture(GL_TEXTURE_2D, m_TextureFramebuffer);	// use the color attachment texture as the texture of the quad plane
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+
+void PostProcessing::recreate(GLuint width, GLuint height)
+{
+	// Framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
+
+	// Color attachment texture
+	glBindTexture(GL_TEXTURE_2D, m_TextureFramebuffer);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_TextureFramebuffer, 0);
+
+	// Renderbuffer (for depth and stencil attachments)
+	glBindRenderbuffer(GL_RENDERBUFFER, m_RenderFramebuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RenderFramebuffer);
+
+	// Check if the framebuffer we created is actually complete now
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cerr << "ERROR::FRAMEBUFFER RECREATION WASN'T COMPLETED::ID " << m_Framebuffer << std::endl;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 
 void PostProcessing::deactivate()
 {

@@ -1,4 +1,7 @@
 #include "scene.h"
+#include "scene.h"
+#include "scene.h"
+#include "scene.h"
 
 Scene::Scene(Camera& camera) :
     m_Camera(std::make_shared<Camera>(camera)),
@@ -132,6 +135,27 @@ std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm
     auto sph_billboard = ResourceManager::makeSphBillboard(name, pos, size, texture_path);
     sphBillboardMap.emplace(name, sph_billboard);
     return sph_billboard;
+}
+
+std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<Model> const model)
+{
+    auto c_model = std::make_shared<Model>(*model);
+    modelMap.emplace(name, c_model);
+    return c_model;
+}
+
+std::shared_ptr<CylindricalBillboard> Scene::copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> const cyl_billboard)
+{
+    auto c_cyl_billboard = std::make_shared<CylindricalBillboard>(*cyl_billboard);
+    cylBillboardMap.emplace(name, c_cyl_billboard);
+    return c_cyl_billboard;
+}
+
+std::shared_ptr<SphericalBillboard> Scene::copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> const sph_billboard)
+{
+    auto c_sph_billboard = std::make_shared<SphericalBillboard>(*sph_billboard);
+    sphBillboardMap.emplace(name, c_sph_billboard);
+    return c_sph_billboard;
 }
 
 std::shared_ptr<DirLight> Scene::addDirLight(DirLight& dir_light)

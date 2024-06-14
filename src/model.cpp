@@ -12,12 +12,9 @@ Model::Model(std::vector<Vertex>& vertices,
 }
 
 Model::Model(const Model& obj) :
-    m_vertices(obj.m_vertices),
     m_indices(obj.m_indices),
     m_textures(obj.m_textures),
     m_model_matrix(obj.m_model_matrix),
-    VBO(obj.VBO),
-    EBO(obj.EBO),
     VAO(obj.VAO)
 { /* empty */ }
 

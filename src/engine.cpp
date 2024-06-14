@@ -103,8 +103,10 @@ void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 
-    if (!this->scenes.empty() && this->scenes.count(this->currentScene))
+    if (!this->scenes.empty() && this->scenes.count(this->currentScene)) {
         this->scenes.at(this->currentScene)->m_Camera->UpdateSize(width, height);
+        this->scenes.at(this->currentScene)->m_PostProcessing->recreate(width, height);
+    }
 }
 
 // Gets called upon key press

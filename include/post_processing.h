@@ -10,9 +10,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-// TODO: upon resizing the framebuffer doesn't respond correctly and fucks up big time
-//       https://gamedev.stackexchange.com/questions/91991/ <- this can help
-
 class PostProcessing
 {
 public:
@@ -27,6 +24,8 @@ public:
 
 	// Postprocessing funcs
 	void activate(const std::shared_ptr<Shader>& screen_shader);
+
+	void recreate(GLuint width, GLuint height);
 
 	// Deactivating postprocessing (must be used BEFORE any postprocessing funcs and objects drawing)
 	void deactivate();

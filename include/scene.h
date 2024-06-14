@@ -30,6 +30,7 @@ class Scene
 public:
     // Camera (TODO: make it just a camera object, not a pointer perhaps)
     std::shared_ptr<Camera> m_Camera;
+    std::shared_ptr<PostProcessing> m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
 
     // Constructor
     Scene(Camera& camera);
@@ -50,6 +51,11 @@ public:
     std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
     std::shared_ptr<SphericalBillboard> addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 
+    // Some stuff to copy in the scene
+    std::shared_ptr<Model> copyModel(std::string name, const std::shared_ptr<Model> const model);
+    std::shared_ptr<CylindricalBillboard> copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> const cyl_billboard);
+    std::shared_ptr<SphericalBillboard> copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> const sph_billboard);
+
     // Add lights to the scene
     std::shared_ptr<DirLight> addDirLight(DirLight& dir_light);
     std::shared_ptr<PointLight> addPointLight(PointLight& point_light);
@@ -63,8 +69,6 @@ private:
     std::vector<std::shared_ptr<DirLight>> m_DirLights;
     std::vector<std::shared_ptr<PointLight>> m_PointLights;
     std::vector<std::shared_ptr<SpotLight>> m_SpotLights;
-
-    std::shared_ptr<PostProcessing> m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
     
     std::shared_ptr<Shader> m_CurrentShader; // a shader to draw stuff with
     std::shared_ptr<Shader> m_CurrentScreenShader; // a postprocessing shader
