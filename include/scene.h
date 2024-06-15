@@ -41,6 +41,9 @@ public:
     // Gets called every frame in the engine class
     void update();
 
+    // Set post processing
+    void setPostProcessing();
+
     void setShader(const std::string& name); // set shader to draw stuff with
     void setScreenShader(const std::string& name); // set postprocessing shader
 
@@ -70,6 +73,9 @@ public:
     void getObjectsInMaps(ObjectType objectType);
 
 private:
+    // Post processing bool
+    bool m_is_PostProcessing = false;
+
     // Vectors with scene lights
     std::vector<std::shared_ptr<DirLight>> m_DirLights;
     std::vector<std::shared_ptr<PointLight>> m_PointLights;

@@ -112,7 +112,8 @@ void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 // Gets called upon key press
 void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    // do something here :P
+    if (key == GLFW_KEY_0 && action == GLFW_PRESS)
+        this->scenes.at(this->currentScene)->setPostProcessing();
 }
 
 void Engine::process()

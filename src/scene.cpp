@@ -1,10 +1,5 @@
 #include "scene.h"
 #include "scene.h"
-#include "scene.h"
-#include "scene.h"
-#include "scene.h"
-#include "scene.h"
-#include "scene.h"
 
 Scene::Scene(Camera& camera) :
     m_Camera(std::make_shared<Camera>(camera)),
@@ -23,7 +18,7 @@ Scene::~Scene()
 
 void Scene::update()
 {
-    if (m_CurrentScreenShader)
+    if (m_CurrentScreenShader && m_is_PostProcessing)
         this->m_PostProcessing->deactivate();
 
     this->m_CurrentShader->activateShader();
@@ -91,8 +86,13 @@ void Scene::update()
         }
     }
 
-    if (m_CurrentScreenShader)
+    if (m_CurrentScreenShader && m_is_PostProcessing)
         this->m_PostProcessing->activate(m_CurrentScreenShader);
+}
+
+void Scene::setPostProcessing()
+{
+    m_is_PostProcessing = !m_is_PostProcessing;
 }
 
 void Scene::setShader(const std::string& name)
