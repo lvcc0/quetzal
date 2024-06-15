@@ -56,6 +56,11 @@ public:
     std::shared_ptr<CylindricalBillboard> copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> const cyl_billboard);
     std::shared_ptr<SphericalBillboard> copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> const sph_billboard);
 
+    // Some stuff to delete in the scene
+    void deleteModel(std::string name, std::shared_ptr<Model>& model);
+    void deleteCylBillboard(std::string name, std::shared_ptr<CylindricalBillboard>& cyl_billboard);
+    void deleteSphBillboard(std::string name, std::shared_ptr<SphericalBillboard>& sph_billboard);
+
     // Add lights to the scene
     std::shared_ptr<DirLight> addDirLight(DirLight& dir_light);
     std::shared_ptr<PointLight> addPointLight(PointLight& point_light);

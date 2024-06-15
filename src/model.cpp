@@ -23,6 +23,8 @@ Model::~Model()
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &VAO);
     glDeleteBuffers(1, &EBO);
+    
+    std::cout << "model deleted with VAO::"<< VAO << std::endl;
 }
 
 void Model::Draw(std::shared_ptr<Shader>& shader)

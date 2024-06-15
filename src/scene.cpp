@@ -2,6 +2,9 @@
 #include "scene.h"
 #include "scene.h"
 #include "scene.h"
+#include "scene.h"
+#include "scene.h"
+#include "scene.h"
 
 Scene::Scene(Camera& camera) :
     m_Camera(std::make_shared<Camera>(camera)),
@@ -156,6 +159,24 @@ std::shared_ptr<SphericalBillboard> Scene::copySphBillboard(std::string name, co
     auto c_sph_billboard = std::make_shared<SphericalBillboard>(*sph_billboard);
     sphBillboardMap.emplace(name, c_sph_billboard);
     return c_sph_billboard;
+}
+
+void Scene::deleteModel(std::string name, std::shared_ptr<Model>& model)
+{
+    modelMap.erase(name);
+    model.reset();
+}
+
+void Scene::deleteCylBillboard(std::string name, std::shared_ptr<CylindricalBillboard>& cyl_billboard)
+{
+    cylBillboardMap.erase(name);
+    cyl_billboard.reset();
+}
+
+void Scene::deleteSphBillboard(std::string name, std::shared_ptr<SphericalBillboard>& sph_billboard)
+{
+    sphBillboardMap.erase(name);
+    sph_billboard.reset();
 }
 
 std::shared_ptr<DirLight> Scene::addDirLight(DirLight& dir_light)
