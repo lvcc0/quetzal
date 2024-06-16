@@ -25,13 +25,16 @@ public:
     // Destructor
     ~Engine();
 
-    bool isRunning();
+    bool isRunning() const;
 
-    float getDeltaTime();
-    float getLastFrame();
+    float getDeltaTime() const;
+    float getLastFrame() const;
 
     void createWindow(); // create the glfw window
     void processInput(); // gets called every frame in the process() function below
+
+    // Shows imgui config window
+    void showGuiWindow();
 
     // Callbacks
     void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -44,6 +47,8 @@ public:
     std::shared_ptr<Scene> createScene(std::string name);
 
 private:
+    bool shouldDrawGui = false;
+
     unsigned int winWidth;
     unsigned int winHeight;
     

@@ -68,7 +68,7 @@ int main()
 
         catSphere->rotate(engine.getLastFrame() * 15, glm::vec3(0.0f, 1.0f, 0.0f));
 
-        pepeBoard->translate(glm::vec3(cos(engine.getLastFrame()) * 10.0f, 0.0f, sin(engine.getLastFrame()) * 10.0f)); // TODO: billboard sprite renders somewhat weirdly when camera.y = board.y
+        pepeBoard->translate(glm::vec3(cos(engine.getLastFrame()) * 10.0f, 0.0f, sin(engine.getLastFrame()) * 10.0f));
 
         engine.process();
     }

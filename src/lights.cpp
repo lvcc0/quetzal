@@ -1,7 +1,7 @@
 #include "lights.h"
 
 // --- Dir Light --- //
-void DirLight::updateUni(std::shared_ptr<Shader>& shader, int index)
+void DirLight::updateUni(std::shared_ptr<Shader>& shader, int index) const
 {
     std::string name = "dirLights[" + std::to_string(index) + "]";
 
@@ -16,7 +16,7 @@ void DirLight::updateUni(std::shared_ptr<Shader>& shader, int index)
 // --- //
 
 // --- Point Light --- //
-void PointLight::updateUni(std::shared_ptr<Shader>& shader, int index)
+void PointLight::updateUni(std::shared_ptr<Shader>& shader, int index) const
 {
     std::string name = "pointLights[" + std::to_string(index) + "]";
 
@@ -40,7 +40,7 @@ void PointLight::enableBillboard()
 // --- //
 
 // --- Spot Light --- //
-void SpotLight::updateUni(std::shared_ptr<Shader>& shader, int index)
+void SpotLight::updateUni(std::shared_ptr<Shader>& shader, int index) const
 {
     std::string name = "spotLights[" + std::to_string(index) + "]";
 

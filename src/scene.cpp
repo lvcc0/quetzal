@@ -1,9 +1,8 @@
 #include "scene.h"
-#include "scene.h"
 
 Scene::Scene(Camera& camera) :
     m_Camera(std::make_shared<Camera>(camera)),
-    m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders("screen_shaders"), camera.m_width, camera.m_height))
+    m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders("postprocess"), camera.m_width, camera.m_height))
 { /* empty */ }
 
 Scene::~Scene()
@@ -18,7 +17,7 @@ Scene::~Scene()
 
 void Scene::update()
 {
-    if (m_CurrentScreenShader && m_is_PostProcessing)
+    if (m_CurrentScreenShader && m_IsPostProcessing)
         this->m_PostProcessing->deactivate();
 
     this->m_CurrentShader->activateShader();
@@ -36,23 +35,17 @@ void Scene::update()
     if (!this->m_DirLights.empty())
     {
         for (auto i = 0; i < this->m_DirLights.size(); i++)
-        {
             this->m_DirLights[i]->updateUni(this->m_CurrentShader, i);
-        }
     }
     if (!this->m_PointLights.empty())
     {
         for (auto i = 0; i < this->m_PointLights.size(); i++)
-        {
             this->m_PointLights[i]->updateUni(this->m_CurrentShader, i);
-        }
     }
     if (!this->m_SpotLights.empty())
     {
         for (auto i = 0; i < this->m_SpotLights.size(); i++)
-        {
             this->m_SpotLights[i]->updateUni(this->m_CurrentShader, i);
-        }
     }
 
     // TODO: do something with billboards corresponding to point- and spotlights
@@ -86,13 +79,13 @@ void Scene::update()
         }
     }
 
-    if (m_CurrentScreenShader && m_is_PostProcessing)
+    if (m_CurrentScreenShader && m_IsPostProcessing)
         this->m_PostProcessing->activate(m_CurrentScreenShader);
 }
 
-void Scene::setPostProcessing()
+void Scene::enablePostProcessing()
 {
-    m_is_PostProcessing = !m_is_PostProcessing;
+    this->m_IsPostProcessing = !this->m_IsPostProcessing;
 }
 
 void Scene::setShader(const std::string& name)
@@ -103,6 +96,24 @@ void Scene::setShader(const std::string& name)
 void Scene::setScreenShader(const std::string& name)
 {
     this->m_CurrentScreenShader = this->m_PostProcessing->m_ShaderMap.at(name);
+}
+
+const std::string Scene::getShaderName()
+{
+    for (const auto& entry : this->shaderMap)
+        if (entry.second == this->m_CurrentShader)
+            return entry.first;
+
+    return "";
+}
+
+const std::string Scene::getScreenShaderName()
+{
+    for (const auto& entry : this->m_PostProcessing->m_ShaderMap)
+        if (entry.second == this->m_CurrentScreenShader)
+            return entry.first;
+
+    return "";
 }
 
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
@@ -140,21 +151,21 @@ std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm
     return sph_billboard;
 }
 
-std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<Model> const model)
+std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<Model> model)
 {
     auto c_model = std::make_shared<Model>(*model);
     modelMap.emplace(name, c_model);
     return c_model;
 }
 
-std::shared_ptr<CylindricalBillboard> Scene::copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> const cyl_billboard)
+std::shared_ptr<CylindricalBillboard> Scene::copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard)
 {
     auto c_cyl_billboard = std::make_shared<CylindricalBillboard>(*cyl_billboard);
     cylBillboardMap.emplace(name, c_cyl_billboard);
     return c_cyl_billboard;
 }
 
-std::shared_ptr<SphericalBillboard> Scene::copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> const sph_billboard)
+std::shared_ptr<SphericalBillboard> Scene::copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard)
 {
     auto c_sph_billboard = std::make_shared<SphericalBillboard>(*sph_billboard);
     sphBillboardMap.emplace(name, c_sph_billboard);

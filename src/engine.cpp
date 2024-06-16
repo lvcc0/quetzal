@@ -53,17 +53,17 @@ Engine::~Engine()
     glfwTerminate();
 }
 
-bool Engine::isRunning()
+bool Engine::isRunning() const
 {
     return !glfwWindowShouldClose(this->window);
 }
 
-float Engine::getDeltaTime()
+float Engine::getDeltaTime() const
 {
     return this->deltaTime;
 }
 
-float Engine::getLastFrame()
+float Engine::getLastFrame() const
 {
     return this->lastFrame;
 }
@@ -98,6 +98,37 @@ void Engine::processInput()
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
 
+void Engine::showGuiWindow()
+{
+    ImGui::Begin((this->currentScene + " config").c_str());
+
+    if (ImGui::Checkbox("Postprocessing Enabled", &this->scenes.at(this->currentScene)->m_IsPostProcessing))
+        glEnable(GL_DEPTH_TEST);
+
+    if (this->scenes.at(this->currentScene)->m_IsPostProcessing)
+    {
+        std::vector<const char*> items;
+
+        for (const auto& entry : this->scenes.at(this->currentScene)->m_PostProcessing->m_ShaderMap)
+            items.push_back(entry.first.c_str());
+
+        static int item_current = 0;
+        ImGui::Combo("Current Shader", &item_current, items.data(), items.size());
+
+        if (items[item_current] != this->scenes.at(this->currentScene)->getScreenShaderName())
+            this->scenes.at(this->currentScene)->setScreenShader(items[item_current]);
+    }
+
+    ImGui::SeparatorText("Screen");
+
+    // TODO: rewrite this stuff more compact
+    ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", this->scenes.at(this->currentScene)->m_Camera->m_pos.x, this->scenes.at(this->currentScene)->m_Camera->m_pos.y, this->scenes.at(this->currentScene)->m_Camera->m_pos.z);
+    ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", this->scenes.at(this->currentScene)->m_Camera->m_orientation.x, this->scenes.at(this->currentScene)->m_Camera->m_orientation.y, this->scenes.at(this->currentScene)->m_Camera->m_orientation.z);
+    ImGui::Text("%.3f ms (%.1f FPS)", this->deltaTime * 1000.0f, 1.0f / this->deltaTime);
+
+    ImGui::End();
+}
+
 // Gets called upon window resize
 void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -113,7 +144,7 @@ void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_0 && action == GLFW_PRESS)
-        this->scenes.at(this->currentScene)->setPostProcessing();
+        this->shouldDrawGui = !this->shouldDrawGui;
 }
 
 void Engine::process()
@@ -122,13 +153,16 @@ void Engine::process()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    if (this->shouldDrawGui)
+        this->showGuiWindow();
+
     float curFrame = (float)glfwGetTime();
     this->deltaTime = curFrame - lastFrame;
     this->lastFrame = curFrame;
 
     this->processInput();
 
-    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);                                       // TODO: this stuff is also updating in scene postprocessing
+    glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // TODO: this stuff is also updating in scene postprocessing
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // COMMENT: IMHO it isn`t a problem
 
     // Update current scene here

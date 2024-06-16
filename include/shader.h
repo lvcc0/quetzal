@@ -12,28 +12,28 @@
 class Shader
 {
 public:
-	GLuint ID;
+    GLuint ID;
 
-	// Constructor
-	Shader(std::string& vertexCode, std::string& fragmentCode);
+    // Constructor
+    Shader(std::string& vertexCode, std::string& fragmentCode);
 
-	// Destructor
-	~Shader();
+    // Destructor
+    ~Shader();
 
-	// A bunch of functions to set shader uniforms
-	void setBool(const std::string& name, bool value);
-	void setInt(const std::string& name, int value);
-	void setFloat(const std::string& name, float value);
-	void setVec2(const std::string& name, const glm::vec2& value);
-	void setVec3(const std::string& name, const glm::vec3& value);
-	void setVec4(const std::string& name, const glm::vec4& value);
-	void setMat2(const std::string& name, const glm::mat2& value);
-	void setMat3(const std::string& name, const glm::mat3& value);
-	void setMat4(const std::string& name, const glm::mat4& value);
+    // A bunch of functions to set shader uniforms
+    void setBool(const std::string& name, bool value) const;
+    void setInt(const std::string& name, int value) const;
+    void setFloat(const std::string& name, float value) const;
+    void setVec2(const std::string& name, const glm::vec2& value) const;
+    void setVec3(const std::string& name, const glm::vec3& value) const;
+    void setVec4(const std::string& name, const glm::vec4& value) const;
+    void setMat2(const std::string& name, const glm::mat2& value) const;
+    void setMat3(const std::string& name, const glm::mat3& value) const;
+    void setMat4(const std::string& name, const glm::mat4& value) const;
 
-	void activateShader();
-	void deleteShader();
+    void activateShader() const;
+    void deleteShader() const;
 
 private:
-	void compileErrors(unsigned int shader, const char* type);
+    void compileErrors(unsigned int shader, const char* type);
 };

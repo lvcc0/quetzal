@@ -81,7 +81,7 @@ void CylindricalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 objec
 
 void CylindricalBillboard::translate(glm::vec3 vector)
 {
-    this->m_pos = vector;
+    this->m_pos = vector; // doing it like this because it already translates in the Draw function
 }
 
 void CylindricalBillboard::scale(glm::vec2 vector)
@@ -155,7 +155,8 @@ void SphericalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 object_
     float vert_angle_in_rad = glm::acos(glm::dot(proj_to_obj, glm::vec3(0.0f, 0.0f, -1.0f)));
     float hor_angle_in_rad = glm::acos(glm::dot(proj_to_obj, vector_to_obj));
 
-    if (vert_angle_in_rad < 0.01 || vert_angle_in_rad > 3.14) up = glm::vec3(0.0f, 1.0f, 0.0f); // stability reasons
+    if (vert_angle_in_rad < 0.01 || vert_angle_in_rad > 3.14) up = glm::vec3(0.0f, 1.0f, 0.0f);  // stability reasons
+    if (!(hor_angle_in_rad > 0 || hor_angle_in_rad < 3.15)) hor_angle_in_rad = 0.0;              // stability reasons
 
     m_model_matrix = glm::translate(m_model_matrix, m_pos);
     
@@ -181,7 +182,7 @@ void SphericalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 object_
 
 void SphericalBillboard::translate(glm::vec3 vector)
 {
-    this->m_pos = vector;
+    this->m_pos = vector; // doing it like this because it already translates in the Draw function
 }
 
 void SphericalBillboard::scale(glm::vec2 vector)
