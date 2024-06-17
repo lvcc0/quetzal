@@ -31,7 +31,7 @@ Model::~Model()
     VAO = 0;
 }
 
-void Model::Draw(std::shared_ptr<Shader>& shader)
+void Model::draw(std::shared_ptr<Shader>& shader)
 {
     unsigned int diffuseNum = 1;
     unsigned int specularNum = 1;

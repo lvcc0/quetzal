@@ -28,11 +28,11 @@ public:
     static std::map<const std::string, std::shared_ptr<Shader>> makePostProcessingShaders(const std::string& path_to_folder);
 
     // Save shared_ptrs into their maps specified above
-    static std::shared_ptr<Shader> makeShaderProgram(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
-    static std::shared_ptr<Texture> makeTexture(std::string name, std::string type, const std::string& texture_rel_path);
-    static std::shared_ptr<Model> makeModel(std::string name, const std::string& model_rel_path);
+    static std::shared_ptr<Shader>               makeShaderProgram(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
+    static std::shared_ptr<Texture>              makeTexture(std::string name, std::string type, const std::string& texture_rel_path);
+    static std::shared_ptr<Model>                makeModel(std::string name, const std::string& model_rel_path);
     static std::shared_ptr<CylindricalBillboard> makeCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
-    static std::shared_ptr<SphericalBillboard> makeSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
+    static std::shared_ptr<SphericalBillboard>   makeSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 
 private:
     inline static const std::string relResPath = RES_PATH; // full path to res directory

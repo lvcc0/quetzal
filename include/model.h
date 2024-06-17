@@ -33,8 +33,8 @@ class Model
 public:
     glm::mat4 m_model_matrix = glm::mat4(1.0f);
 
-    std::vector<Vertex> m_vertices;
-    std::vector<unsigned int> m_indices;
+    std::vector<Vertex>                   m_vertices;
+    std::vector<unsigned int>             m_indices;
     std::vector<std::shared_ptr<Texture>> m_textures;
 
     // Constructor
@@ -49,7 +49,7 @@ public:
     ~Model();
 
     // Draw model
-    void Draw(std::shared_ptr<Shader>& shader);
+    void draw(std::shared_ptr<Shader>& shader);
 
     // Moving in world space
     void translate(glm::vec3 vector);

@@ -102,21 +102,23 @@ void Engine::showGuiWindow()
 {
     ImGui::Begin((this->currentScene + " config").c_str());
 
-    if (ImGui::Checkbox("Postprocessing Enabled", &this->scenes.at(this->currentScene)->m_IsPostProcessing))
-        glEnable(GL_DEPTH_TEST);
+    ImGui::Checkbox("Postprocessing Enabled", &this->scenes.at(this->currentScene)->m_IsPostProcessing);
 
     if (this->scenes.at(this->currentScene)->m_IsPostProcessing)
     {
-        std::vector<const char*> items;
+        ImGui::Separator();
 
+        std::vector<std::string> currentScreenShaderNames = this->scenes.at(this->currentScene)->getScreenShaders();
+
+        // TODO: ngl this looks like shit
         for (const auto& entry : this->scenes.at(this->currentScene)->m_PostProcessing->m_ShaderMap)
-            items.push_back(entry.first.c_str());
+            if (ImGui::Selectable(entry.first.c_str(), (std::find(currentScreenShaderNames.begin(), currentScreenShaderNames.end(), entry.first) != currentScreenShaderNames.end())))
+            {
+                this->scenes.at(this->currentScene)->setScreenShader(entry.first, (std::find(currentScreenShaderNames.begin(), currentScreenShaderNames.end(), entry.first) == currentScreenShaderNames.end()));
+                glEnable(GL_DEPTH_TEST);
+            }
 
-        static int item_current = 0;
-        ImGui::Combo("Current Shader", &item_current, items.data(), items.size());
-
-        if (items[item_current] != this->scenes.at(this->currentScene)->getScreenShaderName())
-            this->scenes.at(this->currentScene)->setScreenShader(items[item_current]);
+        ImGui::Separator();
     }
 
     ImGui::SeparatorText("Screen");
@@ -134,7 +136,8 @@ void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 
-    if (!this->scenes.empty() && this->scenes.count(this->currentScene)) {
+    if (!this->scenes.empty() && this->scenes.count(this->currentScene))
+    {
         this->scenes.at(this->currentScene)->m_Camera->UpdateSize(width, height);
         this->scenes.at(this->currentScene)->m_PostProcessing->recreate(width, height);
     }
@@ -162,8 +165,8 @@ void Engine::process()
 
     this->processInput();
 
-    glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // TODO: this stuff is also updating in scene postprocessing
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // COMMENT: IMHO it isn`t a problem
+    glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // clearing stuff in the default framebuffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //
 
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
@@ -180,8 +183,8 @@ std::shared_ptr<Scene> Engine::createScene(std::string name)
 {
     std::shared_ptr<Scene> scene = std::make_shared<Scene>(Camera(this->winWidth, this->winHeight, glm::vec3(0.0f)));
 
-    this->currentScene = name; // don't forget to change the current scene
     this->scenes.emplace(name, scene);
+    this->currentScene = name; // don't forget to change the current scene
 
     return scene;
 }

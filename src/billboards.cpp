@@ -6,37 +6,32 @@ CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 size, std::s
 {
     m_vertices =
     {
+        Vertex(glm::vec3( m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
+        Vertex(glm::vec3( m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
         Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper left
-        Vertex(glm::vec3(m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
-        Vertex(glm::vec3(m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
-        Vertex(glm::vec3(-m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // lower left
-    };
-
-    m_indices =
-    {
-        0, 1, 3,
-        3, 1, 2
+        Vertex(glm::vec3( m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
+        Vertex(glm::vec3(-m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower left
+        Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // upper left
     };
 
     setupBillboard();
 }
 
+CylindricalBillboard::~CylindricalBillboard()
+{
+    glDeleteBuffers(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+}
+
 void CylindricalBillboard::setupBillboard()
 {
     glGenVertexArrays(1, &VAO);
-
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
     glBindVertexArray(VAO);
 
     // Vertex Array Buffer
+    glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
-
-    // Element Array Buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
 
     // Vertex positions
     glEnableVertexAttribArray(0);
@@ -51,7 +46,7 @@ void CylindricalBillboard::setupBillboard()
     glBindVertexArray(0);
 }
 
-void CylindricalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 object_pos)
+void CylindricalBillboard::draw(std::shared_ptr<Shader>& shader, glm::vec3 object_pos)
 {
     glm::vec3 proj_to_obj = glm::normalize(glm::vec3(object_pos.x - m_pos.x, 0.0f, object_pos.z - m_pos.z)); // projection of vector to object in the XZ plane
     glm::vec3 up = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), proj_to_obj); // flips the up vector if going the second half of the loop
@@ -63,8 +58,8 @@ void CylindricalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 objec
     m_model_matrix = glm::rotate(m_model_matrix, angle_in_rad, up);
 
     shader->setInt("material.texture_diffuse1", 0);
-    glBindTexture(GL_TEXTURE_2D, m_texture->ID);
 
+    glBindTexture(GL_TEXTURE_2D, m_texture->ID);
     glActiveTexture(GL_TEXTURE0);
 
     // Convert local coordinates to world coordinates
@@ -74,7 +69,7 @@ void CylindricalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 objec
     m_model_matrix = glm::mat4(1.0f);
 
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glBindVertexArray(0);
 }
@@ -97,37 +92,32 @@ SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 size, std::share
 {
     m_vertices =
     {
+        Vertex(glm::vec3( m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
+        Vertex(glm::vec3( m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
         Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper left
-        Vertex(glm::vec3(m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
-        Vertex(glm::vec3(m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
-        Vertex(glm::vec3(-m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // lower left
-    };
-
-    m_indices =
-    {
-        0, 1, 3,
-        3, 1, 2
+        Vertex(glm::vec3( m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
+        Vertex(glm::vec3(-m_size[0] / 2.0f, -m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower left
+        Vertex(glm::vec3(-m_size[0] / 2.0f,  m_size[1] / 2.0f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // upper left
     };
 
     setupBillboard();
 }
 
+SphericalBillboard::~SphericalBillboard()
+{
+    glDeleteBuffers(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+}
+
 void SphericalBillboard::setupBillboard()
 {
     glGenVertexArrays(1, &VAO);
-
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
     glBindVertexArray(VAO);
 
     // Vertex Array Buffer
+    glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
-
-    // Element Array Buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
 
     // Vertex positions
     glEnableVertexAttribArray(0);
@@ -142,7 +132,7 @@ void SphericalBillboard::setupBillboard()
     glBindVertexArray(0);
 }
 
-void SphericalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 object_pos)
+void SphericalBillboard::draw(std::shared_ptr<Shader>& shader, glm::vec3 object_pos)
 {
     glm::vec3 vector_to_obj = glm::normalize(object_pos - m_pos); // vector to the object
     glm::vec3 proj_to_obj = glm::normalize(glm::vec3(object_pos.x - m_pos.x, 0.0f, object_pos.z - m_pos.z)); // projection of vector to object in the XZ plane
@@ -155,8 +145,8 @@ void SphericalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 object_
     float vert_angle_in_rad = glm::acos(glm::dot(proj_to_obj, glm::vec3(0.0f, 0.0f, -1.0f)));
     float hor_angle_in_rad = glm::acos(glm::dot(proj_to_obj, vector_to_obj));
 
-    if (vert_angle_in_rad < 0.01 || vert_angle_in_rad > 3.14) up = glm::vec3(0.0f, 1.0f, 0.0f);  // stability reasons
-    if (!(hor_angle_in_rad > 0 || hor_angle_in_rad < 3.15)) hor_angle_in_rad = 0.0;              // stability reasons
+    if (vert_angle_in_rad < 0.01 || vert_angle_in_rad > 3.14) up = glm::vec3(0.0f, 1.0f, 0.0f); // stability reasons
+    if (!(hor_angle_in_rad > 0 || hor_angle_in_rad < 3.15)) hor_angle_in_rad = 0.0;             // stability reasons
 
     m_model_matrix = glm::translate(m_model_matrix, m_pos);
     
@@ -164,8 +154,8 @@ void SphericalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 object_
     m_model_matrix = glm::rotate(m_model_matrix, hor_angle_in_rad, right);
 
     shader->setInt("material.texture_diffuse1", 0);
-    glBindTexture(GL_TEXTURE_2D, m_texture->ID);
 
+    glBindTexture(GL_TEXTURE_2D, m_texture->ID);
     glActiveTexture(GL_TEXTURE0);
 
     // Convert local coordinates to world coordinates
@@ -175,7 +165,7 @@ void SphericalBillboard::Draw(std::shared_ptr<Shader>& shader, glm::vec3 object_
     m_model_matrix = glm::mat4(1.0f);
 
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glBindVertexArray(0);
 }

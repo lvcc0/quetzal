@@ -22,24 +22,22 @@ public:
     // Destructor
     ~PostProcessing();
 
-    // Postprocessing funcs
-    void activate(const std::shared_ptr<Shader>& screen_shader) const;
-
-    // Deactivating postprocessing (must be used BEFORE any postprocessing funcs and objects drawing)
-    void deactivate() const;
-
-    // Recreate framebuffer's attachments
-    void recreate(GLuint width, GLuint height) const;
+    void deactivate() const;                                                        // deactivating postprocessing (must be used BEFORE any postprocessing funcs and objects drawing)
+    void activate(const std::vector<std::shared_ptr<Shader>>& screenShaders) const; // postprocessing funcs
+    void recreate(GLuint width, GLuint height) const;                               // recreate framebuffer's attachments
 
 private:
     // Buffers
     GLuint VAO, VBO;
-    GLuint m_Framebuffer, m_TextureFramebuffer, m_RenderFramebuffer;
 
-    void setupBuffers(GLuint& VAO, GLuint& VBO); // setup VAO, VBO
-    void setupFramebuffer(GLuint& frameBuffer, GLuint& textureFrameBuffer, GLuint& renderFrameBuffer, GLfloat width, GLfloat height); // setup framebuffer and all the corresponding ones
+    GLuint m_RBO;                                           // only one renderbuffer object for both fbos
+    GLuint m_FirstFBO, m_SecondFBO;                         // 2 framebuffer objects for ping-pong shading
+    GLuint m_FirstColorAttachment, m_SecondColorAttachment; // 2 color (texture) attachments for 2 fbos
 
-    std::vector<float> quadVertices = // a quad that fills the entire screen
+    void setupBuffers(GLuint& VAO, GLuint& VBO);                                                             // setup VAO, VBO
+    void setupFramebuffer(GLuint& FBO, GLuint& colorAttachment, GLuint& RBO, GLfloat width, GLfloat height); // setup framebuffer and all the corresponding ones
+
+    std::vector<float> m_QuadVertices = // a quad that fills the entire screen
     {
         // positions   // texCoords
         -1.0f,  1.0f,  0.0f,  1.0f,

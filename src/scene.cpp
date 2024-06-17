@@ -17,7 +17,7 @@ Scene::~Scene()
 
 void Scene::update()
 {
-    if (m_CurrentScreenShader && m_IsPostProcessing)
+    if (!m_CurrentScreenShaders.empty() && m_IsPostProcessing)
         this->m_PostProcessing->deactivate();
 
     this->m_CurrentShader->activateShader();
@@ -50,37 +50,41 @@ void Scene::update()
 
     // TODO: do something with billboards corresponding to point- and spotlights
 
-    // Draw all the stuff inside all of the maps 
+    // Draw all models 
     if (!this->modelMap.empty())
     {
         std::map<std::string, std::shared_ptr<Model>>::iterator it = this->modelMap.begin();
         while (it != this->modelMap.end())
         {
-            it->second->Draw(m_CurrentShader);
+            it->second->draw(m_CurrentShader);
             it++;
         }
     }
+
+    // Draw all cylindrical billboards
     if (!this->cylBillboardMap.empty())
     {
         std::map<std::string, std::shared_ptr<CylindricalBillboard>>::iterator it = this->cylBillboardMap.begin();
         while (it != this->cylBillboardMap.end())
         {
-            it->second->Draw(m_CurrentShader, this->m_Camera->m_pos);
+            it->second->draw(m_CurrentShader, this->m_Camera->m_pos);
             it++;
         }
     }
+
+    // Draw all spherical billboards
     if (!this->sphBillboardMap.empty())
     {
         std::map<std::string, std::shared_ptr<SphericalBillboard>>::iterator it = this->sphBillboardMap.begin();
         while (it != this->sphBillboardMap.end())
         {
-            it->second->Draw(m_CurrentShader, this->m_Camera->m_pos);
+            it->second->draw(m_CurrentShader, this->m_Camera->m_pos);
             it++;
         }
     }
 
-    if (m_CurrentScreenShader && m_IsPostProcessing)
-        this->m_PostProcessing->activate(m_CurrentScreenShader);
+    if (!m_CurrentScreenShaders.empty() && m_IsPostProcessing)
+        this->m_PostProcessing->activate(m_CurrentScreenShaders);
 }
 
 void Scene::enablePostProcessing()
@@ -93,12 +97,17 @@ void Scene::setShader(const std::string& name)
     this->m_CurrentShader = this->shaderMap.at(name);
 }
 
-void Scene::setScreenShader(const std::string& name)
+void Scene::setScreenShader(const std::string& name, bool enabled)
 {
-    this->m_CurrentScreenShader = this->m_PostProcessing->m_ShaderMap.at(name);
-}
+    std::vector<std::string>& currentScreenShaderNames = getScreenShaders();
 
-const std::string Scene::getShaderName()
+    if (enabled)
+        this->m_CurrentScreenShaders.push_back(this->m_PostProcessing->m_ShaderMap.at(name));
+    else if (std::find(currentScreenShaderNames.begin(), currentScreenShaderNames.end(), name) != currentScreenShaderNames.end())
+        this->m_CurrentScreenShaders.erase(std::find(m_CurrentScreenShaders.begin(), m_CurrentScreenShaders.end(), this->m_PostProcessing->m_ShaderMap.at(name)));
+} 
+
+const std::string Scene::getShader()
 {
     for (const auto& entry : this->shaderMap)
         if (entry.second == this->m_CurrentShader)
@@ -107,13 +116,15 @@ const std::string Scene::getShaderName()
     return "";
 }
 
-const std::string Scene::getScreenShaderName()
+std::vector<std::string> Scene::getScreenShaders()
 {
-    for (const auto& entry : this->m_PostProcessing->m_ShaderMap)
-        if (entry.second == this->m_CurrentScreenShader)
-            return entry.first;
+    std::vector<std::string> result;
 
-    return "";
+    for (const auto& entry : this->m_PostProcessing->m_ShaderMap)
+        if (std::find(this->m_CurrentScreenShaders.begin(), this->m_CurrentScreenShaders.end(), entry.second) != this->m_CurrentScreenShaders.end())
+            result.push_back(entry.first);
+
+    return result;
 }
 
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
