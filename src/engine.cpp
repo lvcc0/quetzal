@@ -108,20 +108,24 @@ void Engine::showGuiWindow()
     {
         ImGui::Separator();
 
-        std::vector<std::string> currentScreenShaderNames = this->scenes.at(this->currentScene)->getScreenShaders();
+        std::vector<std::string> names = this->scenes.at(this->currentScene)->getScreenShaders(); // current screen shader names
 
-        // TODO: ngl this looks like shit
         for (const auto& entry : this->scenes.at(this->currentScene)->m_PostProcessing->m_ShaderMap)
-            if (ImGui::Selectable(entry.first.c_str(), (std::find(currentScreenShaderNames.begin(), currentScreenShaderNames.end(), entry.first) != currentScreenShaderNames.end())))
+        {
+            auto it = std::find(names.begin(), names.end(), entry.first);
+
+            if (ImGui::Selectable(entry.first.c_str(), (it != names.end())))
             {
-                this->scenes.at(this->currentScene)->setScreenShader(entry.first, (std::find(currentScreenShaderNames.begin(), currentScreenShaderNames.end(), entry.first) == currentScreenShaderNames.end()));
-                glEnable(GL_DEPTH_TEST);
+                this->scenes.at(this->currentScene)->setScreenShader(entry.first, (it == names.end()));
+                glEnable(GL_DEPTH_TEST); // postprocessing disables depth test after as it's final step, so we need to turn it back on
             }
+            ImGui::SameLine(ImGui::GetWindowSize().x - 64); ImGui::Text((it != names.end()) ? "enabled" : "disabled");
+        }
 
         ImGui::Separator();
     }
 
-    ImGui::SeparatorText("Screen");
+    ImGui::SeparatorText("Engine");
 
     // TODO: rewrite this stuff more compact
     ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", this->scenes.at(this->currentScene)->m_Camera->m_pos.x, this->scenes.at(this->currentScene)->m_Camera->m_pos.y, this->scenes.at(this->currentScene)->m_Camera->m_pos.z);

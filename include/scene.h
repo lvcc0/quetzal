@@ -42,7 +42,7 @@ public:
     // Gets called every frame in the engine class
     void update();
 
-    // Set post processing
+    // Enable post processing
     void enablePostProcessing();
 
     void setShader(const std::string& name);                     // set shader to draw stuff with (only one for now (ig it'll always be only one))
@@ -50,6 +50,12 @@ public:
 
     const std::string        getShader();        // get active shader name
     std::vector<std::string> getScreenShaders(); // get vector of active screen shader names
+    
+    std::map<const std::string, std::shared_ptr<Shader>>               getShaderMap();
+    std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap();
+    std::map<const std::string, std::shared_ptr<Model>>                getModelMap();
+    std::map<const std::string, std::shared_ptr<CylindricalBillboard>> getCylindricalBillboardMap();
+    std::map<const std::string, std::shared_ptr<SphericalBillboard>>   getSphericalBiillboardMap();
 
     // Some stuff to add to the scene
     std::shared_ptr<Shader>               addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
@@ -72,9 +78,9 @@ public:
     std::shared_ptr<DirLight>   addDirLight(DirLight& dir_light);
     std::shared_ptr<PointLight> addPointLight(PointLight& point_light);
     std::shared_ptr<SpotLight>  addSpotLight(SpotLight& spot_light);
-    
+
     // Print objects in maps
-    void getObjectsInMaps(ObjectType objectType);
+    void printObjectsInMaps(ObjectType objectType);
 
 private:
     // Vectors with scene lights
@@ -85,20 +91,10 @@ private:
     std::shared_ptr<Shader>              m_CurrentShader;        // a shader to draw stuff with
     std::vector<std::shared_ptr<Shader>> m_CurrentScreenShaders; // vector of postprocessing shaders
 
-    // --- Maps of loaded objects --- //
-    typedef std::map<const std::string, std::shared_ptr<Shader>> ShaderMap;
-    ShaderMap shaderMap;
-
-    typedef std::map<const std::string, std::shared_ptr<Model>> ModelMap;
-    ModelMap modelMap;
-
-    typedef std::map<const std::string, std::shared_ptr<Texture>> TextureMap;
-    TextureMap textureMap;
-
-    typedef std::map<const std::string, std::shared_ptr<CylindricalBillboard>> CylBillboardMap;
-    CylBillboardMap cylBillboardMap;
-
-    typedef std::map<const std::string, std::shared_ptr<SphericalBillboard>> SphBillboardMap;
-    SphBillboardMap sphBillboardMap;
-    // --- //
+    // Maps of loaded objects
+    std::map<const std::string, std::shared_ptr<Shader>>               m_ShaderMap;
+    std::map<const std::string, std::shared_ptr<Texture>>              m_TextureMap;
+    std::map<const std::string, std::shared_ptr<Model>>                m_ModelMap;
+    std::map<const std::string, std::shared_ptr<CylindricalBillboard>> m_CylBillboardMap;
+    std::map<const std::string, std::shared_ptr<SphericalBillboard>>   m_SphBillboardMap;
 };

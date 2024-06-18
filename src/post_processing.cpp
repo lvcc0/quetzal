@@ -32,7 +32,9 @@ PostProcessing::~PostProcessing()
 void PostProcessing::activate(const std::vector<std::shared_ptr<Shader>>& screenShaders) const
 {
     // So called "ping-pong shading" ahead!
-    for (auto i = 0; i < screenShaders.size(); i++)
+
+    auto i = 0;
+    for (i; i < screenShaders.size(); i++)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, (i % 2) ? m_FirstFBO : m_SecondFBO); // if i is odd, then we bind first fbo else we bind the second one
         glDisable(GL_DEPTH_TEST);
@@ -45,7 +47,6 @@ void PostProcessing::activate(const std::vector<std::shared_ptr<Shader>>& screen
         glBindTexture(GL_TEXTURE_2D, (i % 2) ? m_SecondColorAttachment : m_FirstColorAttachment); // if i is odd, then we bind second color attachment else we bind the first one
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
-    // BUG: "inversion_color" doesn't work if turned on after anything else
     
     // Don't forget to attach the default fbo to actually draw stuff on the screen
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -53,7 +54,7 @@ void PostProcessing::activate(const std::vector<std::shared_ptr<Shader>>& screen
     glClear(GL_COLOR_BUFFER_BIT);
 
     glBindVertexArray(VAO);
-    glBindTexture(GL_TEXTURE_2D, m_FirstColorAttachment);
+    glBindTexture(GL_TEXTURE_2D, (i % 2) ? m_FirstColorAttachment : m_SecondColorAttachment); // set the next color attachment to draw all shader effects
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 

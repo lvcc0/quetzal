@@ -22,7 +22,7 @@ int main()
         true,
         "dirLight0",
         glm::vec3(-0.2f, -1.0f, -0.3f),
-        glm::vec3(0.8f, 0.8f, 0.8f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
         glm::vec3(0.4f, 0.4f, 0.4f),
         glm::vec3(0.5f, 0.5f, 0.5f),
         glm::vec3(0.5f, 1.0f, 1.0f)
