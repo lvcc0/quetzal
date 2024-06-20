@@ -93,7 +93,7 @@ std::shared_ptr<Texture> ResourceManager::makeTexture(std::string name, std::str
 	return texture;
 }
 
-std::shared_ptr<Model> ResourceManager::makeModel(std::string name, const std::string& model_rel_path)
+std::shared_ptr<Model> ResourceManager::makeModel(std::string name, const std::string& model_rel_path, CollisionType col_type)
 {
 	std::string full_path = relResPath + model_rel_path;
 
@@ -207,7 +207,7 @@ std::shared_ptr<Model> ResourceManager::makeModel(std::string name, const std::s
         }
     }
 
-	std::shared_ptr<Model>& model = std::make_shared<Model>(vertices, indices, textures);
+	std::shared_ptr<Model>& model = std::make_shared<Model>(vertices, indices, textures, col_type);
 
 	return model;
 }

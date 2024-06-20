@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "model.h"
+#include "vertex.h"
 #include "camera.h"
 
 // TODO: technically they're almost the same, so we can do something like inheritance here

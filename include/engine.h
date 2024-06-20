@@ -6,6 +6,7 @@
 
 #include "debugger.h"
 #include "scene.h"
+#include "physics.h"
 
 class Engine
 {

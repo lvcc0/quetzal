@@ -2,21 +2,26 @@
 
 Model::Model(std::vector<Vertex>& vertices,
              std::vector<unsigned int>& indices,
-             std::vector<std::shared_ptr<Texture>>& textures) :
+             std::vector<std::shared_ptr<Texture>>& textures, CollisionType type) :
     m_textures(textures)
 {
+    m_collision = std::make_shared<Collision>();
     m_vertices.swap(vertices);
     m_indices.swap(indices);
 
     setupModel(); // setup VAO, VBO, EBO
+
 }
 
 Model::Model(const Model& obj) :
     m_indices(obj.m_indices),
     m_textures(obj.m_textures),
+    m_vertices(obj.m_vertices),
     m_model_matrix(obj.m_model_matrix),
     VAO(obj.VAO)
-{ /* empty */ }
+{
+    this->m_collision = std::make_shared<Collision>();
+}
 
 Model::~Model()
 {
@@ -58,6 +63,9 @@ void Model::Draw(std::shared_ptr<Shader>& shader)
     // Convert local coordinates to world coordinates
     shader->setMat4("model", m_model_matrix);
     shader->setMat4("inversed", glm::inverse(m_model_matrix));
+
+    // Making collision
+    m_collision->setVerts(Physics::makeGlobalCoordsFromVertex(m_vertices, m_model_matrix));
 
     m_model_matrix = glm::mat4(1.0f);
 

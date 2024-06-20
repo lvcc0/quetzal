@@ -47,10 +47,14 @@ public:
     void setShader(const std::string& name); // set shader to draw stuff with
     void setScreenShader(const std::string& name); // set postprocessing shader
 
+    // Do collisions
+    void doPhysicsProcessing();
+    std::vector<std::shared_ptr<Collision>> collisionsVector;
+
     // Some stuff to add to the scene
     std::shared_ptr<Shader> addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
     std::shared_ptr<Texture> addTexture(std::string name, std::string type, const std::string& texture_rel_path);
-    std::shared_ptr<Model> addModel(std::string name, const std::string& model_rel_path);
+    std::shared_ptr<Model> addModel(std::string name, const std::string& model_rel_path, CollisionType type);
     std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
     std::shared_ptr<SphericalBillboard> addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 

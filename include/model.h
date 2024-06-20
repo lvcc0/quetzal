@@ -17,16 +17,8 @@
 
 #include "shader.h"
 #include "texture.h"
-
-struct Vertex {
-    glm::vec3 Position;
-    glm::vec2 TexCoord;
-    glm::vec3 Normal;
-
-    // Constructor
-    Vertex( glm::vec3 pos, glm::vec2 texCoord, glm::vec3 norm) :
-        Position(pos), TexCoord(texCoord), Normal(norm) { /* empty */ }
-};
+#include "physics.h"
+#include "vertex.h"
 
 class Model
 {
@@ -37,10 +29,13 @@ public:
     std::vector<unsigned int> m_indices;
     std::vector<std::shared_ptr<Texture>> m_textures;
 
+    // Collision in world space
+    std::shared_ptr<Collision> m_collision;
+
     // Constructor
     Model(std::vector<Vertex>& vertices,
           std::vector<unsigned int>& indices,
-          std::vector<std::shared_ptr<Texture>>& textures);
+          std::vector<std::shared_ptr<Texture>>& textures, CollisionType type);
     
     // Copy constructor
     Model(const Model& obj);

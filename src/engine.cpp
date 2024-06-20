@@ -89,8 +89,10 @@ void Engine::createWindow()
 // Gets called every frame
 void Engine::processInput()
 {
-    if (!this->scenes.empty() && this->scenes.count(this->currentScene))
+    if (!this->scenes.empty() && this->scenes.count(this->currentScene)) {
         this->scenes.at(this->currentScene)->m_Camera->Inputs(this->window, deltaTime);
+        this->scenes.at(this->currentScene)->doPhysicsProcessing();
+    }
 
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(this->window, true);
@@ -145,7 +147,6 @@ void Engine::process()
 std::shared_ptr<Scene> Engine::createScene(std::string name)
 {
     std::shared_ptr<Scene> scene = std::make_shared<Scene>(Camera(this->winWidth, this->winHeight, glm::vec3(0.0f)));
-
     this->currentScene = name; // don't forget to change the current scene
     this->scenes.emplace(name, scene);
 

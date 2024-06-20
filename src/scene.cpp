@@ -1,5 +1,6 @@
 #include "scene.h"
 #include "scene.h"
+#include "scene.h"
 
 Scene::Scene(Camera& camera) :
     m_Camera(std::make_shared<Camera>(camera)),
@@ -105,6 +106,11 @@ void Scene::setScreenShader(const std::string& name)
     this->m_CurrentScreenShader = this->m_PostProcessing->m_ShaderMap.at(name);
 }
 
+void Scene::doPhysicsProcessing()
+{
+    Physics::physicsProcessing(collisionsVector);
+}
+
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
 {
     auto shader = ResourceManager::makeShaderProgram(name, vertex_shader_rel_path, fragment_shader_rel_path);
@@ -119,10 +125,11 @@ std::shared_ptr<Texture> Scene::addTexture(std::string name, std::string type, c
     return texture;
 }
 
-std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& model_rel_path)
+std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& model_rel_path, CollisionType type)
 {
-    auto model = ResourceManager::makeModel(name, model_rel_path);
+    auto model = ResourceManager::makeModel(name, model_rel_path, type);
     modelMap.emplace(name, model);
+    collisionsVector.push_back(model->m_collision);
     return model;
 }
 
@@ -144,6 +151,7 @@ std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<
 {
     auto c_model = std::make_shared<Model>(*model);
     modelMap.emplace(name, c_model);
+    collisionsVector.push_back(model->m_collision);
     return c_model;
 }
 
