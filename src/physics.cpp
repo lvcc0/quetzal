@@ -1,9 +1,5 @@
 #include "physics.h"
-#include "physics.h"
-#include "physics.h"
-#include "physics.h"
-#include "physics.h"
-#include "physics.h"
+
 
 bool Physics::checkCollision(Collision& object1, Collision& object2)
 {
@@ -44,25 +40,25 @@ bool Physics::fullCheckCollision(Collision& object1, Collision& object2)
 		for (glm::vec3 second_item : second_verts) {
 			if (first_item.x > second_item.x)
 				first_more_second.x = true;
-			if (first_item.y > second_item.y)
-				first_more_second.y = true;
-			if (first_item.z > second_item.z)
-				first_more_second.z = true;
-			if (first_item.x < second_item.x)
+			else if (first_item.x < second_item.x)
 				first_less_second.x = true;
-			if (first_item.y < second_item.y)
-				first_less_second.y = true;
-			if (first_item.z < second_item.z)
-				first_less_second.z = true;
-			if (first_item.x == second_item.x) {
+			else if (first_item.x == second_item.x) {
 				first_more_second.x = true;
 				first_less_second.x = true;
 			}
-			if (first_item.y == second_item.y) {
+			if (first_item.y > second_item.y)
+				first_more_second.y = true;
+			else if (first_item.y < second_item.y)
+				first_less_second.y = true;
+			else if (first_item.y == second_item.y) {
 				first_more_second.y = true;
 				first_less_second.y = true;
 			}
-			if (first_item.z == second_item.z) {
+			if (first_item.z > second_item.z)
+				first_more_second.z = true;
+			else if (first_item.z < second_item.z)
+				first_less_second.z = true;
+			else if (first_item.z == second_item.z) {
 				first_more_second.z = true;
 				first_less_second.z = true;
 			}
@@ -78,83 +74,16 @@ bool Physics::fullCheckCollision(Collision& object1, Collision& object2)
 	return false;
 }
 
-void Physics::physicsProcessing(std::vector<std::shared_ptr<Collision>>& collisions)
+void Physics::physicsProcessing(std::vector<std::shared_ptr<Model>>& models)
 {
-	for (std::shared_ptr<Collision> collision1: collisions) {
-		for (std::shared_ptr<Collision> collision2: collisions) {
-			if (collision1 != collision2)
-				std::cout << fullCheckCollision(*collision1, *collision2) << std::endl;
+	// Checking collisions 
+	for (std::shared_ptr<Model> model1: models) {
+		for (std::shared_ptr<Model> model2: models) {
+			if (model1 != model2)
+				std::cout << fullCheckCollision(*model1->m_collision, *model2->m_collision) << std::endl;
+				// ¬ообще сюда можно вставить че угодно
 		}
 	}
 }
 
-std::vector<glm::vec3> Physics::makeGlobalCoordsFromVertex(std::vector<Vertex>& local_coords, glm::mat4& model_matrix)
-{
-	std::vector<glm::vec3> return_verts;
-	for (auto item : local_coords)
-	{
-		return_verts.push_back(model_matrix * glm::vec4(item.Position, 1.0f));
-	}
-	return return_verts;
-}
 
-void Collision::updateCollision(const std::vector<glm::vec3>& m_vertices)
-{
-	makeCollision(m_type, m_vertices);
-}
-
-void Collision::makeCollision(CollisionType m_type, const std::vector<glm::vec3>& m_vertices) // m_vertices in local space of object
-{
-	this->m_type = m_type;
-
-	// Working only with orthogonal object
-	if (m_type == CollisionType::SQUARE){
-		glm::vec3 less_coords_corner;
-		bool first_iteration = true;
-		for (auto i : m_vertices)
-		{
-			if (first_iteration || i.x <= less_coords_corner.x && i.y <= less_coords_corner.y && i.z <= less_coords_corner.z) {
-				less_coords_corner = i;
-			}
-			first_iteration = false;
-		}
-		m_position = less_coords_corner;
-
-		for (auto i : m_vertices)
-		{
-			glm::vec3 next_corner = i;
-			if (next_corner.x == m_position.x && next_corner.y == m_position.y) {
-				m_size.z = next_corner.z - m_position.z;
-			}
-			else if (next_corner.x == m_position.x && next_corner.z == m_position.z) {
-				m_size.y = next_corner.y - m_position.y;
-			}
-			else if (next_corner.y == m_position.y && next_corner.z == m_position.z) {
-				m_size.x = next_corner.x - m_position.x;
-			}
-		}
-	}
-	else if (m_type == CollisionType::NONE) {
-		// Nothing
-	}
-	else {
-		std::cerr << "ERROR::COLLISION_CONSTRUCTOR::COLLISION TYPE NOT FOUND" << std::endl;
-	}
-}
-
-void Collision::setVerts(const std::vector<glm::vec3>& m_vertices)
-{
-	this->m_vertices = m_vertices;
-}
-
-Collision::Collision()
-{
-	//Free
-}
-
-Collision::Collision(const Collision& obj)
-{
-	this->m_type = obj.m_type;
-	this->m_position = obj.m_position;
-	this->m_size = obj.m_size;
-}

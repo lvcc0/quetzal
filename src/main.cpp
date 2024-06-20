@@ -63,7 +63,8 @@ int main()
     // Main loop
     while (engine.isRunning())
     {
-        catCube->scale(glm::vec3(2.0f, 1.0f, 1.0f));
+        catCube->translate(glm::vec3(0.0, 2.2, 0.0));
+        catCube->rotate(engine.getLastFrame() * 50, glm::vec3(1.0, 0.0, 0.0));
 
         //catSphere->rotate(engine.getLastFrame() * 15, glm::vec3(0.0f, 1.0f, 0.0f));
 

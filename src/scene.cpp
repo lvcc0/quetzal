@@ -108,7 +108,7 @@ void Scene::setScreenShader(const std::string& name)
 
 void Scene::doPhysicsProcessing()
 {
-    Physics::physicsProcessing(collisionsVector);
+    Physics::physicsProcessing(modelVector);
 }
 
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
@@ -129,7 +129,7 @@ std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& mode
 {
     auto model = ResourceManager::makeModel(name, model_rel_path, type);
     modelMap.emplace(name, model);
-    collisionsVector.push_back(model->m_collision);
+    modelVector.push_back(model);
     return model;
 }
 
@@ -151,7 +151,7 @@ std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<
 {
     auto c_model = std::make_shared<Model>(*model);
     modelMap.emplace(name, c_model);
-    collisionsVector.push_back(model->m_collision);
+    modelVector.push_back(model);
     return c_model;
 }
 

@@ -65,7 +65,7 @@ void Model::Draw(std::shared_ptr<Shader>& shader)
     shader->setMat4("inversed", glm::inverse(m_model_matrix));
 
     // Making collision
-    m_collision->setVerts(Physics::makeGlobalCoordsFromVertex(m_vertices, m_model_matrix));
+    m_collision->setVerts(ExpMath::makeGlobalCoordsFromVertex(m_vertices, m_model_matrix));
 
     m_model_matrix = glm::mat4(1.0f);
 

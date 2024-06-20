@@ -22,6 +22,7 @@
 #include "model.h"
 #include "texture.h"
 #include "billboards.h"
+#include "physics.h"
 
 enum class ObjectType { SHADER, TEXTURE, MODEL, CYL_BILLBOARD, SPH_BILLBOARD };
 
@@ -49,7 +50,7 @@ public:
 
     // Do collisions
     void doPhysicsProcessing();
-    std::vector<std::shared_ptr<Collision>> collisionsVector;
+    std::vector<std::shared_ptr<Model>> modelVector;
 
     // Some stuff to add to the scene
     std::shared_ptr<Shader> addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
