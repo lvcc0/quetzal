@@ -18,6 +18,7 @@
 #include "vertex.h"
 #include "collision.h"
 #include "model.h"
+#include "expanded_math.h"
 
 class Physics {
 public:

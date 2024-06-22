@@ -1,48 +1,25 @@
 #include "collision.h"
 
-
-void Collision::updateCollision(const std::vector<glm::vec3>& m_vertices)
+// Makes collision in local space
+void Collision::makeCollision(const std::vector<glm::vec3>& m_vertices) 
 {
-	makeCollision(m_type, m_vertices);
-}
-
-void Collision::makeCollision(CollisionType m_type, const std::vector<glm::vec3>& m_vertices) // m_vertices in local space of object
-{
-	this->m_type = m_type;
-
-	// Working only with orthogonal object
 	if (m_type == CollisionType::SQUARE) {
-		glm::vec3 less_coords_corner;
-		bool first_iteration = true;
-		for (auto i : m_vertices)
-		{
-			if (first_iteration || i.x <= less_coords_corner.x && i.y <= less_coords_corner.y && i.z <= less_coords_corner.z) {
-				less_coords_corner = i;
-			}
-			first_iteration = false;
-		}
-		m_position = less_coords_corner;
-
-		for (auto i : m_vertices)
-		{
-			glm::vec3 next_corner = i;
-			if (next_corner.x == m_position.x && next_corner.y == m_position.y) {
-				m_size.z = next_corner.z - m_position.z;
-			}
-			else if (next_corner.x == m_position.x && next_corner.z == m_position.z) {
-				m_size.y = next_corner.y - m_position.y;
-			}
-			else if (next_corner.y == m_position.y && next_corner.z == m_position.z) {
-				m_size.x = next_corner.x - m_position.x;
-			}
-		}
+		makeSquare(m_vertices);
+	}
+	else if (m_type == CollisionType::SELF) {
+		setVerts(m_vertices);
 	}
 	else if (m_type == CollisionType::NONE) {
 		// Nothing
 	}
 	else {
-		std::cerr << "ERROR::COLLISION_CONSTRUCTOR::COLLISION TYPE NOT FOUND" << std::endl;
+		std::cerr << "ERROR::COLLISION_MAKER::COLLISION TYPE NOT FOUND" << std::endl;
 	}
+}
+
+void Collision::updateModelMatrix(const glm::mat4& model_matrix)
+{
+	this->m_model_matrix = model_matrix;
 }
 
 void Collision::setVerts(const std::vector<glm::vec3>& m_vertices)
@@ -50,14 +27,52 @@ void Collision::setVerts(const std::vector<glm::vec3>& m_vertices)
 	this->m_vertices = m_vertices;
 }
 
-Collision::Collision()
+void Collision::makeSquare(const std::vector<glm::vec3>& m_vertices)
 {
-	//Free
+	glm::vec3 min_coords, max_coords;
+	bool first_iteration = true;
+	for (auto item : m_vertices) {
+		if (first_iteration) {
+			min_coords = item;
+			max_coords = item;
+			first_iteration = false;
+		}
+		else {
+			if (item.x < min_coords.x)
+				min_coords.x = item.x;
+			if (item.y < min_coords.y)
+				min_coords.y = item.y;
+			if (item.z < min_coords.z)
+				min_coords.z = item.z;
+			if (item.x > max_coords.x)
+				max_coords.x = item.x;
+			if (item.y > max_coords.y)
+				max_coords.y = item.y;
+			if (item.z > max_coords.z)
+				max_coords.z = item.z;
+		}
+	}
+
+	this->m_vertices.push_back(min_coords); // less coords corner
+	this->m_vertices.push_back(max_coords); // more coords corner
+	this->m_vertices.push_back(min_coords + glm::vec3(max_coords.x - min_coords.x, 0, 0));
+	this->m_vertices.push_back(min_coords + glm::vec3(0, max_coords.y - min_coords.y, 0));
+	this->m_vertices.push_back(min_coords + glm::vec3(0, 0, max_coords.z - min_coords.z));
+	this->m_vertices.push_back(max_coords - glm::vec3(max_coords.x - min_coords.x, 0, 0));
+	this->m_vertices.push_back(max_coords - glm::vec3(0, max_coords.y - min_coords.y, 0));
+	this->m_vertices.push_back(max_coords - glm::vec3(0, 0, max_coords.z - min_coords.z));
+
+}
+
+Collision::Collision(const std::vector<glm::vec3>& m_vertices, CollisionType type)
+{
+	this->m_type = type;
+	makeCollision(m_vertices);
 }
 
 Collision::Collision(const Collision& obj)
 {
-	this->m_type = obj.m_type;
-	this->m_position = obj.m_position;
-	this->m_size = obj.m_size;
+	this->m_type = m_type;
+	this->m_vertices = obj.m_vertices;
+	this->m_model_matrix = glm::mat4(1.0f);
 }

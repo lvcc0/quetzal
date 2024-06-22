@@ -25,6 +25,8 @@ public:
 	ExpMath(const ExpMath& obj) = delete;
 	ExpMath(const ExpMath&& obj) = delete;
 
-	static std::vector<glm::vec3> makeGlobalCoordsFromVertex(std::vector<Vertex>& local_coords, glm::mat4& model_matrix = glm::mat4(1.0f));
-	static glm::mat4 makeSummarizeMat4(glm::mat4 model_matrix, glm::mat4 view_matrix = glm::mat4(1.0f), glm::mat4 proj_matrix = glm::mat4(1.0f));
+	static std::vector<glm::vec3> makeGlobalCoordsFromVertex(const std::vector<Vertex>& local_coords, const glm::mat4& model_matrix = glm::mat4(1.0f));
+	static std::vector<glm::vec3> makeGlobalCoordsFromLocal(const std::vector<glm::vec3>& local_coords, const glm::mat4& model_matrix = glm::mat4(1.0f));
+	static glm::mat4 makeSummarizeMat4(const glm::mat4 model_matrix, const glm::mat4 view_matrix = glm::mat4(1.0f), const glm::mat4 proj_matrix = glm::mat4(1.0f));
+	static std::vector<glm::vec3> returnPositionFromVertex(const std::vector<Vertex>& vertex_vector);
 };

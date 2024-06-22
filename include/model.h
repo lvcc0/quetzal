@@ -30,13 +30,13 @@ public:
     std::vector<unsigned int> m_indices;
     std::vector<std::shared_ptr<Texture>> m_textures;
 
-    // Collision in world space
+    // Setting collision in local space and updating a model matrix every draw
     std::shared_ptr<Collision> m_collision;
 
     // Constructor
     Model(std::vector<Vertex>& vertices,
           std::vector<unsigned int>& indices,
-          std::vector<std::shared_ptr<Texture>>& textures, CollisionType type);
+          std::vector<std::shared_ptr<Texture>>& textures, CollisionType collision_type);
     
     // Copy constructor
     Model(const Model& obj);

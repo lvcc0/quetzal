@@ -3,27 +3,7 @@
 
 bool Physics::checkCollision(Collision& object1, Collision& object2)
 {
-	if (object1.m_type == CollisionType::SQUARE && object2.m_type == CollisionType::SQUARE) {
-		bool CollisionX = object1.m_position.x + object1.m_size.x >= object2.m_position.x && object2.m_position.x + object2.m_size.x >= object1.m_position.x;
-		bool CollisionY = object1.m_position.y + object1.m_size.y >= object2.m_position.y && object2.m_position.y + object2.m_size.y >= object1.m_position.y;
-		bool CollisionZ = object1.m_position.z + object1.m_size.z >= object2.m_position.z && object2.m_position.z + object2.m_size.z >= object1.m_position.z;
-		return CollisionX && CollisionY && CollisionZ;
-	}
-	else if (object1.m_type == CollisionType::SQUARE && object2.m_type == CollisionType::SPHERE) {
-		//PLACEHOLDER//
-	}
-	else if (object1.m_type == CollisionType::SPHERE && object2.m_type == CollisionType::SQUARE) {
-		//PLACEHOLDER//
-	}
-	else if (object1.m_type == CollisionType::SPHERE && object2.m_type == CollisionType::SPHERE) {
-		//PLACEHOLDER//
-	}
-	else if (object1.m_type == CollisionType::NONE || object2.m_type == CollisionType::NONE) {
-		//PLACEHOLDER//
-	}
-	else {
-		std::cout << "ERROR::INCORRECT COLLISION TYPE" << std::endl;
-	}
+	// Placeholder //
 	return false;
 }
 
@@ -33,8 +13,8 @@ bool Physics::fullCheckCollision(Collision& object1, Collision& object2)
 	glm::vec3 first_less_second(false, false, false);
 	glm::vec3 first_more_second(false, false, false);
 
-	std::vector<glm::vec3> first_verts = object1.m_vertices;
-	std::vector<glm::vec3> second_verts = object2.m_vertices;
+	std::vector<glm::vec3> first_verts = ExpMath::makeGlobalCoordsFromLocal(object1.m_vertices, object1.m_model_matrix);
+	std::vector<glm::vec3> second_verts = ExpMath::makeGlobalCoordsFromLocal(object2.m_vertices, object2.m_model_matrix);
 
 	for (glm::vec3 first_item : first_verts) {
 		for (glm::vec3 second_item : second_verts) {

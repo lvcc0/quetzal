@@ -15,33 +15,31 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "vertex.h"
-
-enum class CollisionType { NONE, SQUARE, SPHERE };
+enum class CollisionType { NONE, SELF, SQUARE, SPHERE };
 
 class Collision {
 public:
 
-	void updateCollision(const std::vector<glm::vec3>& m_vertices);
-	void makeCollision(CollisionType m_type, const std::vector<glm::vec3>& m_vertices);
-	void setVerts(const std::vector<glm::vec3>& m_vertices);
+	// Funcs
+	void makeCollision(const std::vector<glm::vec3>& m_vertices);
+	void updateModelMatrix(const glm::mat4& model_matrix);
 
-	// Void constructor
-	Collision();
+	// Constructor
+	Collision(const std::vector<glm::vec3>& m_vertices, CollisionType type = CollisionType::NONE);
 
 	// Copy constructor
 	Collision(const Collision& obj);
 
-	// All verts
+	// Verts of collision (in local space)
 	std::vector<glm::vec3> m_vertices;
 
-	// This vars should be using for NOT FULL checking of collision
-	// Type
+	// Model matrix
+	glm::mat4 m_model_matrix = glm::mat4(1.0f);
+
+	// Type of collision
 	CollisionType m_type;
+private:
+	void setVerts(const std::vector<glm::vec3>& m_vertices);
+	void makeSquare(const std::vector<glm::vec3>& m_vertices);
 
-	// Position
-	glm::vec3 m_position;
-
-	// Size
-	glm::vec3 m_size;
 };

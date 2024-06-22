@@ -16,8 +16,7 @@ int main()
 
     auto catCube = first_scene->addModel("catcube", "objects/catcube/catcube.obj", CollisionType::SQUARE);
     auto secCatCube = first_scene->addModel("sec_catcube", "objects/catcube/catcube.obj", CollisionType::SQUARE);
-    //auto secCatCube = first_scene->copyModel("sec_catcube", catCube);
-    //auto catSphere = first_scene->addModel("catsphere", "objects/catsphere/catsphere.obj", CollisionType::NONE);
+    auto catSphere = first_scene->addModel("catsphere", "objects/catsphere/catsphere.obj", CollisionType::SQUARE);
     auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(5.0f, 4.0f, -2.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
     auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
 
