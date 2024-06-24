@@ -15,6 +15,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "expanded_math.h"
+
 enum class CollisionType { NONE, SELF, SQUARE, SPHERE };
 
 class Collision {
@@ -25,7 +27,9 @@ public:
 	void updateModelMatrix(const glm::mat4& model_matrix);
 
 	// Constructor
+	Collision();
 	Collision(CollisionType type, const std::vector<glm::vec3>& m_vertices);
+	Collision(CollisionType type, const std::vector<Vertex>& m_vertices);
 
 	// Copy constructor
 	Collision(const Collision& obj);

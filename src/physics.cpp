@@ -54,13 +54,13 @@ bool Physics::fullCheckCollision(Collision& object1, Collision& object2)
 	return false;
 }
 
-void Physics::physicsProcessing(std::vector<std::shared_ptr<Model>>& models)
+void Physics::physicsProcessing(std::vector<std::shared_ptr<RigidBody>>& bodies)
 {
 	// Checking collisions 
-	for (std::shared_ptr<Model> model1: models) {
-		for (std::shared_ptr<Model> model2: models) {
-			if (model1 != model2)
-				std::cout << fullCheckCollision(*model1->m_collision, *model2->m_collision) << std::endl;
+	for (std::shared_ptr<RigidBody> body1: bodies) {
+		for (std::shared_ptr<RigidBody> body2: bodies) {
+			if (body1 != body2)
+				std::cout << fullCheckCollision(body1->m_collision, body2->m_collision) << std::endl;
 				// ¬ообще сюда можно вставить че угодно
 		}
 	}

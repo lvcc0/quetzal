@@ -1,5 +1,4 @@
 #include "expanded_math.h"
-#include "expanded_math.h"
 
 std::vector<glm::vec3> ExpMath::makeGlobalCoordsFromVertex(const std::vector<Vertex>& local_coords, const glm::mat4& model_matrix)
 {

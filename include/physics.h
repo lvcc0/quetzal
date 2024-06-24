@@ -17,12 +17,12 @@
 
 #include "vertex.h"
 #include "collision.h"
-#include "model.h"
+#include "rigid_body.h"
 #include "expanded_math.h"
 
 class Physics {
 public:
 	static bool checkCollision(Collision& object1, Collision& object2);
 	static bool fullCheckCollision(Collision& object1, Collision& object2);
-	static void physicsProcessing(std::vector<std::shared_ptr<Model>>& models);
+	static void physicsProcessing(std::vector<std::shared_ptr<RigidBody>>& bodies);
 };

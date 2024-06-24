@@ -1,6 +1,5 @@
 #include "scene.h"
 #include "scene.h"
-#include "scene.h"
 
 Scene::Scene(Camera& camera) :
     m_Camera(std::make_shared<Camera>(camera)),
@@ -68,6 +67,15 @@ void Scene::update()
             it++;
         }
     }
+    if (!this->rigidBodyMap.empty())
+    {
+        std::map<std::string, std::shared_ptr<RigidBody>>::iterator it = this->rigidBodyMap.begin();
+        while (it != this->rigidBodyMap.end())
+        {
+            it->second->Draw(m_CurrentShader);
+            it++;
+        }
+    }
     if (!this->cylBillboardMap.empty())
     {
         std::map<std::string, std::shared_ptr<CylindricalBillboard>>::iterator it = this->cylBillboardMap.begin();
@@ -86,6 +94,7 @@ void Scene::update()
             it++;
         }
     }
+
 
     if (m_CurrentScreenShader && m_is_PostProcessing)
         this->m_PostProcessing->activate(m_CurrentScreenShader);
@@ -108,7 +117,7 @@ void Scene::setScreenShader(const std::string& name)
 
 void Scene::doPhysicsProcessing()
 {
-    Physics::physicsProcessing(modelVector);
+    Physics::physicsProcessing(rigidBodyVector);
 }
 
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
@@ -125,12 +134,19 @@ std::shared_ptr<Texture> Scene::addTexture(std::string name, std::string type, c
     return texture;
 }
 
-std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& model_rel_path, CollisionType type)
+std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& model_rel_path)
 {
-    auto model = ResourceManager::makeModel(name, model_rel_path, type);
+    auto model = ResourceManager::makeModel(name, model_rel_path);
     modelMap.emplace(name, model);
-    modelVector.push_back(model);
     return model;
+}
+
+std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::string& model_rel_path, CollisionType type)
+{
+    std::shared_ptr<RigidBody> rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name, model_rel_path), type);
+    rigidBodyMap.emplace(name, rigid_body);
+    rigidBodyVector.push_back(rigid_body);
+    return rigid_body;
 }
 
 std::shared_ptr<CylindricalBillboard> Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
@@ -151,7 +167,6 @@ std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<
 {
     auto c_model = std::make_shared<Model>(*model);
     modelMap.emplace(name, c_model);
-    modelVector.push_back(model);
     return c_model;
 }
 

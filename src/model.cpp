@@ -1,19 +1,13 @@
 #include "model.h"
 
-void Model::updateCollision(CollisionType type, const std::vector<glm::vec3>& m_vertices)
-{
-    m_collision->makeCollision(type, m_vertices);
-}
 
 Model::Model(std::vector<Vertex>& vertices,
              std::vector<unsigned int>& indices,
-             std::vector<std::shared_ptr<Texture>>& textures, CollisionType collision_type) :
+             std::vector<std::shared_ptr<Texture>>& textures) :
     m_textures(textures)
 {
     m_vertices.swap(vertices);
     m_indices.swap(indices);
-
-    m_collision = std::make_shared<Collision>(collision_type, ExpMath::returnPositionFromVertex(m_vertices));
 
     setupModel(); // setup VAO, VBO, EBO
 
@@ -26,7 +20,7 @@ Model::Model(const Model& obj) :
     m_model_matrix(obj.m_model_matrix),
     VAO(obj.VAO)
 {
-    this->m_collision = std::make_shared<Collision>(ExpMath::returnPositionFromVertex(m_vertices), obj.m_collision->m_type);
+
 }
 
 Model::~Model()
@@ -69,9 +63,6 @@ void Model::Draw(std::shared_ptr<Shader>& shader)
     // Convert local coordinates to world coordinates
     shader->setMat4("model", m_model_matrix);
     shader->setMat4("inversed", glm::inverse(m_model_matrix));
-
-    // Making collision
-    m_collision->updateModelMatrix(m_model_matrix);
 
     m_model_matrix = glm::mat4(1.0f);
 

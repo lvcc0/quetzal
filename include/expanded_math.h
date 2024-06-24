@@ -17,16 +17,10 @@
 
 #include "vertex.h"
 
-//Static class with expanded math logic
-class ExpMath {
-public:
-	// Delete all constructors
-	ExpMath() = delete;
-	ExpMath(const ExpMath& obj) = delete;
-	ExpMath(const ExpMath&& obj) = delete;
-
-	static std::vector<glm::vec3> makeGlobalCoordsFromVertex(const std::vector<Vertex>& local_coords, const glm::mat4& model_matrix = glm::mat4(1.0f));
-	static std::vector<glm::vec3> makeGlobalCoordsFromLocal(const std::vector<glm::vec3>& local_coords, const glm::mat4& model_matrix = glm::mat4(1.0f));
-	static glm::mat4 makeSummarizeMat4(const glm::mat4 model_matrix, const glm::mat4 view_matrix = glm::mat4(1.0f), const glm::mat4 proj_matrix = glm::mat4(1.0f));
-	static std::vector<glm::vec3> returnPositionFromVertex(const std::vector<Vertex>& vertex_vector);
+//expanded math logic
+namespace ExpMath {
+	std::vector<glm::vec3> makeGlobalCoordsFromVertex(const std::vector<Vertex>& local_coords, const glm::mat4& model_matrix = glm::mat4(1.0f));
+	std::vector<glm::vec3> makeGlobalCoordsFromLocal(const std::vector<glm::vec3>& local_coords, const glm::mat4& model_matrix = glm::mat4(1.0f));
+	glm::mat4 makeSummarizeMat4(const glm::mat4 model_matrix, const glm::mat4 view_matrix = glm::mat4(1.0f), const glm::mat4 proj_matrix = glm::mat4(1.0f));
+	std::vector<glm::vec3> returnPositionFromVertex(const std::vector<Vertex>& vertex_vector);
 };

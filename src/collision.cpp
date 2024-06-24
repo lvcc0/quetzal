@@ -1,4 +1,6 @@
 #include "collision.h"
+#include "collision.h"
+#include "collision.h"
 
 // Makes collision in local space
 void Collision::makeCollision(CollisionType type, const std::vector<glm::vec3>& m_vertices)
@@ -67,10 +69,22 @@ void Collision::makeSquare(const std::vector<glm::vec3>& m_vertices)
 
 }
 
+
+
+Collision::Collision()
+{
+	// Nothing //
+}
+
 // Makes collision in local space
 Collision::Collision(CollisionType type, const std::vector<glm::vec3>& m_vertices)
 {
 	makeCollision(type, m_vertices);
+}
+
+Collision::Collision(CollisionType type, const std::vector<Vertex>& m_vertices)
+{
+	makeCollision(type, ExpMath::returnPositionFromVertex(m_vertices));
 }
 
 Collision::Collision(const Collision& obj)

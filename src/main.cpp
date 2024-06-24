@@ -14,9 +14,9 @@ int main()
     first_scene->setShader("default_shader");
     first_scene->setScreenShader("inversion_color");
 
-    auto catCube = first_scene->addModel("catcube", "objects/catcube/catcube.obj", CollisionType::SQUARE);
-    auto secCatCube = first_scene->addModel("sec_catcube", "objects/catcube/catcube.obj", CollisionType::SQUARE);
-    auto catSphere = first_scene->addModel("catsphere", "objects/catsphere/catsphere.obj", CollisionType::SQUARE);
+    auto catCube1 = first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", CollisionType::SQUARE);
+    auto catCube2 = first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", CollisionType::SQUARE);
+
     auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(5.0f, 4.0f, -2.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
     auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
 
@@ -62,11 +62,8 @@ int main()
     // Main loop
     while (engine.isRunning())
     {
-        catCube->translate(glm::vec3(0.0, 2.2, 0.0) * engine.getLastFrame());
-        catCube->rotate(engine.getLastFrame() * 50, glm::vec3(1.0, 0.0, 0.0));
-
-        //catSphere->rotate(engine.getLastFrame() * 15, glm::vec3(0.0f, 1.0f, 0.0f));
-
+        catCube1->translate(glm::vec3(1.0, 2.0, 1.0));
+        catCube2->translate(glm::vec3(1.0, 2.0, 0.0));
         pepeBoard->translate(glm::vec3(cos(engine.getLastFrame()) * 10.0f, 0.0f, sin(engine.getLastFrame()) * 10.0f)); // TODO: billboard sprite renders somewhat weirdly when camera.y = board.y
 
         engine.process();

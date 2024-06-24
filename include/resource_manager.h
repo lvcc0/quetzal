@@ -14,6 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "billboards.h"
+#include "rigid_body.h"
 
 class ResourceManager
 {
@@ -30,7 +31,7 @@ public:
 	// Save shared_ptrs into their maps specified above
 	static std::shared_ptr<Shader> makeShaderProgram(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
 	static std::shared_ptr<Texture> makeTexture(std::string name, std::string type, const std::string& texture_rel_path);
-	static std::shared_ptr<Model> makeModel(std::string name, const std::string& model_rel_path, CollisionType col_type);
+	static std::shared_ptr<Model> makeModel(std::string name, const std::string& model_rel_path);
 	static std::shared_ptr<CylindricalBillboard> makeCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 	static std::shared_ptr<SphericalBillboard> makeSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 
