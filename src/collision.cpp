@@ -1,8 +1,10 @@
 #include "collision.h"
 
 // Makes collision in local space
-void Collision::makeCollision(const std::vector<glm::vec3>& m_vertices) 
+void Collision::makeCollision(CollisionType type, const std::vector<glm::vec3>& m_vertices)
 {
+	this->m_type = type;
+
 	if (m_type == CollisionType::SQUARE) {
 		makeSquare(m_vertices);
 	}
@@ -10,7 +12,8 @@ void Collision::makeCollision(const std::vector<glm::vec3>& m_vertices)
 		setVerts(m_vertices);
 	}
 	else if (m_type == CollisionType::NONE) {
-		// Nothing
+		if (this->m_vertices.size() > 0)
+			this->m_vertices.clear();
 	}
 	else {
 		std::cerr << "ERROR::COLLISION_MAKER::COLLISION TYPE NOT FOUND" << std::endl;
@@ -64,10 +67,10 @@ void Collision::makeSquare(const std::vector<glm::vec3>& m_vertices)
 
 }
 
-Collision::Collision(const std::vector<glm::vec3>& m_vertices, CollisionType type)
+// Makes collision in local space
+Collision::Collision(CollisionType type, const std::vector<glm::vec3>& m_vertices)
 {
-	this->m_type = type;
-	makeCollision(m_vertices);
+	makeCollision(type, m_vertices);
 }
 
 Collision::Collision(const Collision& obj)

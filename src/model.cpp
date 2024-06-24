@@ -1,5 +1,10 @@
 #include "model.h"
 
+void Model::updateCollision(CollisionType type, const std::vector<glm::vec3>& m_vertices)
+{
+    m_collision->makeCollision(type, m_vertices);
+}
+
 Model::Model(std::vector<Vertex>& vertices,
              std::vector<unsigned int>& indices,
              std::vector<std::shared_ptr<Texture>>& textures, CollisionType collision_type) :
@@ -8,7 +13,7 @@ Model::Model(std::vector<Vertex>& vertices,
     m_vertices.swap(vertices);
     m_indices.swap(indices);
 
-    m_collision = std::make_shared<Collision>(ExpMath::returnPositionFromVertex(m_vertices), collision_type);
+    m_collision = std::make_shared<Collision>(collision_type, ExpMath::returnPositionFromVertex(m_vertices));
 
     setupModel(); // setup VAO, VBO, EBO
 

@@ -32,6 +32,7 @@ public:
 
     // Setting collision in local space and updating a model matrix every draw
     std::shared_ptr<Collision> m_collision;
+    void updateCollision(CollisionType type, const std::vector<glm::vec3>& m_vertices);
 
     // Constructor
     Model(std::vector<Vertex>& vertices,

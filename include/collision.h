@@ -21,11 +21,11 @@ class Collision {
 public:
 
 	// Funcs
-	void makeCollision(const std::vector<glm::vec3>& m_vertices);
+	void makeCollision(CollisionType type, const std::vector<glm::vec3>& m_vertices);
 	void updateModelMatrix(const glm::mat4& model_matrix);
 
 	// Constructor
-	Collision(const std::vector<glm::vec3>& m_vertices, CollisionType type = CollisionType::NONE);
+	Collision(CollisionType type, const std::vector<glm::vec3>& m_vertices);
 
 	// Copy constructor
 	Collision(const Collision& obj);
