@@ -70,7 +70,16 @@ void Scene::update()
             it++;
         }
     }
-
+    // Draw all rigid bodies
+    if (!this->m_RigidBodyMap.empty())
+    {
+        std::map<std::string, std::shared_ptr<RigidBody>>::iterator it = this->m_RigidBodyMap.begin();
+        while (it != this->m_RigidBodyMap.end())
+        {
+            it->second->Draw(m_CurrentShader);
+            it++;
+        }
+    }
     // Draw all cylindrical billboards
     if (!this->m_CylBillboardMap.empty())
     {
@@ -81,7 +90,6 @@ void Scene::update()
             it++;
         }
     }
-
     // Draw all spherical billboards
     if (!this->m_SphBillboardMap.empty())
     {
@@ -162,6 +170,11 @@ std::map<const std::string, std::shared_ptr<SphericalBillboard>> Scene::getSpher
     return this->m_SphBillboardMap;
 }
 
+void Scene::doPhysicsProcessing()
+{
+    Physics::physicsProcessing(m_RigidBodies);
+}
+
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
 {
     auto shader = ResourceManager::makeShaderProgram(name, vertex_shader_rel_path, fragment_shader_rel_path);
@@ -184,6 +197,14 @@ std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& mode
     m_ModelMap.emplace(name, model);
 
     return model;
+}
+
+std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::string& model_rel_path, Collision &collision)
+{
+    auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name, model_rel_path), collision);
+    m_RigidBodyMap.emplace(name, rigid_body);
+    m_RigidBodies.push_back(rigid_body);
+    return rigid_body;
 }
 
 std::shared_ptr<CylindricalBillboard> Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)

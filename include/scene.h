@@ -22,14 +22,16 @@
 #include "model.h"
 #include "texture.h"
 #include "billboards.h"
+#include "physics.h"
 
 enum class ObjectType { SHADER, TEXTURE, MODEL, CYL_BILLBOARD, SPH_BILLBOARD };
 
 class Scene
 {
 public:
-    std::shared_ptr<Camera>         m_Camera;         // TODO: make it just a camera object, not a pointer perhaps)
-    std::shared_ptr<PostProcessing> m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
+    std::shared_ptr<Camera>                 m_Camera;         // TODO: make it just a camera object, not a pointer perhaps)
+    std::shared_ptr<PostProcessing>         m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
+    std::vector<std::shared_ptr<RigidBody>> m_RigidBodies;
 
     bool m_IsPostProcessing = false; // postprocessing bool
 
@@ -57,10 +59,14 @@ public:
     std::map<const std::string, std::shared_ptr<CylindricalBillboard>> getCylindricalBillboardMap();
     std::map<const std::string, std::shared_ptr<SphericalBillboard>>   getSphericalBiillboardMap();
 
+    // Do collisions
+    void doPhysicsProcessing();
+    
     // Some stuff to add to the scene
     std::shared_ptr<Shader>               addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
     std::shared_ptr<Texture>              addTexture(std::string name, std::string type, const std::string& texture_rel_path);
     std::shared_ptr<Model>                addModel(std::string name, const std::string& model_rel_path);
+    std::shared_ptr<RigidBody>            addRigidBody(std::string name, const std::string& model_rel_path, Collision& collision);
     std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
     std::shared_ptr<SphericalBillboard>   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 
@@ -87,7 +93,7 @@ private:
     std::vector<std::shared_ptr<DirLight>>   m_DirLights;
     std::vector<std::shared_ptr<PointLight>> m_PointLights;
     std::vector<std::shared_ptr<SpotLight>>  m_SpotLights;
-    
+
     std::shared_ptr<Shader>              m_CurrentShader;        // a shader to draw stuff with
     std::vector<std::shared_ptr<Shader>> m_CurrentScreenShaders; // vector of postprocessing shaders
 
@@ -95,6 +101,7 @@ private:
     std::map<const std::string, std::shared_ptr<Shader>>               m_ShaderMap;
     std::map<const std::string, std::shared_ptr<Texture>>              m_TextureMap;
     std::map<const std::string, std::shared_ptr<Model>>                m_ModelMap;
+    std::map<const std::string, std::shared_ptr<RigidBody>>            m_RigidBodyMap;
     std::map<const std::string, std::shared_ptr<CylindricalBillboard>> m_CylBillboardMap;
     std::map<const std::string, std::shared_ptr<SphericalBillboard>>   m_SphBillboardMap;
 };

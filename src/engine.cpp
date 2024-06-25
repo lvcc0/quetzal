@@ -174,7 +174,10 @@ void Engine::process()
 
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
+    {
+        this->scenes.at(this->currentScene)->doPhysicsProcessing();
         this->scenes.at(this->currentScene)->update();
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
