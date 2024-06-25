@@ -61,9 +61,9 @@ public:
     std::shared_ptr<SphericalBillboard> addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 
     // Some stuff to copy in the scene
-    std::shared_ptr<Model> copyModel(std::string name, const std::shared_ptr<Model> const model);
-    std::shared_ptr<CylindricalBillboard> copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> const cyl_billboard);
-    std::shared_ptr<SphericalBillboard> copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> const sph_billboard);
+    std::shared_ptr<Model> copyModel(std::string name, const std::shared_ptr<Model> model);
+    std::shared_ptr<CylindricalBillboard> copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard);
+    std::shared_ptr<SphericalBillboard> copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard);
 
     // Some stuff to delete in the scene
     void deleteModel(std::string name, std::shared_ptr<Model>& model);

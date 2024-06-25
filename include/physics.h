@@ -20,8 +20,9 @@
 #include "rigid_body.h"
 #include "expanded_math.h"
 
-class Physics {
+class Physics
+{
 public:
-	static bool checkCollision(Collision &one, Collision &two);
-	static void physicsProcessing(std::vector<std::shared_ptr<RigidBody>> &bodies);
+    static bool checkCollision(Collision& one, Collision& two);
+    static void physicsProcessing(std::vector<std::shared_ptr<RigidBody>>& bodies);
 };

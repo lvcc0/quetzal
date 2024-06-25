@@ -9,10 +9,15 @@ public:
     std::shared_ptr<Model> m_Model;
     Collision m_Collision;
 
-    // Constructor
-    RigidBody(std::shared_ptr<Model> &model, Collision &collision);
+    glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);        // position in the world space
+    glm::vec3 m_Scale = glm::vec3(1.0f, 1.0f, 1.0f);           // body scaling in the world space
+    glm::vec3 m_RotationDegrees = glm::vec3(0.0f, 0.0f, 0.0f); // body rotation in all 3 axes respectively in the world space
 
-    void Draw(std::shared_ptr<Shader> &shader);
+    // Constructor
+    RigidBody(std::shared_ptr<Model>& model, Collision& collision);
+
+    // Draw body
+    void Draw(std::shared_ptr<Shader>& shader);
 
     // Moving in world space
     void translate(glm::vec3 vector);

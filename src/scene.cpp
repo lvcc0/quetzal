@@ -162,21 +162,21 @@ std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm
     return sph_billboard;
 }
 
-std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<Model> const model)
+std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<Model> model)
 {
     auto c_model = std::make_shared<Model>(*model);
     modelMap.emplace(name, c_model);
     return c_model;
 }
 
-std::shared_ptr<CylindricalBillboard> Scene::copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> const cyl_billboard)
+std::shared_ptr<CylindricalBillboard> Scene::copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard)
 {
     auto c_cyl_billboard = std::make_shared<CylindricalBillboard>(*cyl_billboard);
     cylBillboardMap.emplace(name, c_cyl_billboard);
     return c_cyl_billboard;
 }
 
-std::shared_ptr<SphericalBillboard> Scene::copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> const sph_billboard)
+std::shared_ptr<SphericalBillboard> Scene::copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard)
 {
     auto c_sph_billboard = std::make_shared<SphericalBillboard>(*sph_billboard);
     sphBillboardMap.emplace(name, c_sph_billboard);

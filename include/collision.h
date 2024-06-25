@@ -35,5 +35,5 @@ public:
     Collision(CollisionType type, glm::vec3 position, float radius);   // sphere collider
 
     // Copy constructor
-    Collision(const Collision &obj);
+    Collision(const Collision& obj);
 };

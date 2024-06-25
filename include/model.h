@@ -24,11 +24,11 @@
 class Model
 {
 public:
-    glm::mat4 m_model_matrix = glm::mat4(1.0f);
+    glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 
-    std::vector<Vertex> m_vertices;
-    std::vector<unsigned int> m_indices;
-    std::vector<std::shared_ptr<Texture>> m_textures;
+    std::vector<Vertex> m_Vertices;
+    std::vector<unsigned int> m_Indices;
+    std::vector<std::shared_ptr<Texture>> m_Textures;
 
     // Constructor
     Model(std::vector<Vertex>& vertices,
