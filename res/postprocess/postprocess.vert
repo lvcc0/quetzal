@@ -1,5 +1,3 @@
-// If you want to rename this file, rewrite constant in resource manager
-
 #version 330 core
 
 layout (location = 0) in vec2 aPos;

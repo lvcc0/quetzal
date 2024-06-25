@@ -10,13 +10,13 @@
 class Debugger 
 {
 public:
-	// Constructor
-	Debugger() { /* empty */ };
+    // Constructor
+    Debugger() { /* empty */ };
 
-	// No move or copy constructors allowed
-	Debugger(const Debugger& obj) = delete;
-	Debugger(const Debugger&& obj) = delete;
+    // No move or copy constructors allowed
+    Debugger(const Debugger& obj) = delete;
+    Debugger(const Debugger&& obj) = delete;
 
-	long getPrivateWorkingSet(const wchar_t* process);
-	void printMemory();
+    long getPrivateWorkingSet(const wchar_t* process);
+    void printMemory();
 };

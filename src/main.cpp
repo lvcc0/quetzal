@@ -10,9 +10,7 @@ int main()
     auto first_scene = engine.createScene("first_scene");
 
     first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag");
-
     first_scene->setShader("default_shader");
-    first_scene->setScreenShader("inversion_color");
 
     auto catCube1 = first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     auto catCube2 = first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
@@ -25,7 +23,7 @@ int main()
         true,
         "dirLight0",
         glm::vec3(-0.2f, -1.0f, -0.3f),
-        glm::vec3(0.8f, 0.8f, 0.8f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
         glm::vec3(0.4f, 0.4f, 0.4f),
         glm::vec3(0.5f, 0.5f, 0.5f),
         glm::vec3(0.5f, 1.0f, 1.0f)

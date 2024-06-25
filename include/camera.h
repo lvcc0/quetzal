@@ -8,35 +8,33 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
-#include "shader.h"
-
 class Camera
 {
 public:
-	glm::vec3 m_pos;
-	glm::vec3 m_orientation = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 m_pos;
+    glm::vec3 m_orientation = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	bool m_firstClick = true;
+    bool m_firstClick = true;
 
-	int m_width;
-	int m_height;
+    int m_width;
+    int m_height;
 
-	float m_speed = 3.0f;
-	float m_sens = 100.0f;
+    float m_speed = 3.0f;
+    float m_sens = 100.0f;
 
-	// Constructor
-	Camera(int width, int height, glm::vec3 pos);
+    // Constructor
+    Camera(int width, int height, glm::vec3 pos);
 
-	// Copy constructor
-	Camera(const Camera& obj);
+    // Copy constructor
+    Camera(const Camera& obj);
 
-	// Returns current view matrix
-	glm::mat4 getViewMatrix();
-	
-	// Handles keyboard and mouse inputs
-	void Inputs(GLFWwindow* window, float dt);
-	
-	// Updates camera's width and height
-	void UpdateSize(int w, int h);
+    // Returns current view matrix
+    glm::mat4 getViewMatrix() const;
+    
+    // Handles keyboard and mouse inputs
+    void Inputs(GLFWwindow* window, float dt);
+    
+    // Updates camera's width and height
+    void UpdateSize(int w, int h);
 };

@@ -42,7 +42,7 @@ public:
     ~Model();
 
     // Draw model
-    void Draw(std::shared_ptr<Shader>& shader);
+    void draw(std::shared_ptr<Shader>& shader);
 
     // Moving in world space
     void translate(glm::vec3 vector);
