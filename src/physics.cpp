@@ -58,7 +58,7 @@ bool Physics::checkCollision(Collision& one, Collision& two)
     return false; // just in case something goes wrong
 }
 
-void Physics::physicsProcessing(std::vector<std::shared_ptr<RigidBody>>& bodies)
+void Physics::processPhysics(std::vector<std::shared_ptr<RigidBody>>& bodies)
 {
     for (std::shared_ptr<RigidBody> one : bodies)
     {

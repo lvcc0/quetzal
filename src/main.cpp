@@ -10,13 +10,12 @@ int main()
     auto first_scene = engine.createScene("first_scene");
 
     first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag");
-    first_scene->setShader("default_shader");
 
-    auto catCube1 = first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    auto catCube2 = first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    auto catCube3 = first_scene->addRigidBody("catcube3", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    auto catCube1 = first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    auto catCube2 = first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    auto catCube3 = first_scene->addRigidBody("catcube3", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
 
-    auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(5.0f, 4.0f, -2.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
+    auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
     auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
 
     first_scene->addDirLight(DirLight(
@@ -65,7 +64,7 @@ int main()
     // Main loop
     while (engine.isRunning())
     {
-        pepeBoard->translate(glm::vec3(cos(engine.getLastFrame()) * 10.0f, 0.0f, sin(engine.getLastFrame()) * 10.0f)); // TODO: billboard sprite renders somewhat weirdly when camera.y = board.y
+        pepeBoard->translate(glm::vec3(cos(engine.getLastFrame()), 0.0f, sin(engine.getLastFrame())) * 10.0f);
 
         engine.process();
     }

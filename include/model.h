@@ -17,9 +17,7 @@
 
 #include "shader.h"
 #include "texture.h"
-#include "collision.h"
 #include "vertex.h"
-#include "expanded_math.h"
 
 class Model
 {

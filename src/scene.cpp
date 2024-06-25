@@ -1,8 +1,8 @@
 #include "scene.h"
 
-Scene::Scene(Camera& camera) :
-    m_Camera(std::make_shared<Camera>(camera)),
-    m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders("postprocess"), camera.m_width, camera.m_height))
+Scene::Scene(Camera& camera)
+    : m_Camera(std::make_shared<Camera>(camera)),
+      m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders("postprocess"), camera.m_width, camera.m_height))
 { /* empty */ }
 
 Scene::~Scene()
@@ -76,7 +76,7 @@ void Scene::update()
         std::map<std::string, std::shared_ptr<RigidBody>>::iterator it = this->m_RigidBodyMap.begin();
         while (it != this->m_RigidBodyMap.end())
         {
-            it->second->Draw(m_CurrentShader);
+            it->second->draw(m_CurrentShader);
             it++;
         }
     }
@@ -103,6 +103,11 @@ void Scene::update()
 
     if (!m_CurrentScreenShaders.empty() && m_IsPostProcessing)
         this->m_PostProcessing->activate(m_CurrentScreenShaders);
+}
+
+void Scene::doPhysicsProcessing()
+{
+    Physics::processPhysics(m_RigidBodies);
 }
 
 void Scene::enablePostProcessing()
@@ -160,6 +165,11 @@ std::map<const std::string, std::shared_ptr<Model>> Scene::getModelMap()
     return this->m_ModelMap;
 }
 
+std::map<const std::string, std::shared_ptr<RigidBody>> Scene::getRigidBodyMap()
+{
+    return this->m_RigidBodyMap;
+}
+
 std::map<const std::string, std::shared_ptr<CylindricalBillboard>> Scene::getCylindricalBillboardMap()
 {
     return this->m_CylBillboardMap;
@@ -170,16 +180,14 @@ std::map<const std::string, std::shared_ptr<SphericalBillboard>> Scene::getSpher
     return this->m_SphBillboardMap;
 }
 
-void Scene::doPhysicsProcessing()
-{
-    Physics::physicsProcessing(m_RigidBodies);
-}
-
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
 {
     auto shader = ResourceManager::makeShaderProgram(name, vertex_shader_rel_path, fragment_shader_rel_path);
-    m_ShaderMap.emplace(name, shader);
+    
+    if (m_ShaderMap.empty()) // automatically set this shader if it's the first one in the map
+        this->m_CurrentShader = shader;
 
+    m_ShaderMap.emplace(name, shader);
     return shader;
 }
 
@@ -204,6 +212,7 @@ std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::stri
     auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name, model_rel_path), collision);
     m_RigidBodyMap.emplace(name, rigid_body);
     m_RigidBodies.push_back(rigid_body);
+    
     return rigid_body;
 }
 

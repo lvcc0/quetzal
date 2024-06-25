@@ -1,7 +1,7 @@
 #include "post_processing.h"
 
-PostProcessing::PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>& shaderMap, GLfloat width, GLfloat height) :
-    m_ShaderMap(shaderMap)
+PostProcessing::PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>& shaderMap, GLfloat width, GLfloat height)
+    : m_ShaderMap(shaderMap)
 {
     this->setupBuffers(VAO, VBO);
     this->setupFramebuffer(m_FirstFBO, m_FirstColorAttachment, m_RBO, width, height);

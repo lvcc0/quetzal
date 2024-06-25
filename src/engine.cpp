@@ -1,7 +1,7 @@
 #include "engine.h"
 
-Engine::Engine(unsigned int width, unsigned int height) :
-    winWidth(width), winHeight(height)
+Engine::Engine(unsigned int width, unsigned int height)
+    : winWidth(width), winHeight(height)
 {
     glfwInit();
 
@@ -102,7 +102,8 @@ void Engine::showGuiWindow()
 {
     ImGui::Begin((this->currentScene + " config").c_str());
 
-    ImGui::Checkbox("Postprocessing Enabled", &this->scenes.at(this->currentScene)->m_IsPostProcessing);
+    if (ImGui::Checkbox("Postprocessing Enabled", &this->scenes.at(this->currentScene)->m_IsPostProcessing))
+        glEnable(GL_DEPTH_TEST);
 
     if (this->scenes.at(this->currentScene)->m_IsPostProcessing)
     {

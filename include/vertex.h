@@ -11,7 +11,7 @@ struct Vertex {
     glm::vec3 Normal;
 
     // Constructor
-    Vertex(glm::vec3 pos, glm::vec2 texCoord, glm::vec3 norm) :
-        Position(pos), TexCoord(texCoord), Normal(norm) { /* empty */
-    }
+    Vertex(glm::vec3 pos, glm::vec2 texCoord, glm::vec3 norm) 
+        : Position(pos), TexCoord(texCoord), Normal(norm)
+    { /* empty */ }
 };

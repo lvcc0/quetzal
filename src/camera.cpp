@@ -1,11 +1,11 @@
 #include "camera.h"
 
-Camera::Camera(int width, int height, glm::vec3 pos) :
-    m_width(width), m_height(height), m_pos(pos)
+Camera::Camera(int width, int height, glm::vec3 pos)
+    : m_width(width), m_height(height), m_pos(pos)
 { /* empty */ }
 
-Camera::Camera(const Camera& obj) :
-    m_width(obj.m_width), m_height(obj.m_height), m_pos(obj.m_pos)
+Camera::Camera(const Camera& obj)
+    : m_width(obj.m_width), m_height(obj.m_height), m_pos(obj.m_pos)
 { /* empty */ }
 
 glm::mat4 Camera::getViewMatrix() const

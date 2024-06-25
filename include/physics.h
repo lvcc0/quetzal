@@ -15,14 +15,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "vertex.h"
-#include "collision.h"
 #include "rigid_body.h"
-#include "expanded_math.h"
 
 class Physics
 {
 public:
     static bool checkCollision(Collision& one, Collision& two);
-    static void physicsProcessing(std::vector<std::shared_ptr<RigidBody>>& bodies);
+    static void processPhysics(std::vector<std::shared_ptr<RigidBody>>& bodies);
 };

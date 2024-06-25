@@ -1,7 +1,7 @@
 #include "texture.h"
 
-Texture::Texture(std::string type, unsigned char* image, int width, int height, int numComponents) :
-    m_type(type)
+Texture::Texture(std::string type, unsigned char* image, int width, int height, int numComponents)
+    : m_type(type)
 {
     GLenum format{};
 

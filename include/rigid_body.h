@@ -17,7 +17,7 @@ public:
     RigidBody(std::shared_ptr<Model>& model, Collision& collision);
 
     // Draw body
-    void Draw(std::shared_ptr<Shader>& shader);
+    void draw(std::shared_ptr<Shader>& shader) const;
 
     // Moving in world space
     void translate(glm::vec3 vector);

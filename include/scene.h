@@ -31,7 +31,7 @@ class Scene
 public:
     std::shared_ptr<Camera>                 m_Camera;         // TODO: make it just a camera object, not a pointer perhaps)
     std::shared_ptr<PostProcessing>         m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
-    std::vector<std::shared_ptr<RigidBody>> m_RigidBodies;
+    std::vector<std::shared_ptr<RigidBody>> m_RigidBodies;    // TODO: (?) get rid of this vaector as we already have the map of rigid bodies
 
     bool m_IsPostProcessing = false; // postprocessing bool
 
@@ -43,6 +43,9 @@ public:
 
     // Gets called every frame in the engine class
     void update();
+
+    // Do collisions
+    void doPhysicsProcessing();
 
     // Enable post processing
     void enablePostProcessing();
@@ -56,12 +59,10 @@ public:
     std::map<const std::string, std::shared_ptr<Shader>>               getShaderMap();
     std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap();
     std::map<const std::string, std::shared_ptr<Model>>                getModelMap();
+    std::map<const std::string, std::shared_ptr<RigidBody>>            getRigidBodyMap();
     std::map<const std::string, std::shared_ptr<CylindricalBillboard>> getCylindricalBillboardMap();
     std::map<const std::string, std::shared_ptr<SphericalBillboard>>   getSphericalBiillboardMap();
 
-    // Do collisions
-    void doPhysicsProcessing();
-    
     // Some stuff to add to the scene
     std::shared_ptr<Shader>               addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
     std::shared_ptr<Texture>              addTexture(std::string name, std::string type, const std::string& texture_rel_path);
