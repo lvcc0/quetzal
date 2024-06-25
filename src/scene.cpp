@@ -95,7 +95,6 @@ void Scene::update()
         }
     }
 
-
     if (m_CurrentScreenShader && m_is_PostProcessing)
         this->m_PostProcessing->activate(m_CurrentScreenShader);
 }
@@ -117,7 +116,7 @@ void Scene::setScreenShader(const std::string& name)
 
 void Scene::doPhysicsProcessing()
 {
-    Physics::physicsProcessing(rigidBodyVector);
+    Physics::physicsProcessing(m_RigidBodies);
 }
 
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
@@ -141,11 +140,11 @@ std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& mode
     return model;
 }
 
-std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::string& model_rel_path, CollisionType type)
+std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::string& model_rel_path, Collision &collision)
 {
-    std::shared_ptr<RigidBody> rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name, model_rel_path), type);
+    auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name, model_rel_path), collision);
     rigidBodyMap.emplace(name, rigid_body);
-    rigidBodyVector.push_back(rigid_body);
+    m_RigidBodies.push_back(rigid_body);
     return rigid_body;
 }
 

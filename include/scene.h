@@ -32,6 +32,7 @@ public:
     // Camera (TODO: make it just a camera object, not a pointer perhaps)
     std::shared_ptr<Camera> m_Camera;
     std::shared_ptr<PostProcessing> m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
+    std::vector<std::shared_ptr<RigidBody>> m_RigidBodies;
 
     // Constructor
     Scene(Camera& camera);
@@ -50,13 +51,12 @@ public:
 
     // Do collisions
     void doPhysicsProcessing();
-    std::vector<std::shared_ptr<RigidBody>> rigidBodyVector;
-
+    
     // Some stuff to add to the scene
     std::shared_ptr<Shader> addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
     std::shared_ptr<Texture> addTexture(std::string name, std::string type, const std::string& texture_rel_path);
     std::shared_ptr<Model> addModel(std::string name, const std::string& model_rel_path);
-    std::shared_ptr<RigidBody> addRigidBody(std::string name, const std::string& model_rel_path, CollisionType type);
+    std::shared_ptr<RigidBody> addRigidBody(std::string name, const std::string& model_rel_path, Collision& collision);
     std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
     std::shared_ptr<SphericalBillboard> addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
 

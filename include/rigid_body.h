@@ -1,18 +1,18 @@
 #pragma once
 
-#include "collision.h"
 #include "model.h"
+#include "collision.h"
 
-class RigidBody {
+class RigidBody
+{
 public:
-    std::shared_ptr<Model> m_model;
-    Collision m_collision;
-    // Constructors
-    RigidBody(std::shared_ptr<Model>& model, CollisionType type);
+    std::shared_ptr<Model> m_Model;
+    Collision m_Collision;
 
-    void Draw(std::shared_ptr <Shader> shader);
+    // Constructor
+    RigidBody(std::shared_ptr<Model> &model, Collision &collision);
 
-    glm::mat4 m_model_matrix = glm::mat4(1.0f);
+    void Draw(std::shared_ptr<Shader> &shader);
 
     // Moving in world space
     void translate(glm::vec3 vector);

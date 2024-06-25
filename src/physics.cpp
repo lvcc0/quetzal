@@ -1,69 +1,71 @@
 #include "physics.h"
 
-
-bool Physics::checkCollision(Collision& object1, Collision& object2)
+bool Physics::checkCollision(Collision& one, Collision& two)
 {
-	// Placeholder //
-	return false;
+    switch (one.m_Type)
+    {
+    case (CollisionType::BOX):
+    {
+        switch (two.m_Type)
+        {
+        case (CollisionType::BOX): // BOX - BOX collision
+        {
+            bool collisionX = one.m_Position.x + one.m_Size.x >= two.m_Position.x && two.m_Position.x + two.m_Size.x >= one.m_Position.x;
+            bool collisionY = one.m_Position.y + one.m_Size.y >= two.m_Position.y && two.m_Position.y + two.m_Size.y >= one.m_Position.y;
+            bool collisionZ = one.m_Position.z + one.m_Size.z >= two.m_Position.z && two.m_Position.z + two.m_Size.z >= one.m_Position.z;
+
+            return collisionX && collisionY && collisionZ;
+        }
+        case (CollisionType::SPHERE): // BOX - SPHERE collision
+        {
+            glm::vec3 sphereCenter(two.m_Position + two.m_Radius);
+
+            glm::vec3 boxHalfExtents(one.m_Size.x / 2.0f, one.m_Size.y / 2.0f, one.m_Size.z / 2.0f);
+            glm::vec3 boxCenter(one.m_Position.x + boxHalfExtents.x, one.m_Position.y + boxHalfExtents.y, one.m_Position.z + boxHalfExtents.z);
+
+            glm::vec3 clampedDifference = glm::clamp(sphereCenter - boxCenter, -boxHalfExtents, boxHalfExtents); // clamped difference between centers
+            glm::vec3 shapesDifference = boxCenter + clampedDifference - sphereCenter; // difference between sphere center and closest point on the box
+
+            return glm::length(shapesDifference) < two.m_Radius;
+        }
+        } // switch (two.m_Type)
+    }
+    case (CollisionType::SPHERE):
+    {
+        switch (two.m_Type)
+        {
+        case (CollisionType::BOX): // SPHERE - BOX collision
+        {
+            glm::vec3 sphereCenter(one.m_Position + one.m_Radius);
+
+            glm::vec3 boxHalfExtents(two.m_Size.x / 2.0f, two.m_Size.y / 2.0f, two.m_Size.z / 2.0f);
+            glm::vec3 boxCenter(two.m_Position.x + boxHalfExtents.x, two.m_Position.y + boxHalfExtents.y, two.m_Position.z + boxHalfExtents.z);
+
+            glm::vec3 clampedDifference = glm::clamp(sphereCenter - boxCenter, -boxHalfExtents, boxHalfExtents); // clamped difference between centers
+            glm::vec3 shapesDifference = boxCenter + clampedDifference - sphereCenter; // difference between sphere center and closest point on the box
+
+            return glm::length(shapesDifference) < one.m_Radius;
+        }
+        case (CollisionType::SPHERE): // SPHERE - SPHERE collision
+        {
+            // if the distance between centers of spheres is less than the sum of their radii, then the spheres collided
+            return glm::length((one.m_Position + one.m_Radius) - (two.m_Position + two.m_Radius)) < one.m_Radius + two.m_Radius;
+        }
+        } // switch (two.m_Type)
+    }
+    } // switch (one.m_Type)
 }
 
-bool Physics::fullCheckCollision(Collision& object1, Collision& object2)
+void Physics::physicsProcessing(std::vector<std::shared_ptr<RigidBody>> &bodies)
 {
-	// using as vectors of bools
-	glm::vec3 first_less_second(false, false, false);
-	glm::vec3 first_more_second(false, false, false);
+    for (std::shared_ptr<RigidBody> one : bodies)
+    {
+        for (std::shared_ptr<RigidBody> two : bodies)
+        {
+            if (one == two)
+                continue;
 
-	std::vector<glm::vec3> first_verts = ExpMath::makeGlobalCoordsFromLocal(object1.m_vertices, object1.m_model_matrix);
-	std::vector<glm::vec3> second_verts = ExpMath::makeGlobalCoordsFromLocal(object2.m_vertices, object2.m_model_matrix);
-
-	for (glm::vec3 first_item : first_verts) {
-		for (glm::vec3 second_item : second_verts) {
-			if (first_item.x > second_item.x)
-				first_more_second.x = true;
-			else if (first_item.x < second_item.x)
-				first_less_second.x = true;
-			else if (first_item.x == second_item.x) {
-				first_more_second.x = true;
-				first_less_second.x = true;
-			}
-			if (first_item.y > second_item.y)
-				first_more_second.y = true;
-			else if (first_item.y < second_item.y)
-				first_less_second.y = true;
-			else if (first_item.y == second_item.y) {
-				first_more_second.y = true;
-				first_less_second.y = true;
-			}
-			if (first_item.z > second_item.z)
-				first_more_second.z = true;
-			else if (first_item.z < second_item.z)
-				first_less_second.z = true;
-			else if (first_item.z == second_item.z) {
-				first_more_second.z = true;
-				first_less_second.z = true;
-			}
-		}
-	}
-	glm::vec3 result;
-	result.x = first_less_second.x && first_more_second.x;
-	result.y = first_less_second.y && first_more_second.y;
-	result.z = first_less_second.z && first_more_second.z;
-
-	if (result == glm::vec3(true, true, true))
-		return true;
-	return false;
+            std::cout << checkCollision(one->m_Collision, two->m_Collision) << std::endl;
+        }
+    }
 }
-
-void Physics::physicsProcessing(std::vector<std::shared_ptr<RigidBody>>& bodies)
-{
-	// Checking collisions 
-	for (std::shared_ptr<RigidBody> body1: bodies) {
-		for (std::shared_ptr<RigidBody> body2: bodies) {
-			if (body1 != body2)
-				std::cout << fullCheckCollision(body1->m_collision, body2->m_collision) << std::endl;
-				// ¬ообще сюда можно вставить че угодно
-		}
-	}
-}
-
-

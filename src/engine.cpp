@@ -89,10 +89,8 @@ void Engine::createWindow()
 // Gets called every frame
 void Engine::processInput()
 {
-    if (!this->scenes.empty() && this->scenes.count(this->currentScene)) {
+    if (!this->scenes.empty() && this->scenes.count(this->currentScene))
         this->scenes.at(this->currentScene)->m_Camera->Inputs(this->window, deltaTime);
-        this->scenes.at(this->currentScene)->doPhysicsProcessing();
-    }
 
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(this->window, true);
@@ -135,7 +133,10 @@ void Engine::process()
 
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
+    {
+        this->scenes.at(this->currentScene)->doPhysicsProcessing();
         this->scenes.at(this->currentScene)->update();
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -22,7 +22,6 @@
 
 class Physics {
 public:
-	static bool checkCollision(Collision& object1, Collision& object2);
-	static bool fullCheckCollision(Collision& object1, Collision& object2);
-	static void physicsProcessing(std::vector<std::shared_ptr<RigidBody>>& bodies);
+	static bool checkCollision(Collision &one, Collision &two);
+	static void physicsProcessing(std::vector<std::shared_ptr<RigidBody>> &bodies);
 };

@@ -10,7 +10,6 @@ Model::Model(std::vector<Vertex>& vertices,
     m_indices.swap(indices);
 
     setupModel(); // setup VAO, VBO, EBO
-
 }
 
 Model::Model(const Model& obj) :
@@ -19,9 +18,7 @@ Model::Model(const Model& obj) :
     m_vertices(obj.m_vertices),
     m_model_matrix(obj.m_model_matrix),
     VAO(obj.VAO)
-{
-
-}
+{ /* empty */ }
 
 Model::~Model()
 {

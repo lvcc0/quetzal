@@ -1,32 +1,25 @@
 #include "rigid_body.h"
 
-RigidBody::RigidBody(std::shared_ptr<Model>& model, CollisionType type)
-{
-	this->m_model = model;
-	this->m_collision = Collision(type, this->m_model->m_vertices);
-}
+RigidBody::RigidBody(std::shared_ptr<Model>& model, Collision& collision)
+    : m_Model(model), m_Collision(collision)
+{ /* empty */ }
 
-void RigidBody::Draw(std::shared_ptr<Shader> shader)
+void RigidBody::Draw(std::shared_ptr<Shader> &shader)
 {
-	m_model->Draw(shader);
-	m_collision.updateModelMatrix(m_model_matrix);
-	m_model_matrix = glm::mat4(1.0f);
+    m_Model->Draw(shader);
 }
 
 void RigidBody::translate(glm::vec3 vector)
 {
-	m_model_matrix = glm::translate(m_model_matrix, vector);
-	m_model->translate(vector);
+    m_Model->translate(vector);
 }
 
 void RigidBody::scale(glm::vec3 vector)
 {
-	m_model_matrix = glm::scale(m_model_matrix, vector);
-	m_model->scale(vector);
+    m_Model->scale(vector);
 }
 
 void RigidBody::rotate(float degrees, glm::vec3 vector)
 {
-	m_model_matrix = glm::rotate(m_model_matrix, glm::radians(degrees), vector);
-	m_model->rotate(degrees, vector);
+    m_Model->rotate(degrees, vector);
 }

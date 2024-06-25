@@ -17,33 +17,23 @@
 
 #include "expanded_math.h"
 
-enum class CollisionType { NONE, SELF, SQUARE, SPHERE };
+enum class CollisionType { BOX, SPHERE };
 
-class Collision {
+// TODO: (?) make inherited BoxCollider and SphereCollider
+
+class Collision
+{
 public:
+    CollisionType m_Type; // collision type
 
-	// Funcs
-	void makeCollision(CollisionType type, const std::vector<glm::vec3>& m_vertices);
-	void updateModelMatrix(const glm::mat4& model_matrix);
+    glm::vec3 m_Position; // for both
+    glm::vec3 m_Size;     // for box collision
+    float m_Radius;       // for sphere collision       
 
-	// Constructor
-	Collision();
-	Collision(CollisionType type, const std::vector<glm::vec3>& m_vertices);
-	Collision(CollisionType type, const std::vector<Vertex>& m_vertices);
+    // Constructor
+    Collision(CollisionType type, glm::vec3 position, glm::vec3 size); // box collider
+    Collision(CollisionType type, glm::vec3 position, float radius);   // sphere collider
 
-	// Copy constructor
-	Collision(const Collision& obj);
-
-	// Verts of collision (in local space)
-	std::vector<glm::vec3> m_vertices;
-
-	// Model matrix
-	glm::mat4 m_model_matrix = glm::mat4(1.0f);
-
-	// Type of collision
-	CollisionType m_type;
-private:
-	void setVerts(const std::vector<glm::vec3>& m_vertices);
-	void makeSquare(const std::vector<glm::vec3>& m_vertices);
-
+    // Copy constructor
+    Collision(const Collision &obj);
 };
