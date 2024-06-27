@@ -57,10 +57,11 @@ int main()
         glm::vec3(0.0f, 0.0f, 1.0f)
     ));
 
-    catCube1->translate(glm::vec3(0.0f, 0.0f, 0.0f));
+    catCube1->translate(glm::vec3(-10.0f, 0.0f, 0.0f));
     catCube2->translate(glm::vec3(2.1f, 0.0f, 0.0f));
-    catCube3->translate(glm::vec3(-2.0f, 2.0f, 0.0f));
-
+    catCube3->translate(glm::vec3(-2.5f, 2.0f, 0.0f));
+    catCube1->m_MoveVector = glm::vec3(0.01, 0.0, 0.0);
+    catCube2->m_MoveVector = glm::vec3(-0.005, 0.0, 0.0);
     // Main loop
     while (engine.isRunning())
     {

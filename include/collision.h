@@ -36,4 +36,6 @@ public:
 
     // Copy constructor
     Collision(const Collision& obj);
+
+    void changeCollision();
 };

@@ -1,12 +1,19 @@
 #include "rigid_body.h"
+#include "rigid_body.h"
 
 RigidBody::RigidBody(std::shared_ptr<Model>& model, Collision& collision)
     : m_Model(model), m_Collision(collision)
 { /* empty */ }
 
-void RigidBody::draw(std::shared_ptr<Shader>& shader) const
+void RigidBody::draw(std::shared_ptr<Shader>& shader)
 {
     m_Model->draw(shader);
+    this->move();
+}
+
+void RigidBody::move()
+{
+    translate(m_MoveVector);
 }
 
 void RigidBody::translate(glm::vec3 vector)

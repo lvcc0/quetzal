@@ -1,5 +1,7 @@
 #include "physics.h"
 
+// TODO: Make rays
+
 bool Physics::checkCollision(Collision& one, Collision& two)
 {
     switch (one.m_Type)
@@ -48,7 +50,7 @@ bool Physics::checkCollision(Collision& one, Collision& two)
         }
         case (CollisionType::SPHERE): // SPHERE - SPHERE collision
         {
-            // if the distance between centers of spheres is less than the sum of their radii, then the spheres collided
+            // if the distance between centers of spheres is less than the sum of their radi, then the spheres collided
             return glm::length((one.m_Position + one.m_Radius) - (two.m_Position + two.m_Radius)) < one.m_Radius + two.m_Radius;
         }
         } // switch (two.m_Type)
@@ -56,6 +58,23 @@ bool Physics::checkCollision(Collision& one, Collision& two)
     } // switch (one.m_Type)
 
     return false; // just in case something goes wrong
+}
+
+void Physics::simplePhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two)
+{
+    absolutelyInelasticImpact(one, two);
+}
+
+void Physics::advancedPhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two)
+{
+    
+}
+
+void Physics::absolutelyInelasticImpact(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two)
+{
+    
+    one->m_MoveVector = (one->m_Mass * one->m_MoveVector + two->m_Mass * two->m_MoveVector) / (one->m_Mass + two->m_Mass);
+    two->m_MoveVector = (one->m_Mass * one->m_MoveVector + two->m_Mass * two->m_MoveVector) / (one->m_Mass + two->m_Mass);
 }
 
 void Physics::processPhysics(std::vector<std::shared_ptr<RigidBody>>& bodies)
@@ -67,7 +86,9 @@ void Physics::processPhysics(std::vector<std::shared_ptr<RigidBody>>& bodies)
             if (one == two)
                 continue;
 
-            std::cout << checkCollision(one->m_Collision, two->m_Collision) << std::endl;
+            if (checkCollision(one->m_Collision, two->m_Collision)) {
+                simplePhysics(one, two);
+            }
         }
     }
 }

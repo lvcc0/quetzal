@@ -17,9 +17,16 @@
 
 #include "rigid_body.h"
 
+// TODO: Make clearing impact if objects no longer collide
+
 class Physics
 {
 public:
     static bool checkCollision(Collision& one, Collision& two);
+
+    static void simplePhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two);
+    static void advancedPhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two);
+    static void absolutelyInelasticImpact(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two);
+
     static void processPhysics(std::vector<std::shared_ptr<RigidBody>>& bodies);
 };
