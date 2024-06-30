@@ -15,11 +15,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "expanded_math.h"
-
 enum class CollisionType { BOX, SPHERE };
 
 // TODO: (?) make inherited BoxCollider and SphereCollider
+// TODO: make rotations
 
 class Collision
 {

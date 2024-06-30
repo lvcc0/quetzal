@@ -16,6 +16,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "rigid_body.h"
+#include "colliding_ray.h"
 
 // TODO: Make clearing impact if objects no longer collide
 

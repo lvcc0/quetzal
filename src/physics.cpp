@@ -57,12 +57,15 @@ bool Physics::checkCollision(Collision& one, Collision& two)
     }
     } // switch (one.m_Type)
 
+    std::cerr << "ERROR IN PHYSICS::CHECK_COLLISION::ERROR COLLISION TYPE " << std::endl;
+
     return false; // just in case something goes wrong
 }
 
 void Physics::simplePhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two)
 {
     absolutelyInelasticImpact(one, two);
+
 }
 
 void Physics::advancedPhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two)
@@ -72,9 +75,13 @@ void Physics::advancedPhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<R
 
 void Physics::absolutelyInelasticImpact(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two)
 {
-    
-    one->m_MoveVector = (one->m_Mass * one->m_MoveVector + two->m_Mass * two->m_MoveVector) / (one->m_Mass + two->m_Mass);
-    two->m_MoveVector = (one->m_Mass * one->m_MoveVector + two->m_Mass * two->m_MoveVector) / (one->m_Mass + two->m_Mass);
+    CollidingRay one_move_ray(one->m_Position, one->m_MoveVector);
+    CollidingRay two_move_ray(two->m_Position, two->m_MoveVector);
+
+    if (one_move_ray.checkCollision(two->m_Collision) || two_move_ray.checkCollision(one->m_Collision)) {
+        one->m_MoveVector = (one->m_Mass * one->m_MoveVector + two->m_Mass * two->m_MoveVector) / (one->m_Mass + two->m_Mass);
+        two->m_MoveVector = (one->m_Mass * one->m_MoveVector + two->m_Mass * two->m_MoveVector) / (one->m_Mass + two->m_Mass);
+    }
 }
 
 void Physics::processPhysics(std::vector<std::shared_ptr<RigidBody>>& bodies)

@@ -40,7 +40,7 @@ else()
 
 endif()
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES})
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} "include/colliding_ray.h" "src/colliding_ray.cpp")
 
 if(MSVC)
 	
