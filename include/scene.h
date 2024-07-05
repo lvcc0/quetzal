@@ -34,6 +34,9 @@ public:
     std::vector<std::shared_ptr<RigidBody>> m_RigidBodies;    // TODO: (?) get rid of this vaector as we already have the map of rigid bodies
 
     bool m_IsPostProcessing = false; // postprocessing bool
+    bool m_IsPhysics = true; // physics bool
+    bool m_IsPreworking = true; 
+    bool m_StartInit = true; // start bool for preworking
 
     // Constructor
     Scene(Camera& camera);
@@ -44,11 +47,20 @@ public:
     // Gets called every frame in the engine class
     void update();
 
-    // Do collisions
+    // Do physics
     void doPhysicsProcessing();
+
+    // Do processing
+    void doProcessing();
 
     // Enable post processing
     void enablePostProcessing();
+
+    // Enable physics
+    void enablePhysics();
+
+    // Enable preworking
+    void enablePreworking();
 
     void setShader(const std::string& name);                     // set shader to draw stuff with (only one for now (ig it'll always be only one))
     void setScreenShader(const std::string& name, bool enabled); // set postprocessing shader on or off
@@ -90,6 +102,7 @@ public:
     void printObjectsInMaps(ObjectType objectType);
 
 private:
+
     // Vectors with scene lights
     std::vector<std::shared_ptr<DirLight>>   m_DirLights;
     std::vector<std::shared_ptr<PointLight>> m_PointLights;

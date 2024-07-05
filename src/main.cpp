@@ -13,7 +13,6 @@ int main()
 
     auto catCube1 = first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     auto catCube2 = first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    auto catCube3 = first_scene->addRigidBody("catcube3", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
 
     auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
     auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
@@ -57,16 +56,14 @@ int main()
         glm::vec3(0.0f, 0.0f, 1.0f)
     ));
 
-    catCube1->translate(glm::vec3(1.0f, 0.0f, 1.0f));
-    catCube2->translate(glm::vec3(20.0f, 0.0f, 0.0f));
-    catCube3->translate(glm::vec3(0.0f, 0.0f, 0.0f));
-    catCube1->m_MoveVector = glm::vec3(0.01, 0.0, 0.0);
+    // TODO: Set all components into imgui window
+    catCube1->m_MoveVector = glm::vec3(0.001, 0.0, 0.0);
     catCube2->m_MoveVector = glm::vec3(-0.005, 0.0, 0.0);
+    // ----------
     // Main loop
     while (engine.isRunning())
     {
         pepeBoard->translate(glm::vec3(cos(engine.getLastFrame()), 0.0f, sin(engine.getLastFrame())) * 10.0f);
-
         engine.process();
     }
 }

@@ -1,5 +1,4 @@
 #include "rigid_body.h"
-#include "rigid_body.h"
 
 RigidBody::RigidBody(std::shared_ptr<Model>& model, Collision& collision)
     : m_Model(model), m_Collision(collision)
@@ -8,19 +7,23 @@ RigidBody::RigidBody(std::shared_ptr<Model>& model, Collision& collision)
 void RigidBody::draw(std::shared_ptr<Shader>& shader)
 {
     m_Model->draw(shader);
-    this->move();
+
+    translate(m_Position);
 }
 
 void RigidBody::move()
 {
-    translate(m_MoveVector);
+    m_Collision.m_Position += m_MoveVector;
+    this->m_Position += m_MoveVector;
+
+    m_Model->translate(m_MoveVector);
 }
 
 void RigidBody::translate(glm::vec3 vector)
 {
-    m_Position += vector;
-    m_Collision.m_Position += vector;
+    m_Collision.m_Position = vector;
 
+    m_Model->m_ModelMatrix = glm::mat4(1.0f);
     m_Model->translate(vector);
 }
 

@@ -110,9 +110,42 @@ void Scene::doPhysicsProcessing()
     Physics::processPhysics(m_RigidBodies);
 }
 
+void Scene::doProcessing()
+{
+    // Let objects moving or smth else
+    if (!m_IsPreworking) {
+        // Example
+        // Let rigid bodies moving()
+        if (!this->m_RigidBodyMap.empty())
+        {
+            std::map<std::string, std::shared_ptr<RigidBody>>::iterator it = this->m_RigidBodyMap.begin();
+            while (it != this->m_RigidBodyMap.end())
+            {
+                it->second->move();
+                it++;
+            }
+        }
+
+        // Turning on physics if not preworking
+        if (m_IsPhysics) {
+            doPhysicsProcessing();
+        }
+    }
+}
+
 void Scene::enablePostProcessing()
 {
     this->m_IsPostProcessing = !this->m_IsPostProcessing;
+}
+
+void Scene::enablePhysics()
+{
+    this->m_IsPhysics = !this->m_IsPhysics;
+}
+
+void Scene::enablePreworking()
+{
+    this->m_IsPreworking = !this->m_IsPreworking;
 }
 
 void Scene::setShader(const std::string& name)

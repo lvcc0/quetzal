@@ -29,5 +29,5 @@ public:
     static void advancedPhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two);
     static void absolutelyInelasticImpact(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two);
 
-    static void processPhysics(std::vector<std::shared_ptr<RigidBody>>& bodies);
+    static void processPhysics(std::vector<std::shared_ptr<RigidBody>>& bodies); // Called every tick
 };

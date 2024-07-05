@@ -66,6 +66,7 @@ void Physics::simplePhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<Rig
 {
     absolutelyInelasticImpact(one, two);
 
+
 }
 
 void Physics::advancedPhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two)

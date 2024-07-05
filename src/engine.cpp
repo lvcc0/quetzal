@@ -102,6 +102,14 @@ void Engine::showGuiWindow()
 {
     ImGui::Begin((this->currentScene + " config").c_str());
 
+    if (ImGui::Checkbox("Preworking Enabled", &this->scenes.at(this->currentScene)->m_IsPreworking))
+
+    ImGui::Separator();
+
+    if (ImGui::Checkbox("Physics Enabled", &this->scenes.at(this->currentScene)->m_IsPhysics))
+
+    ImGui::Separator();
+
     if (ImGui::Checkbox("Postprocessing Enabled", &this->scenes.at(this->currentScene)->m_IsPostProcessing))
         glEnable(GL_DEPTH_TEST);
 
@@ -124,6 +132,19 @@ void Engine::showGuiWindow()
         }
 
         ImGui::Separator();
+    }
+    ImGui::SeparatorText("RigidBodies");
+    if (!this->scenes.at(this->currentScene)->m_RigidBodies.empty()) 
+    {
+        ImGui::Separator();
+
+        auto items = this->scenes.at(this->currentScene)->getRigidBodyMap();
+
+        for (const auto& entry : items) 
+        {
+            ImGui::DragFloat3(entry.first.c_str(), (float*)&entry.second->m_Position, 0.5f);
+            
+        }
     }
 
     ImGui::SeparatorText("Engine");
@@ -176,7 +197,7 @@ void Engine::process()
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
     {
-        this->scenes.at(this->currentScene)->doPhysicsProcessing();
+        this->scenes.at(this->currentScene)->doProcessing();
         this->scenes.at(this->currentScene)->update();
     }
 
