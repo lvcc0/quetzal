@@ -56,14 +56,9 @@ int main()
         glm::vec3(0.0f, 0.0f, 1.0f)
     ));
 
-    // TODO: Set all components into imgui window
-    catCube1->m_MoveVector = glm::vec3(0.001, 0.0, 0.0);
-    catCube2->m_MoveVector = glm::vec3(-0.005, 0.0, 0.0);
-    // ----------
     // Main loop
     while (engine.isRunning())
     {
-        pepeBoard->translate(glm::vec3(cos(engine.getLastFrame()), 0.0f, sin(engine.getLastFrame())) * 10.0f);
         engine.process();
     }
 }

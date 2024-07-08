@@ -34,6 +34,7 @@ public:
           std::vector<std::shared_ptr<Texture>>& textures);
     
     // Copy constructor
+    // NOT MADE WORKING AT NOW
     Model(const Model& obj);
 
     // Destructor

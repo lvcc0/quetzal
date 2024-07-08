@@ -9,6 +9,10 @@ void RigidBody::draw(std::shared_ptr<Shader>& shader)
     m_Model->draw(shader);
 
     translate(m_Position);
+    scale(m_Scale);
+    rotate(m_RotationDegrees.x, glm::vec3(1.0, 0.0, 0.0));
+    rotate(m_RotationDegrees.y, glm::vec3(0.0, 1.0, 0.0));
+    rotate(m_RotationDegrees.z, glm::vec3(0.0, 0.0, 1.0));
 }
 
 void RigidBody::move()
@@ -29,7 +33,6 @@ void RigidBody::translate(glm::vec3 vector)
 
 void RigidBody::scale(glm::vec3 vector)
 {
-    m_Scale *= vector;
     m_Collision.m_Size *= vector;
 
     m_Model->scale(vector);
@@ -37,8 +40,6 @@ void RigidBody::scale(glm::vec3 vector)
 
 void RigidBody::rotate(float degrees, glm::vec3 vector)
 {
-    m_RotationDegrees += vector * degrees;
     // we don't rotate the collider, because it's either an AABB or a sphere
-    
     m_Model->rotate(degrees, vector);
 }

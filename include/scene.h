@@ -38,6 +38,8 @@ public:
     bool m_IsPreworking = true; 
     bool m_StartInit = true; // start bool for preworking
 
+    glm::mat4 m_ProjectionMatrix;
+
     // Constructor
     Scene(Camera& camera);
 

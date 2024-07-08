@@ -95,18 +95,24 @@ void Engine::processInput()
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(this->window, true);
 
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+    {
+        pickObject();
+    }
+
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
 
+//Updates every tick
 void Engine::showGuiWindow()
 {
     ImGui::Begin((this->currentScene + " config").c_str());
 
-    if (ImGui::Checkbox("Preworking Enabled", &this->scenes.at(this->currentScene)->m_IsPreworking))
+    ImGui::Checkbox("Preworking Enabled", &this->scenes.at(this->currentScene)->m_IsPreworking);
 
     ImGui::Separator();
 
-    if (ImGui::Checkbox("Physics Enabled", &this->scenes.at(this->currentScene)->m_IsPhysics))
+    ImGui::Checkbox("Physics Enabled", &this->scenes.at(this->currentScene)->m_IsPhysics);
 
     ImGui::Separator();
 
@@ -133,19 +139,90 @@ void Engine::showGuiWindow()
 
         ImGui::Separator();
     }
-    ImGui::SeparatorText("RigidBodies");
-    if (!this->scenes.at(this->currentScene)->m_RigidBodies.empty()) 
+    ImGui::SeparatorText("Objects");
+
+    // Rigid bodies UI
+    if (!this->scenes.at(this->currentScene)->getRigidBodyMap().empty())
     {
-        ImGui::Separator();
+        ImGui::SeparatorText("Rigid bodies");
 
         auto items = this->scenes.at(this->currentScene)->getRigidBodyMap();
 
-        for (const auto& entry : items) 
+        for (const auto& entry : items)
         {
-            ImGui::DragFloat3(entry.first.c_str(), (float*)&entry.second->m_Position, 0.5f);
-            
+            ImGui::Separator();
+            if (ImGui::Selectable(entry.first.c_str())) 
+            {
+                if (currentRigidBody.second == entry.second) 
+                {
+                    currentRigidBody.first = "";
+                    currentRigidBody.second = nullptr;
+                }
+                else 
+                {
+                    currentRigidBody.first = entry.first;
+                    currentRigidBody.second = entry.second;
+                }
+            }
         }
     }
+    // Spherical billboards UI
+    if (!this->scenes.at(this->currentScene)->getSphericalBiillboardMap().empty())
+    {
+        ImGui::SeparatorText("Spherical billboards");
+
+        auto items = this->scenes.at(this->currentScene)->getSphericalBiillboardMap();
+
+        for (const auto& entry : items)
+        {
+            ImGui::Separator();
+            if (ImGui::Selectable(entry.first.c_str()))
+            {
+                if (currentSphericalBillboard.second == entry.second)
+                {
+                    currentSphericalBillboard.first = "";
+                    currentSphericalBillboard.second = nullptr;
+                }
+                else
+                {
+                    currentSphericalBillboard.first = entry.first;
+                    currentSphericalBillboard.second = entry.second;
+                }
+            }
+        }
+    }
+    // Cylindrical billboards UI
+    if (!this->scenes.at(this->currentScene)->getCylindricalBillboardMap().empty())
+    {
+        ImGui::SeparatorText("Cylindrical billboards");
+
+        auto items = this->scenes.at(this->currentScene)->getCylindricalBillboardMap();
+
+        for (const auto& entry : items)
+        {
+            ImGui::Separator();
+            if (ImGui::Selectable(entry.first.c_str()))
+            {
+                if (currentCylindricalBillboard.second == entry.second)
+                {
+                    currentCylindricalBillboard.first = "";
+                    currentCylindricalBillboard.second = nullptr;
+                }
+                else
+                {
+                    currentCylindricalBillboard.first = entry.first;
+                    currentCylindricalBillboard.second = entry.second;
+                }
+            }
+        }
+    }
+
+    if (currentRigidBody.second != nullptr)
+        showCurrentRigidBodyGuiWindow();
+    if (currentCylindricalBillboard.second != nullptr)
+        showCurrentCylBillboard();
+    if (currentSphericalBillboard.second != nullptr)
+        showCurrentSphericalBillboard();
 
     ImGui::SeparatorText("Engine");
 
@@ -155,6 +232,80 @@ void Engine::showGuiWindow()
     ImGui::Text("%.3f ms (%.1f FPS)", this->deltaTime * 1000.0f, 1.0f / this->deltaTime);
 
     ImGui::End();
+}
+
+void Engine::showCurrentRigidBodyGuiWindow()
+{
+    ImGui::Begin((currentRigidBody.first + " config").c_str());
+
+    ImGui::Separator();
+    ImGui::DragFloat3("Position", (float*)&currentRigidBody.second->m_Position, 0.5f);
+
+    ImGui::Separator();
+    ImGui::DragFloat3("Move speed", (float*)&currentRigidBody.second->m_MoveVector, 0.001f);
+
+    ImGui::Separator();
+    ImGui::DragFloat3("Scale", (float*)&currentRigidBody.second->m_Scale, 0.2f);
+
+    ImGui::Separator();
+    ImGui::DragFloat3("Rotation", (float*)&currentRigidBody.second->m_RotationDegrees, 1.0f);
+
+    ImGui::End();
+}
+
+void Engine::showCurrentCylBillboard()
+{
+    ImGui::Begin((currentCylindricalBillboard.first + " config").c_str());
+
+    ImGui::Separator();
+    ImGui::DragFloat3("Position", (float*)&currentCylindricalBillboard.second->m_Position, 0.5f);
+
+    ImGui::End();
+}
+
+void Engine::showCurrentSphericalBillboard()
+{
+    ImGui::Begin((currentSphericalBillboard.first + " config").c_str());
+
+    ImGui::Separator();
+    ImGui::DragFloat3("Position", (float*)&currentSphericalBillboard.second->m_Position, 0.5f);
+
+    ImGui::End();
+}
+
+void Engine::pickObject()
+{
+    GLdouble mouse_x, mouse_y;
+    glfwGetCursorPos(window, &mouse_x, &mouse_y);
+
+    glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Camera->m_pos;
+    glm::vec3 direction = ExpMath::getGlobalCoordsFromScreen(mouse_x, mouse_y, this->scenes.at(currentScene)->m_Camera->m_width, this->scenes.at(currentScene)->m_Camera->m_height, this->scenes.at(currentScene)->m_ProjectionMatrix, this->scenes.at(currentScene)->m_Camera->getViewMatrix());
+    
+    Ray ray(cam_coords, direction);
+    
+    // At this section checking models of rigid bodies at now(but maybe better using special AABB collisions(not physics))
+    std::vector<std::pair<std::shared_ptr<RigidBody>, GLfloat>> inter_rigid_body_vector;
+
+    for (auto item : this->scenes.at(currentScene)->getRigidBodyMap()) 
+    {
+        GLfloat intersection_distance;
+        if (ray.TestRayOBBIntersection(ExpMath::getMinimumCoordsFromVertex(item.second->m_Model->m_Vertices), ExpMath::getMaximumCoordsFromVertex(item.second->m_Model->m_Vertices), item.second->m_Model->m_ModelMatrix, intersection_distance)) 
+        {
+            inter_rigid_body_vector.push_back(std::pair(item.second, intersection_distance));
+        }
+    }
+    
+    // Picking object with lesser intersection_distance
+    std::shared_ptr<RigidBody> curr_rigid_body_ptr = ExpMath::getItemWithMinimumFloat<std::shared_ptr<RigidBody>>(inter_rigid_body_vector).first;
+    auto rigid_body_map = this->scenes.at(currentScene)->getRigidBodyMap();
+    for (auto it = rigid_body_map.begin(); it != rigid_body_map.end(); ++it)
+    {
+        if (it->second == curr_rigid_body_ptr) 
+        {
+            currentRigidBody.first = it->first;
+            currentRigidBody.second = it->second;
+        }
+    }
 }
 
 // Gets called upon window resize
@@ -217,6 +368,7 @@ std::shared_ptr<Scene> Engine::createScene(std::string name)
 
     return scene;
 }
+
 
 static void framebufferSizeCallbackWrapper(GLFWwindow* window, int width, int height)
 {

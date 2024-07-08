@@ -22,13 +22,13 @@ void Scene::update()
 
     this->m_CurrentShader->activateShader();
 
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)this->m_Camera->m_width / (float)this->m_Camera->m_height, 0.1f, 100.0f);
+    m_ProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)this->m_Camera->m_width / (float)this->m_Camera->m_height, 0.1f, 100.0f);
     glm::mat4 view = this->m_Camera->getViewMatrix();
 
     this->m_CurrentShader->setVec3("viewPos", this->m_Camera->m_pos);
     this->m_CurrentShader->setFloat("material.shininess", 32.0f);
 
-    this->m_CurrentShader->setMat4("projection", proj);
+    this->m_CurrentShader->setMat4("projection", m_ProjectionMatrix);
     this->m_CurrentShader->setMat4("view", view);
 
     // Rendering lights' influence
