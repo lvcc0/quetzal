@@ -38,7 +38,11 @@ public:
     bool m_IsPreworking = true; 
     bool m_StartInit = true; // start bool for preworking
 
+    // Matricies
     glm::mat4 m_ProjectionMatrix;
+
+    // Stencil shader for models
+    std::shared_ptr<Shader> m_StencilShader = nullptr;
 
     // Constructor
     Scene(Camera& camera);

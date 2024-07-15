@@ -23,6 +23,9 @@ Engine::Engine(unsigned int width, unsigned int height)
 
     stbi_set_flip_vertically_on_load(true);
 
+    m_StencilShader = ResourceManager::makeShaderProgram("stencil_shader", "shaders/stencil.vert", "shaders/stencil.frag");
+    Model::setStencilShader(m_StencilShader);
+
     // Depth testing
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -32,8 +35,8 @@ Engine::Engine(unsigned int width, unsigned int height)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Stencil testing
-    glEnable(GL_STENCIL);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 
     // Face culling
     glEnable(GL_CULL_FACE);
@@ -302,8 +305,18 @@ void Engine::pickObject()
     {
         if (it->second == curr_rigid_body_ptr) 
         {
+            // Deselecting current object before (if it has sense)
+            if (currentRigidBody.second != nullptr && currentRigidBody.second != it->second) 
+            {
+                currentRigidBody.second->m_Model->is_selected = false;
+            }
+
+            // Setting the current variable  for IMGUI
             currentRigidBody.first = it->first;
             currentRigidBody.second = it->second;
+
+            // Selecting model
+            currentRigidBody.second->m_Model->is_selected = true;
         }
     }
 }
@@ -344,6 +357,7 @@ void Engine::process()
 
     glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // clearing stuff in the default framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //
+    glStencilMask(0x00); // turn off writing to the stencil buffer
 
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
@@ -362,6 +376,7 @@ void Engine::process()
 std::shared_ptr<Scene> Engine::createScene(std::string name)
 {
     std::shared_ptr<Scene> scene = std::make_shared<Scene>(Camera(this->winWidth, this->winHeight, glm::vec3(0.0f)));
+    scene->m_StencilShader = this->m_StencilShader;
 
     this->scenes.emplace(name, scene);
     this->currentScene = name; // don't forget to change the current scene

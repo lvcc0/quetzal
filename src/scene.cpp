@@ -20,10 +20,18 @@ void Scene::update()
     if (!m_CurrentScreenShaders.empty() && m_IsPostProcessing)
         this->m_PostProcessing->deactivate();
 
-    this->m_CurrentShader->activateShader();
-
     m_ProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)this->m_Camera->m_width / (float)this->m_Camera->m_height, 0.1f, 100.0f);
     glm::mat4 view = this->m_Camera->getViewMatrix();
+
+    if (this->m_StencilShader != nullptr) 
+    {
+        this->m_StencilShader->activateShader();
+
+        this->m_StencilShader->setMat4("projection", m_ProjectionMatrix);
+        this->m_StencilShader->setMat4("view", view);
+    }
+
+    this->m_CurrentShader->activateShader();
 
     this->m_CurrentShader->setVec3("viewPos", this->m_Camera->m_pos);
     this->m_CurrentShader->setFloat("material.shininess", 32.0f);

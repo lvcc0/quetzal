@@ -21,6 +21,8 @@ public:
     std::pair<std::string, std::shared_ptr<CylindricalBillboard>> currentCylindricalBillboard;
     std::pair<std::string, std::shared_ptr<SphericalBillboard>> currentSphericalBillboard;
 
+    std::shared_ptr<Shader> m_StencilShader;
+
     // Constructor
     Engine(unsigned int width, unsigned int height);
 

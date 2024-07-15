@@ -37,6 +37,8 @@ void Model::draw(std::shared_ptr<Shader>& shader)
     unsigned int diffuseNum = 1;
     unsigned int specularNum = 1;
 
+    shader->activateShader(); // Using default shader
+
     // Assign all texture fragment shader uniforms
     for (auto i = 0; i < m_Textures.size(); i++)
     {
@@ -61,10 +63,43 @@ void Model::draw(std::shared_ptr<Shader>& shader)
     shader->setMat4("inversed", glm::inverse(m_ModelMatrix));
 
     // Draw via indices
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    if (is_selected && m_StencilShader != nullptr) 
+    {
+        // 1st. render pass, draw objects as normal, writing to the stencil buffer
+        glStencilFunc(GL_ALWAYS, 1, 0xFF); 
+        glStencilMask(0xFF);
 
-    glBindVertexArray(0);
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+
+        // 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);   
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+
+        m_StencilShader->activateShader(); // Using special stencil shader
+        for (auto i = 0; i < m_Textures.size(); i++)
+        {
+            glActiveTexture(GL_TEXTURE0 + i);
+            glBindTexture(GL_TEXTURE_2D, m_Textures[i]->ID);
+        }
+
+        // Convert local coordinates to world coordinates
+        m_StencilShader->setMat4("model", glm::scale(m_ModelMatrix, glm::vec3(m_StencilScaling, m_StencilScaling, m_StencilScaling)));
+        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
+        glStencilFunc(GL_ALWAYS, 0, 0xFF);
+        glStencilMask(0xFF);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    else 
+    {
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
 }
 
 void Model::translate(glm::vec3 vector)
@@ -80,6 +115,11 @@ void Model::scale(glm::vec3 vector)
 void Model::rotate(float degrees, glm::vec3 vector)
 {
     m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees), vector);
+}
+
+void Model::setStencilShader(const std::shared_ptr<Shader>& stencil_shader)
+{
+    m_StencilShader = stencil_shader;
 }
 
 void Model::setupModel()

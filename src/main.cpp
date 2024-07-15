@@ -13,6 +13,7 @@ int main()
 
     auto catCube1 = first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     auto catCube2 = first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    auto catCube3 = first_scene->addRigidBody("catcube3", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
 
     auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
     auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");

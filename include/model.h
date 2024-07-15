@@ -24,6 +24,8 @@ class Model
 public:
     glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 
+    float m_StencilScaling = 1.4f;
+
     std::vector<Vertex> m_Vertices;
     std::vector<unsigned int> m_Indices;
     std::vector<std::shared_ptr<Texture>> m_Textures;
@@ -43,10 +45,15 @@ public:
     // Draw model
     void draw(std::shared_ptr<Shader>& shader);
 
+    bool is_selected = false;
+
     // Moving in world space
     void translate(glm::vec3 vector);
     void scale(glm::vec3 vector);
     void rotate(float degrees, glm::vec3 vector);
+
+    static void setStencilShader(const std::shared_ptr<Shader>& stencil_shader);
+    static inline std::shared_ptr<Shader> m_StencilShader = nullptr;
 
 private:
     GLuint VAO, VBO, EBO;
