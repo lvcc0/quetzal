@@ -4,9 +4,9 @@ RigidBody::RigidBody(std::shared_ptr<Model>& model, Collision& collision)
     : m_Model(model), m_Collision(collision)
 { /* empty */ }
 
-void RigidBody::draw(std::shared_ptr<Shader>& shader)
+void RigidBody::draw(std::shared_ptr<Shader>& shader, std::shared_ptr<Shader>& stencil_shader)
 {
-    m_Model->draw(shader);
+    m_Model->draw(shader, stencil_shader);
 
     translate(m_Position);
     scale(m_Scale);

@@ -1,11 +1,8 @@
 #pragma once
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
 #include "debugger.h"
 #include "scene.h"
+#include "gui.h"
 
 #include "deque"
 
@@ -17,11 +14,7 @@ public:
     std::map<const std::string, std::shared_ptr<Scene>> scenes;
     std::string currentScene;
 
-    std::pair<std::string, std::shared_ptr<RigidBody>> currentRigidBody;
-    std::pair<std::string, std::shared_ptr<CylindricalBillboard>> currentCylindricalBillboard;
-    std::pair<std::string, std::shared_ptr<SphericalBillboard>> currentSphericalBillboard;
-
-    std::shared_ptr<Shader> m_StencilShader;
+    GUI m_GUI;
 
     // Constructor
     Engine(unsigned int width, unsigned int height);
@@ -40,12 +33,6 @@ public:
 
     void createWindow(); // create the glfw window
     void processInput(); // gets called every frame in the process() function below
-
-    // Shows imgui config window
-    void showGuiWindow();
-    void showCurrentRigidBodyGuiWindow();
-    void showCurrentCylBillboard();
-    void showCurrentSphericalBillboard();
 
     // Picking an object
     void pickObject();

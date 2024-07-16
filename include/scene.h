@@ -25,6 +25,7 @@
 #include "physics.h"
 
 enum class ObjectType { SHADER, TEXTURE, MODEL, CYL_BILLBOARD, SPH_BILLBOARD };
+enum class CurrentShaderType { MAIN, STENCIL };
 
 class Scene
 {
@@ -67,8 +68,8 @@ public:
 
     // Enable preworking
     void enablePreworking();
-
-    void setShader(const std::string& name);                     // set shader to draw stuff with (only one for now (ig it'll always be only one))
+    
+    void setShader(const std::string& name, CurrentShaderType type);                     // set shader to draw stuff with (only one for now (ig it'll always be only one)) //IMHO: There could be more than one shader
     void setScreenShader(const std::string& name, bool enabled); // set postprocessing shader on or off
 
     const std::string        getShader();        // get active shader name
@@ -114,7 +115,8 @@ private:
     std::vector<std::shared_ptr<PointLight>> m_PointLights;
     std::vector<std::shared_ptr<SpotLight>>  m_SpotLights;
 
-    std::shared_ptr<Shader>              m_CurrentShader;        // a shader to draw stuff with
+    std::shared_ptr<Shader>              m_CurrentMainShader;        // a shader to draw stuff with
+    std::shared_ptr<Shader>              m_CurrentStencilShader;        // a shader for outlining while picking
     std::vector<std::shared_ptr<Shader>> m_CurrentScreenShaders; // vector of postprocessing shaders
 
     // Maps of loaded objects

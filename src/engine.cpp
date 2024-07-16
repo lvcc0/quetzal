@@ -13,18 +13,10 @@ Engine::Engine(unsigned int width, unsigned int height)
 
     gladLoadGL();
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
+    // ImGUI init
+    m_GUI.initialize(window);
 
     stbi_set_flip_vertically_on_load(true);
-
-    m_StencilShader = ResourceManager::makeShaderProgram("stencil_shader", "shaders/stencil.vert", "shaders/stencil.frag");
-    Model::setStencilShader(m_StencilShader);
 
     // Depth testing
     glEnable(GL_DEPTH_TEST);
@@ -47,9 +39,7 @@ Engine::Engine(unsigned int width, unsigned int height)
 Engine::~Engine()
 {
     // ImGui stuff
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    m_GUI.destroyGUI();
 
     // GLFW stuff
     glfwDestroyWindow(this->window);
@@ -106,176 +96,6 @@ void Engine::processInput()
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
 
-//Updates every tick
-void Engine::showGuiWindow()
-{
-    ImGui::Begin((this->currentScene + " config").c_str());
-
-    ImGui::Checkbox("Preworking Enabled", &this->scenes.at(this->currentScene)->m_IsPreworking);
-
-    ImGui::Separator();
-
-    ImGui::Checkbox("Physics Enabled", &this->scenes.at(this->currentScene)->m_IsPhysics);
-
-    ImGui::Separator();
-
-    if (ImGui::Checkbox("Postprocessing Enabled", &this->scenes.at(this->currentScene)->m_IsPostProcessing))
-        glEnable(GL_DEPTH_TEST);
-
-    if (this->scenes.at(this->currentScene)->m_IsPostProcessing)
-    {
-        ImGui::Separator();
-
-        std::vector<std::string> names = this->scenes.at(this->currentScene)->getScreenShaders(); // current screen shader names
-
-        for (const auto& entry : this->scenes.at(this->currentScene)->m_PostProcessing->m_ShaderMap)
-        {
-            auto it = std::find(names.begin(), names.end(), entry.first);
-
-            if (ImGui::Selectable(entry.first.c_str(), (it != names.end())))
-            {
-                this->scenes.at(this->currentScene)->setScreenShader(entry.first, (it == names.end()));
-                glEnable(GL_DEPTH_TEST); // postprocessing disables depth test after as it's final step, so we need to turn it back on
-            }
-            ImGui::SameLine(ImGui::GetWindowSize().x - 64); ImGui::Text((it != names.end()) ? "enabled" : "disabled");
-        }
-
-        ImGui::Separator();
-    }
-    ImGui::SeparatorText("Objects");
-
-    // Rigid bodies UI
-    if (!this->scenes.at(this->currentScene)->getRigidBodyMap().empty())
-    {
-        ImGui::SeparatorText("Rigid bodies");
-
-        auto items = this->scenes.at(this->currentScene)->getRigidBodyMap();
-
-        for (const auto& entry : items)
-        {
-            ImGui::Separator();
-            if (ImGui::Selectable(entry.first.c_str())) 
-            {
-                if (currentRigidBody.second == entry.second) 
-                {
-                    currentRigidBody.first = "";
-                    currentRigidBody.second = nullptr;
-                }
-                else 
-                {
-                    currentRigidBody.first = entry.first;
-                    currentRigidBody.second = entry.second;
-                }
-            }
-        }
-    }
-    // Spherical billboards UI
-    if (!this->scenes.at(this->currentScene)->getSphericalBiillboardMap().empty())
-    {
-        ImGui::SeparatorText("Spherical billboards");
-
-        auto items = this->scenes.at(this->currentScene)->getSphericalBiillboardMap();
-
-        for (const auto& entry : items)
-        {
-            ImGui::Separator();
-            if (ImGui::Selectable(entry.first.c_str()))
-            {
-                if (currentSphericalBillboard.second == entry.second)
-                {
-                    currentSphericalBillboard.first = "";
-                    currentSphericalBillboard.second = nullptr;
-                }
-                else
-                {
-                    currentSphericalBillboard.first = entry.first;
-                    currentSphericalBillboard.second = entry.second;
-                }
-            }
-        }
-    }
-    // Cylindrical billboards UI
-    if (!this->scenes.at(this->currentScene)->getCylindricalBillboardMap().empty())
-    {
-        ImGui::SeparatorText("Cylindrical billboards");
-
-        auto items = this->scenes.at(this->currentScene)->getCylindricalBillboardMap();
-
-        for (const auto& entry : items)
-        {
-            ImGui::Separator();
-            if (ImGui::Selectable(entry.first.c_str()))
-            {
-                if (currentCylindricalBillboard.second == entry.second)
-                {
-                    currentCylindricalBillboard.first = "";
-                    currentCylindricalBillboard.second = nullptr;
-                }
-                else
-                {
-                    currentCylindricalBillboard.first = entry.first;
-                    currentCylindricalBillboard.second = entry.second;
-                }
-            }
-        }
-    }
-
-    if (currentRigidBody.second != nullptr)
-        showCurrentRigidBodyGuiWindow();
-    if (currentCylindricalBillboard.second != nullptr)
-        showCurrentCylBillboard();
-    if (currentSphericalBillboard.second != nullptr)
-        showCurrentSphericalBillboard();
-
-    ImGui::SeparatorText("Engine");
-
-    // TODO: rewrite this stuff more compact
-    ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", this->scenes.at(this->currentScene)->m_Camera->m_pos.x, this->scenes.at(this->currentScene)->m_Camera->m_pos.y, this->scenes.at(this->currentScene)->m_Camera->m_pos.z);
-    ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", this->scenes.at(this->currentScene)->m_Camera->m_orientation.x, this->scenes.at(this->currentScene)->m_Camera->m_orientation.y, this->scenes.at(this->currentScene)->m_Camera->m_orientation.z);
-    ImGui::Text("%.3f ms (%.1f FPS)", this->deltaTime * 1000.0f, 1.0f / this->deltaTime);
-
-    ImGui::End();
-}
-
-void Engine::showCurrentRigidBodyGuiWindow()
-{
-    ImGui::Begin((currentRigidBody.first + " config").c_str());
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Position", (float*)&currentRigidBody.second->m_Position, 0.5f);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Move speed", (float*)&currentRigidBody.second->m_MoveVector, 0.001f);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Scale", (float*)&currentRigidBody.second->m_Scale, 0.2f);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Rotation", (float*)&currentRigidBody.second->m_RotationDegrees, 1.0f);
-
-    ImGui::End();
-}
-
-void Engine::showCurrentCylBillboard()
-{
-    ImGui::Begin((currentCylindricalBillboard.first + " config").c_str());
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Position", (float*)&currentCylindricalBillboard.second->m_Position, 0.5f);
-
-    ImGui::End();
-}
-
-void Engine::showCurrentSphericalBillboard()
-{
-    ImGui::Begin((currentSphericalBillboard.first + " config").c_str());
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Position", (float*)&currentSphericalBillboard.second->m_Position, 0.5f);
-
-    ImGui::End();
-}
-
 void Engine::pickObject()
 {
     GLdouble mouse_x, mouse_y;
@@ -292,7 +112,7 @@ void Engine::pickObject()
     for (auto item : this->scenes.at(currentScene)->getRigidBodyMap()) 
     {
         GLfloat intersection_distance;
-        if (ray.TestRayOBBIntersection(ExpMath::getMinimumCoordsFromVertex(item.second->m_Model->m_Vertices), ExpMath::getMaximumCoordsFromVertex(item.second->m_Model->m_Vertices), item.second->m_Model->m_ModelMatrix, intersection_distance)) 
+        if (ray.TestRayOBBIntersection(ExpMath::getMinimumCoordsFromVertex(item.second->m_Model->m_Vertices), ExpMath::getMaximumCoordsFromVertex(item.second->m_Model->m_Vertices), item.second->m_Model->m_ModelMatrix, intersection_distance))
         {
             inter_rigid_body_vector.push_back(std::pair(item.second, intersection_distance));
         }
@@ -306,17 +126,17 @@ void Engine::pickObject()
         if (it->second == curr_rigid_body_ptr) 
         {
             // Deselecting current object before (if it has sense)
-            if (currentRigidBody.second != nullptr && currentRigidBody.second != it->second) 
+            if (m_GUI.m_CurrentRigidBody.second != nullptr && m_GUI.m_CurrentRigidBody.second != it->second) 
             {
-                currentRigidBody.second->m_Model->is_selected = false;
+                m_GUI.m_CurrentRigidBody.second->m_Model->is_selected = false;
             }
 
             // Setting the current variable  for IMGUI
-            currentRigidBody.first = it->first;
-            currentRigidBody.second = it->second;
+            m_GUI.m_CurrentRigidBody.first = it->first;
+            m_GUI.m_CurrentRigidBody.second = it->second;
 
             // Selecting model
-            currentRigidBody.second->m_Model->is_selected = true;
+            m_GUI.m_CurrentRigidBody.second->m_Model->is_selected = true;
         }
     }
 }
@@ -342,13 +162,16 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
 void Engine::process()
 {
+    // GUI PART //
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
-        this->showGuiWindow();
+        this->m_GUI.showCurrentSceneGUI(this->deltaTime);
 
+    m_GUI.mainGUILoop();
+    // --------- //
     float curFrame = (float)glfwGetTime();
     this->deltaTime = curFrame - lastFrame;
     this->lastFrame = curFrame;
@@ -366,8 +189,10 @@ void Engine::process()
         this->scenes.at(this->currentScene)->update();
     }
 
+    // GUI PART // 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    // -------- //
 
     glfwSwapBuffers(this->window);
     glfwPollEvents();
@@ -376,10 +201,12 @@ void Engine::process()
 std::shared_ptr<Scene> Engine::createScene(std::string name)
 {
     std::shared_ptr<Scene> scene = std::make_shared<Scene>(Camera(this->winWidth, this->winHeight, glm::vec3(0.0f)));
-    scene->m_StencilShader = this->m_StencilShader;
 
     this->scenes.emplace(name, scene);
+    this->m_GUI.scenes.emplace(name, scene);
+
     this->currentScene = name; // don't forget to change the current scene
+    this->m_GUI.currentScene = name;
 
     return scene;
 }

@@ -23,7 +23,7 @@ public:
     // Delete all constructors
     ResourceManager() = delete;
     ResourceManager(const ResourceManager& obj) = delete;
-    ResourceManager(const ResourceManager&& obj) = delete;
+    ResourceManager(ResourceManager&& obj) = delete;
 
     // Make post processing shaders
     static std::map<const std::string, std::shared_ptr<Shader>> makePostProcessingShaders(const std::string& path_to_folder);

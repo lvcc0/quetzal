@@ -23,48 +23,50 @@ void Scene::update()
     m_ProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)this->m_Camera->m_width / (float)this->m_Camera->m_height, 0.1f, 100.0f);
     glm::mat4 view = this->m_Camera->getViewMatrix();
 
-    if (this->m_StencilShader != nullptr) 
-    {
-        this->m_StencilShader->activateShader();
+    // Default shader
+    setShader("default_shader", CurrentShaderType::MAIN);
 
-        this->m_StencilShader->setMat4("projection", m_ProjectionMatrix);
-        this->m_StencilShader->setMat4("view", view);
-    }
+    this->m_CurrentMainShader->setVec3("viewPos", this->m_Camera->m_pos);
+    this->m_CurrentMainShader->setFloat("material.shininess", 32.0f);
 
-    this->m_CurrentShader->activateShader();
+    this->m_CurrentMainShader->setMat4("projection", m_ProjectionMatrix);
+    this->m_CurrentMainShader->setMat4("view", view);
 
-    this->m_CurrentShader->setVec3("viewPos", this->m_Camera->m_pos);
-    this->m_CurrentShader->setFloat("material.shininess", 32.0f);
+    // Stencil shader
+    setShader("stencil_shader", CurrentShaderType::STENCIL);
 
-    this->m_CurrentShader->setMat4("projection", m_ProjectionMatrix);
-    this->m_CurrentShader->setMat4("view", view);
+    this->m_CurrentStencilShader->setMat4("projection", m_ProjectionMatrix);
+    this->m_CurrentStencilShader->setMat4("view", view);
+
+    // Rendering
+    setShader("default_shader", CurrentShaderType::MAIN);
 
     // Rendering lights' influence
     if (!this->m_DirLights.empty())
     {
         for (auto i = 0; i < this->m_DirLights.size(); i++)
         {
-            this->m_DirLights[i]->updateUni(this->m_CurrentShader, i);
+            this->m_DirLights[i]->updateUni(this->m_CurrentMainShader, i);
         }
     }
     if (!this->m_PointLights.empty())
     {
         for (auto i = 0; i < this->m_PointLights.size(); i++)
         {
-            this->m_PointLights[i]->updateUni(this->m_CurrentShader, i);
+            this->m_PointLights[i]->updateUni(this->m_CurrentMainShader, i);
 
             this->m_SphBillboardMap.at(m_PointLights[i]->m_name)->translate(this->m_PointLights[i]->m_pos);
-            this->m_SphBillboardMap.at(m_PointLights[i]->m_name)->draw(m_CurrentShader, m_Camera->m_pos);
+            this->m_SphBillboardMap.at(m_PointLights[i]->m_name)->draw(m_CurrentMainShader, m_Camera->m_pos);
         }
     }
     if (!this->m_SpotLights.empty())
     {
         for (auto i = 0; i < this->m_SpotLights.size(); i++)
         {
-            this->m_SpotLights[i]->updateUni(this->m_CurrentShader, i);
+            this->m_SpotLights[i]->updateUni(this->m_CurrentMainShader, i);
 
             this->m_SphBillboardMap.at(m_SpotLights[i]->m_name)->translate(this->m_SpotLights[i]->m_pos);
-            this->m_SphBillboardMap.at(m_SpotLights[i]->m_name)->draw(m_CurrentShader, m_Camera->m_pos);
+            this->m_SphBillboardMap.at(m_SpotLights[i]->m_name)->draw(m_CurrentMainShader, m_Camera->m_pos);
         }
     }
 
@@ -74,7 +76,7 @@ void Scene::update()
         std::map<std::string, std::shared_ptr<Model>>::iterator it = this->m_ModelMap.begin();
         while (it != this->m_ModelMap.end())
         {
-            it->second->draw(m_CurrentShader);
+            it->second->draw(m_CurrentMainShader, m_CurrentStencilShader);
             it++;
         }
     }
@@ -84,7 +86,7 @@ void Scene::update()
         std::map<std::string, std::shared_ptr<RigidBody>>::iterator it = this->m_RigidBodyMap.begin();
         while (it != this->m_RigidBodyMap.end())
         {
-            it->second->draw(m_CurrentShader);
+            it->second->draw(m_CurrentMainShader, m_CurrentStencilShader);
             it++;
         }
     }
@@ -94,7 +96,7 @@ void Scene::update()
         std::map<std::string, std::shared_ptr<CylindricalBillboard>>::iterator it = this->m_CylBillboardMap.begin();
         while (it != this->m_CylBillboardMap.end())
         {
-            it->second->draw(m_CurrentShader, this->m_Camera->m_pos);
+            it->second->draw(m_CurrentMainShader, this->m_Camera->m_pos);
             it++;
         }
     }
@@ -104,7 +106,7 @@ void Scene::update()
         std::map<std::string, std::shared_ptr<SphericalBillboard>>::iterator it = this->m_SphBillboardMap.begin();
         while (it != this->m_SphBillboardMap.end())
         {
-            it->second->draw(m_CurrentShader, this->m_Camera->m_pos);
+            it->second->draw(m_CurrentMainShader, this->m_Camera->m_pos);
             it++;
         }
     }
@@ -156,9 +158,25 @@ void Scene::enablePreworking()
     this->m_IsPreworking = !this->m_IsPreworking;
 }
 
-void Scene::setShader(const std::string& name)
+void Scene::setShader(const std::string& name, CurrentShaderType type)
 {
-    this->m_CurrentShader = this->m_ShaderMap.at(name);
+    if (m_ShaderMap.find(name) != m_ShaderMap.end()) {
+        switch (type)
+        {
+        case (CurrentShaderType::MAIN):
+            this->m_CurrentMainShader = this->m_ShaderMap.at(name);
+            this->m_CurrentMainShader->activateShader();
+            break;
+
+        case (CurrentShaderType::STENCIL):
+            this->m_CurrentStencilShader = this->m_ShaderMap.at(name);
+            this->m_CurrentStencilShader->activateShader();
+            break;
+        }
+    }
+
+    else
+        std::cout << "ERROR::SHADER WITH NAME " << name << "NOT FOUND " << std::endl;
 }
 
 void Scene::setScreenShader(const std::string& name, bool enabled)
@@ -174,7 +192,7 @@ void Scene::setScreenShader(const std::string& name, bool enabled)
 const std::string Scene::getShader()
 {
     for (const auto& entry : this->m_ShaderMap)
-        if (entry.second == this->m_CurrentShader)
+        if (entry.second == this->m_CurrentMainShader)
             return entry.first;
 
     return "";
@@ -226,7 +244,7 @@ std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& ve
     auto shader = ResourceManager::makeShaderProgram(name, vertex_shader_rel_path, fragment_shader_rel_path);
     
     if (m_ShaderMap.empty()) // automatically set this shader if it's the first one in the map
-        this->m_CurrentShader = shader;
+        this->m_CurrentMainShader = shader;
 
     m_ShaderMap.emplace(name, shader);
     return shader;

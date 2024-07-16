@@ -15,9 +15,10 @@ Model::Model(const Model& obj)
     : m_Indices(obj.m_Indices),
       m_Textures(obj.m_Textures),
       m_Vertices(obj.m_Vertices),
-      m_ModelMatrix(obj.m_ModelMatrix),
-      VAO(obj.VAO)
-{ /* empty */ }
+      m_ModelMatrix(obj.m_ModelMatrix)
+{ 
+    setupModel();
+}
 
 Model::~Model()
 {
@@ -32,12 +33,24 @@ Model::~Model()
     VAO = 0;
 }
 
-void Model::draw(std::shared_ptr<Shader>& shader)
+void Model::draw(std::shared_ptr<Shader>& main_shader, std::shared_ptr<Shader>& stencil_shader)
 {
+    #ifdef DEBUG
+    if (main_shader != nullptr)
+        std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::MAIN_SHADER STATE::SET" << std::endl;
+    else
+        std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::MAIN_SHADER STATE::MISSING" << std::endl;
+
+    if (stencil_shader != nullptr)
+        std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::STENCIL_SHADER STATE::SET" << std::endl;
+    else
+        std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::STENCIL_SHADER STATE::MISSING" << std::endl;
+    #endif
+    
     unsigned int diffuseNum = 1;
     unsigned int specularNum = 1;
 
-    shader->activateShader(); // Using default shader
+    main_shader->activateShader(); // Using default shader
 
     // Assign all texture fragment shader uniforms
     for (auto i = 0; i < m_Textures.size(); i++)
@@ -52,18 +65,19 @@ void Model::draw(std::shared_ptr<Shader>& shader)
         else if (name == "texture_specular")
             number = std::to_string(specularNum++);
 
-        shader->setInt(("material." + name + number).c_str(), i);
+        main_shader->setInt(("material." + name + number).c_str(), i);
         glBindTexture(GL_TEXTURE_2D, m_Textures[i]->ID);
     }
 
     glActiveTexture(GL_TEXTURE0);
 
     // Convert local coordinates to world coordinates
-    shader->setMat4("model", m_ModelMatrix);
-    shader->setMat4("inversed", glm::inverse(m_ModelMatrix));
+    main_shader->setMat4("model", m_ModelMatrix);
+    main_shader->setMat4("inversed", glm::inverse(m_ModelMatrix));
 
     // Draw via indices
-    if (is_selected && m_StencilShader != nullptr) 
+    // Part working if model selected
+    if (is_selected && stencil_shader != nullptr)
     {
         // 1st. render pass, draw objects as normal, writing to the stencil buffer
         glStencilFunc(GL_ALWAYS, 1, 0xFF); 
@@ -77,7 +91,7 @@ void Model::draw(std::shared_ptr<Shader>& shader)
         glStencilMask(0x00);
         glDisable(GL_DEPTH_TEST);
 
-        m_StencilShader->activateShader(); // Using special stencil shader
+        stencil_shader->activateShader(); // Using special stencil shader
         for (auto i = 0; i < m_Textures.size(); i++)
         {
             glActiveTexture(GL_TEXTURE0 + i);
@@ -85,15 +99,17 @@ void Model::draw(std::shared_ptr<Shader>& shader)
         }
 
         // Convert local coordinates to world coordinates
-        m_StencilShader->setMat4("model", glm::scale(m_ModelMatrix, glm::vec3(m_StencilScaling, m_StencilScaling, m_StencilScaling)));
+        stencil_shader->setMat4("model", glm::scale(m_ModelMatrix, glm::vec3(m_StencilScaling, m_StencilScaling, m_StencilScaling)));
         glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         glStencilFunc(GL_ALWAYS, 0, 0xFF);
         glStencilMask(0xFF);
         glEnable(GL_DEPTH_TEST);
-    }
 
+        main_shader->activateShader(); // Return default shader
+    }
+    // Part working if model not selected
     else 
     {
         glBindVertexArray(VAO);
@@ -115,11 +131,6 @@ void Model::scale(glm::vec3 vector)
 void Model::rotate(float degrees, glm::vec3 vector)
 {
     m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees), vector);
-}
-
-void Model::setStencilShader(const std::shared_ptr<Shader>& stencil_shader)
-{
-    m_StencilShader = stencil_shader;
 }
 
 void Model::setupModel()

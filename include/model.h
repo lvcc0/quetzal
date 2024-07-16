@@ -43,7 +43,7 @@ public:
     ~Model();
 
     // Draw model
-    void draw(std::shared_ptr<Shader>& shader);
+    void draw(std::shared_ptr<Shader>& main_shader, std::shared_ptr<Shader>& stencil_shader);
 
     bool is_selected = false;
 
@@ -51,9 +51,6 @@ public:
     void translate(glm::vec3 vector);
     void scale(glm::vec3 vector);
     void rotate(float degrees, glm::vec3 vector);
-
-    static void setStencilShader(const std::shared_ptr<Shader>& stencil_shader);
-    static inline std::shared_ptr<Shader> m_StencilShader = nullptr;
 
 private:
     GLuint VAO, VBO, EBO;
