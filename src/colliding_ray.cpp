@@ -138,7 +138,7 @@ bool CollidingRay::checkCollision(const Collision& object)
 				return true;
 			}
 		}
-
+		break;
 	}
 	case (CollisionType::SPHERE): {
 		std::vector<glm::vec3> directions_from_object_to_ray;
@@ -154,6 +154,7 @@ bool CollidingRay::checkCollision(const Collision& object)
 				return true;
 			}
 		}
+		break;
 	}
 	}
 	return false;

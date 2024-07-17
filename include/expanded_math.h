@@ -22,8 +22,7 @@ namespace ExpMath {
 	std::vector<glm::vec3> makeGlobalCoordsFromVertex(const std::vector<Vertex>& local_coords, const glm::mat4& model_matrix = glm::mat4(1.0f));
 	std::vector<glm::vec3> makeGlobalCoordsFromLocal(const std::vector<glm::vec3>& local_coords, const glm::mat4& model_matrix = glm::mat4(1.0f));
 	glm::vec3 getGlobalCoordsFromScreen(GLfloat screen_x, GLfloat screen_y, GLfloat width, GLfloat height, glm::mat4 projection_matrix, glm::mat4 view_matrix);
-	glm::vec3 getMinimumCoordsFromVertex(const std::vector<Vertex>& vertex);
-	glm::vec3 getMaximumCoordsFromVertex(const std::vector<Vertex>& vertex);
+	std::pair<glm::vec3, glm::vec3> makeAABB(const std::vector<Vertex>& coords); // First - corner with lesser coords 
 	glm::mat4 makeSummarizeMat4(const glm::mat4 model_matrix, const glm::mat4 view_matrix = glm::mat4(1.0f), const glm::mat4 proj_matrix = glm::mat4(1.0f));
 	std::vector<glm::vec3> returnPositionFromVertex(const std::vector<Vertex>& vertex_vector);
 	

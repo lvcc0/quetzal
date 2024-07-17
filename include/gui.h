@@ -17,7 +17,7 @@
 #include "billboards.h"
 #include "scene.h"
 
-// Singleton
+// (pseudo) Singleton
 class GUI {
 public:
     GUI(); // TODO:: CHANGE INITIALIZATION
@@ -40,6 +40,8 @@ public:
     std::pair<std::string, std::shared_ptr<SphericalBillboard>> m_CurrentSphericalBillboard = std::pair<std::string, std::shared_ptr<SphericalBillboard>>("", nullptr);
 
 private:
+    inline static bool is_Exist = false;
+
     void showCurrentRigidBodyGuiWindow();
     void showCurrentCylBillboard();
     void showCurrentSphericalBillboard();

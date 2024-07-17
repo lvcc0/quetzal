@@ -37,51 +37,41 @@ glm::vec3 ExpMath::getGlobalCoordsFromScreen(GLfloat screen_x, GLfloat screen_y,
 	return ray_wor;
 }
 
-// Actually using for AABB
-glm::vec3 ExpMath::getMinimumCoordsFromVertex(const std::vector<Vertex>& vertex)
+std::pair<glm::vec3, glm::vec3> ExpMath::makeAABB(const std::vector<Vertex>& coords)
 {
-	bool first_iteration = true;
+	if (coords.size() == 0)
+		std::cerr << "ERROR::EXP_MATH makeAABB HAS TAKEN COORDS WITH ZERO SIZE" << std::endl;
 
-	glm::vec3 return_vec3;
-	for (const auto& item : vertex) 
+	glm::vec3 min_corner, max_corner;
+
+	bool first_iter = true;
+	for (auto item : coords) 
 	{
-		if (first_iteration) 
+		if (first_iter)
 		{
-			return_vec3 = item.Position;
-			first_iteration = false;
+			min_corner = item.Position;
+			max_corner = item.Position;
+
+			first_iter = false;
 		}
-		else {
-			if (item.Position.x <= return_vec3.x && item.Position.y <= return_vec3.y && item.Position.z <= return_vec3.z)
-			{
-				return_vec3 = item.Position;
-			}
+		else
+		{
+			if (min_corner.x > item.Position.x)
+				min_corner.x = item.Position.x;
+			if (max_corner.x < item.Position.x)
+				max_corner.x = item.Position.x;
+			if (min_corner.y > item.Position.y)
+				min_corner.y = item.Position.y;
+			if (max_corner.y < item.Position.y)
+				max_corner.y = item.Position.y;
+			if (min_corner.z > item.Position.z)
+				min_corner.z = item.Position.z;
+			if (max_corner.z < item.Position.z)
+				max_corner.z = item.Position.z;
 		}
 	}
-
-	return return_vec3;
-}
-
-glm::vec3 ExpMath::getMaximumCoordsFromVertex(const std::vector<Vertex>& vertex)
-{
-	bool first_iteration = true;
-
-	glm::vec3 return_vec3;
-	for (const auto& item : vertex)
-	{
-		if (first_iteration)
-		{
-			return_vec3 = item.Position;
-			first_iteration = false;
-		}
-		else {
-			if (item.Position.x >= return_vec3.x && item.Position.y >= return_vec3.y && item.Position.z >= return_vec3.z)
-			{
-				return_vec3 = item.Position;
-			}
-		}
-	}
-
-	return return_vec3;
+	
+	return std::make_pair(min_corner, max_corner);
 }
 
 glm::mat4 ExpMath::makeSummarizeMat4(const glm::mat4 model_matrix, const glm::mat4 view_matrix, const glm::mat4 proj_matrix)

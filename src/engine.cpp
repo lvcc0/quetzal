@@ -106,38 +106,35 @@ void Engine::pickObject()
     
     Ray ray(cam_coords, direction);
     
-    // At this section checking models of rigid bodies at now(but maybe better using special AABB collisions(not physics))
-    std::vector<std::pair<std::shared_ptr<RigidBody>, GLfloat>> inter_rigid_body_vector;
+    // At this section checking models of rigid bodies (two corners of model make square)
+    std::vector <std::pair<std::pair<std::string, std::shared_ptr<RigidBody>>, GLfloat >> inter_rigid_body_vector; // pair (pair (string, RigidBody), float)
 
     for (auto item : this->scenes.at(currentScene)->getRigidBodyMap()) 
     {
         GLfloat intersection_distance;
-        if (ray.TestRayOBBIntersection(ExpMath::getMinimumCoordsFromVertex(item.second->m_Model->m_Vertices), ExpMath::getMaximumCoordsFromVertex(item.second->m_Model->m_Vertices), item.second->m_Model->m_ModelMatrix, intersection_distance))
+        if (ray.TestRayOBBIntersection(ExpMath::makeAABB(item.second->m_Model->m_Vertices).first, ExpMath::makeAABB(item.second->m_Model->m_Vertices).second, item.second->m_Model->m_ModelMatrix, intersection_distance))
         {
-            inter_rigid_body_vector.push_back(std::pair(item.second, intersection_distance));
+            inter_rigid_body_vector.push_back(std::pair(std::pair(item.first, item.second), intersection_distance));
         }
     }
     
     // Picking object with lesser intersection_distance
-    std::shared_ptr<RigidBody> curr_rigid_body_ptr = ExpMath::getItemWithMinimumFloat<std::shared_ptr<RigidBody>>(inter_rigid_body_vector).first;
-    auto rigid_body_map = this->scenes.at(currentScene)->getRigidBodyMap();
-    for (auto it = rigid_body_map.begin(); it != rigid_body_map.end(); ++it)
+    std::pair<std::string, std::shared_ptr<RigidBody>> curr_rigid_body_ptr = ExpMath::getItemWithMinimumFloat<std::pair<std::string, std::shared_ptr<RigidBody>>>(inter_rigid_body_vector).first;
+
+    if (curr_rigid_body_ptr.second != nullptr) 
     {
-        if (it->second == curr_rigid_body_ptr) 
+        // Deselecting current object before (if it has sense)
+        if (m_GUI.m_CurrentRigidBody.second != nullptr && m_GUI.m_CurrentRigidBody.second != curr_rigid_body_ptr.second)
         {
-            // Deselecting current object before (if it has sense)
-            if (m_GUI.m_CurrentRigidBody.second != nullptr && m_GUI.m_CurrentRigidBody.second != it->second) 
-            {
-                m_GUI.m_CurrentRigidBody.second->m_Model->is_selected = false;
-            }
-
-            // Setting the current variable  for IMGUI
-            m_GUI.m_CurrentRigidBody.first = it->first;
-            m_GUI.m_CurrentRigidBody.second = it->second;
-
-            // Selecting model
-            m_GUI.m_CurrentRigidBody.second->m_Model->is_selected = true;
+            m_GUI.m_CurrentRigidBody.second->m_Model->is_selected = false;
         }
+
+        // Setting the current variable  for IMGUI
+        m_GUI.m_CurrentRigidBody.first = curr_rigid_body_ptr.first;
+        m_GUI.m_CurrentRigidBody.second = curr_rigid_body_ptr.second;
+
+        // Selecting model
+        m_GUI.m_CurrentRigidBody.second->m_Model->is_selected = true;
     }
 }
 

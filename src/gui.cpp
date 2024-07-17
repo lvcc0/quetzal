@@ -2,17 +2,27 @@
 
 GUI::GUI()
 {
+    
 }
 
 void GUI::initialize(GLFWwindow* window)
 {
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    if (!is_Exist) 
+    {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init();
+
+        is_Exist = true;
+    }
+    else 
+    {
+        std::cerr << "ERROR::GUI ALREADY INITIALIZATED" << std::endl;
+    }
 }
 
 void GUI::showCurrentSceneGUI(GLfloat delta_time)
@@ -127,8 +137,6 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time)
             }
         }
     }
-
-    mainGUILoop();
 
     ImGui::SeparatorText("Engine");
 
