@@ -117,7 +117,7 @@ void Scene::update()
 
 void Scene::doPhysicsProcessing()
 {
-    Physics::processPhysics(m_RigidBodies);
+    Physics::processPhysics(m_RigidBodyMap);
 }
 
 void Scene::doProcessing()
@@ -270,7 +270,6 @@ std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::stri
 {
     auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name, model_rel_path), collision);
     m_RigidBodyMap.emplace(name, rigid_body);
-    m_RigidBodies.push_back(rigid_body);
     
     return rigid_body;
 }
@@ -319,6 +318,12 @@ void Scene::deleteModel(std::string name, std::shared_ptr<Model>& model)
 {
     m_ModelMap.erase(name);
     model.reset();
+}
+
+void Scene::deleteRigidBody(std::string name, std::shared_ptr<RigidBody>& rigid_body)
+{
+    m_RigidBodyMap.erase(name);
+    rigid_body.reset();
 }
 
 void Scene::deleteCylBillboard(std::string name, std::shared_ptr<CylindricalBillboard>& cyl_billboard)

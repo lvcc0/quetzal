@@ -17,31 +17,32 @@
 #include "billboards.h"
 #include "scene.h"
 
-// (pseudo) Singleton
+// Singleton
 class GUI {
-public:
-    GUI(); // TODO:: CHANGE INITIALIZATION
+
+    GUI(); 
     GUI(const GUI& obj) = delete;
     GUI(GUI&& obj) = delete;
 
-    void initialize(GLFWwindow* window); // INIT CRUTCH
+    // Destructor
+    ~GUI();
+
+    // Delete operator for copying
+    GUI& operator= (GUI const&) = delete;
+
+public:
+    static GUI& Instance(GLFWwindow* window); // INIT CRUTCH
     // main funcs //
     void mainGUILoop();
-    void showCurrentSceneGUI(GLfloat delta_time);
+    void showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene);
     // ------------------ //
 
-    void destroyGUI();
-
-    std::map<const std::string, std::shared_ptr<Scene>> scenes;
-    std::string currentScene = "";
-
+    // TODO:: Make only one object selectable at time
     std::pair<std::string, std::shared_ptr<RigidBody>> m_CurrentRigidBody = std::pair<std::string, std::shared_ptr<RigidBody>>("", nullptr);
     std::pair<std::string, std::shared_ptr<CylindricalBillboard>> m_CurrentCylindricalBillboard = std::pair<std::string, std::shared_ptr<CylindricalBillboard>>("", nullptr);
     std::pair<std::string, std::shared_ptr<SphericalBillboard>> m_CurrentSphericalBillboard = std::pair<std::string, std::shared_ptr<SphericalBillboard>>("", nullptr);
 
 private:
-    inline static bool is_Exist = false;
-
     void showCurrentRigidBodyGuiWindow();
     void showCurrentCylBillboard();
     void showCurrentSphericalBillboard();

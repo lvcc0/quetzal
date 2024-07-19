@@ -1,20 +1,31 @@
 #include "engine.h"
 
-Engine::Engine(unsigned int width, unsigned int height)
-    : winWidth(width), winHeight(height)
+Engine::Engine()
 {
+}
+
+Engine::~Engine()
+{
+    // GLFW stuff
+    glfwDestroyWindow(this->window);
+    glfwTerminate();
+}
+
+Engine& Engine::Instance(unsigned int width, unsigned int height)
+{
+    static Engine engine;
+    engine.winHeight = height;
+    engine.winWidth = width;
+
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    this->createWindow();
+    engine.createWindow();
 
     gladLoadGL();
-
-    // ImGUI init
-    m_GUI.initialize(window);
 
     stbi_set_flip_vertically_on_load(true);
 
@@ -34,16 +45,8 @@ Engine::Engine(unsigned int width, unsigned int height)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
-}
 
-Engine::~Engine()
-{
-    // ImGui stuff
-    m_GUI.destroyGUI();
-
-    // GLFW stuff
-    glfwDestroyWindow(this->window);
-    glfwTerminate();
+    return engine;
 }
 
 bool Engine::isRunning() const
@@ -80,7 +83,7 @@ void Engine::createWindow()
 }
 
 // Gets called every frame
-void Engine::processInput()
+void Engine::processInput(GUI& gui)
 {
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
         this->scenes.at(this->currentScene)->m_Camera->Inputs(this->window, deltaTime);
@@ -90,13 +93,13 @@ void Engine::processInput()
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
     {
-        pickObject();
+        pickObject(gui);
     }
 
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
 
-void Engine::pickObject()
+void Engine::pickObject(GUI& gui)
 {
     GLdouble mouse_x, mouse_y;
     glfwGetCursorPos(window, &mouse_x, &mouse_y);
@@ -124,17 +127,17 @@ void Engine::pickObject()
     if (curr_rigid_body_ptr.second != nullptr) 
     {
         // Deselecting current object before (if it has sense)
-        if (m_GUI.m_CurrentRigidBody.second != nullptr && m_GUI.m_CurrentRigidBody.second != curr_rigid_body_ptr.second)
+        if (gui.m_CurrentRigidBody.second != nullptr && gui.m_CurrentRigidBody.second != curr_rigid_body_ptr.second)
         {
-            m_GUI.m_CurrentRigidBody.second->m_Model->is_selected = false;
+            gui.m_CurrentRigidBody.second->m_Model->is_selected = false;
         }
 
         // Setting the current variable  for IMGUI
-        m_GUI.m_CurrentRigidBody.first = curr_rigid_body_ptr.first;
-        m_GUI.m_CurrentRigidBody.second = curr_rigid_body_ptr.second;
+        gui.m_CurrentRigidBody.first = curr_rigid_body_ptr.first;
+        gui.m_CurrentRigidBody.second = curr_rigid_body_ptr.second;
 
         // Selecting model
-        m_GUI.m_CurrentRigidBody.second->m_Model->is_selected = true;
+        gui.m_CurrentRigidBody.second->m_Model->is_selected = true;
     }
 }
 
@@ -157,7 +160,7 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
         this->shouldDrawGui = !this->shouldDrawGui;
 }
 
-void Engine::process()
+void Engine::process(GUI& gui)
 {
     // GUI PART //
     ImGui_ImplOpenGL3_NewFrame();
@@ -165,15 +168,15 @@ void Engine::process()
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
-        this->m_GUI.showCurrentSceneGUI(this->deltaTime);
+        gui.showCurrentSceneGUI(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)));
 
-    m_GUI.mainGUILoop();
+    gui.mainGUILoop();
     // --------- //
     float curFrame = (float)glfwGetTime();
     this->deltaTime = curFrame - lastFrame;
     this->lastFrame = curFrame;
 
-    this->processInput();
+    this->processInput(gui);
 
     glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // clearing stuff in the default framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //
@@ -200,10 +203,8 @@ std::shared_ptr<Scene> Engine::createScene(std::string name)
     std::shared_ptr<Scene> scene = std::make_shared<Scene>(Camera(this->winWidth, this->winHeight, glm::vec3(0.0f)));
 
     this->scenes.emplace(name, scene);
-    this->m_GUI.scenes.emplace(name, scene);
 
     this->currentScene = name; // don't forget to change the current scene
-    this->m_GUI.currentScene = name;
 
     return scene;
 }

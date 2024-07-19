@@ -6,25 +6,31 @@
 
 #include "deque"
 
+// Singleton
 class Engine
 {
-public:
-    GLFWwindow* window;
-
-    std::map<const std::string, std::shared_ptr<Scene>> scenes;
-    std::string currentScene;
-
-    GUI m_GUI;
-
+private:
+    // Private to prohibit their using outside the class
     // Constructor
-    Engine(unsigned int width, unsigned int height);
+    Engine();
+    // Destructor
+    ~Engine();
 
     // Delete move and copy constructors
     Engine(const Engine& obj) = delete;
     Engine(const Engine&& obj) = delete;
 
-    // Destructor
-    ~Engine();
+    // Delete operator for copying
+    Engine& operator= (Engine const&) = delete;
+
+public:
+    // Initiating
+    static Engine& Instance(unsigned int width, unsigned int height);
+
+    GLFWwindow* window;
+
+    std::map<const std::string, std::shared_ptr<Scene>> scenes;
+    std::string currentScene;
 
     bool isRunning() const;
 
@@ -32,17 +38,17 @@ public:
     float getLastFrame() const;
 
     void createWindow(); // create the glfw window
-    void processInput(); // gets called every frame in the process() function below
+    void processInput(GUI& gui); // gets called every frame in the process() function below
 
     // Picking an object
-    void pickObject();
+    void pickObject(GUI& gui);
 
     // Callbacks
     void framebufferSizeCallback(GLFWwindow* window, int width, int height);
     void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     // Main loop function
-    void process();
+    void process(GUI& gui);
 
     // Create a scene, add it to the scenes map and set currentScene to it
     std::shared_ptr<Scene> createScene(std::string name);

@@ -1,7 +1,5 @@
 #include "physics.h"
 
-// TODO: Make rays
-
 bool Physics::checkCollision(Collision& one, Collision& two)
 {
     switch (one.m_Type)
@@ -85,17 +83,17 @@ void Physics::absolutelyInelasticImpact(std::shared_ptr<RigidBody>& one, std::sh
     }
 }
 
-void Physics::processPhysics(std::vector<std::shared_ptr<RigidBody>>& bodies)
+void Physics::processPhysics(std::map<const std::string, std::shared_ptr<RigidBody>>& rig_body_map)
 {
-    for (std::shared_ptr<RigidBody> one : bodies)
+    for (std::pair<const std::string, std::shared_ptr<RigidBody>> one : rig_body_map)
     {
-        for (std::shared_ptr<RigidBody> two : bodies)
+        for (std::pair<const std::string, std::shared_ptr<RigidBody>> two : rig_body_map)
         {
-            if (one == two)
+            if (one.second == two.second)
                 continue;
 
-            if (checkCollision(one->m_Collision, two->m_Collision)) {
-                simplePhysics(one, two);
+            if (checkCollision(one.second->m_Collision, two.second->m_Collision)) {
+                simplePhysics(one.second, two.second);
             }
         }
     }

@@ -116,7 +116,7 @@ bool Ray::TestRayOBBIntersection(glm::vec3 aabb_min, glm::vec3 aabb_max, glm::ma
 	intersection_distance = tMin;
 	return true;
 }
-
+// TODO:: change this(maybe use scheme as in TestRayOBBIntersection)
 bool CollidingRay::checkCollision(const Collision& object)
 {
 	switch (object.m_Type)

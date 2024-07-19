@@ -32,7 +32,6 @@ class Scene
 public:
     std::shared_ptr<Camera>                 m_Camera;         // TODO: make it just a camera object, not a pointer perhaps)
     std::shared_ptr<PostProcessing>         m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
-    std::vector<std::shared_ptr<RigidBody>> m_RigidBodies;    // TODO: (?) get rid of this vaector as we already have the map of rigid bodies
 
     bool m_IsPostProcessing = false; // postprocessing bool
     bool m_IsPhysics = true; // physics bool
@@ -97,6 +96,7 @@ public:
 
     // Some stuff to delete in the scene
     void deleteModel(std::string name, std::shared_ptr<Model>& model);
+    void deleteRigidBody(std::string name, std::shared_ptr<RigidBody>& rigid_body);
     void deleteCylBillboard(std::string name, std::shared_ptr<CylindricalBillboard>& cyl_billboard);
     void deleteSphBillboard(std::string name, std::shared_ptr<SphericalBillboard>& sph_billboard);
 
