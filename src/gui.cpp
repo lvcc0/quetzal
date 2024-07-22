@@ -17,10 +17,6 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
 {
     ImGui::Begin((current_scene.first + " config").c_str());
 
-    ImGui::Checkbox("Preworking Enabled", &current_scene.second->m_IsPreworking);
-
-    ImGui::Separator();
-
     ImGui::Checkbox("Physics Enabled", &current_scene.second->m_IsPhysics);
 
     ImGui::Separator();
@@ -50,87 +46,37 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     }
     ImGui::SeparatorText("Objects");
 
-    // Rigid bodies UI
-    if (!current_scene.second->getRigidBodyMap().empty())
+    // Renderable UI
+    if (!current_scene.second->getRenderableMap().empty())
     {
-        ImGui::SeparatorText("Rigid bodies");
+        ImGui::SeparatorText("Renderables");
 
-        auto items = current_scene.second->getRigidBodyMap();
+        auto items = current_scene.second->getRenderableMap();
 
         for (const auto& entry : items)
         {
             ImGui::Separator();
             if (ImGui::Selectable(entry.first.c_str()))
             {
-                if (m_CurrentRigidBody.second == entry.second)
+                if (m_CurrentRenderable.second == entry.second)
                 {
-                    // Deselecting model
-                    m_CurrentRigidBody.second->m_Model->is_selected = false;
+                    // Deselecting renderable
+                    m_CurrentRenderable.second->is_selected = false;
 
-                    m_CurrentRigidBody.first = "";
-                    m_CurrentRigidBody.second = nullptr;
+                    m_CurrentRenderable.first = "";
+                    m_CurrentRenderable.second = nullptr;
                 }
                 else
                 {
-                    // Deselecting model
-                    if (m_CurrentRigidBody.second != nullptr)
-                        m_CurrentRigidBody.second->m_Model->is_selected = false;
+                    // Deselecting renderable
+                    if (m_CurrentRenderable.second != nullptr)
+                        m_CurrentRenderable.second->is_selected = false;
 
-                    m_CurrentRigidBody.first = entry.first;
-                    m_CurrentRigidBody.second = entry.second;
+                    m_CurrentRenderable.first = entry.first;
+                    m_CurrentRenderable.second = entry.second;
 
-                    // Selecting model
-                    m_CurrentRigidBody.second->m_Model->is_selected = true;
-                }
-            }
-        }
-    }
-    // Spherical billboards UI
-    if (!current_scene.second->getSphericalBiillboardMap().empty())
-    {
-        ImGui::SeparatorText("Spherical billboards");
-
-        auto items = current_scene.second->getSphericalBiillboardMap();
-
-        for (const auto& entry : items)
-        {
-            ImGui::Separator();
-            if (ImGui::Selectable(entry.first.c_str()))
-            {
-                if (m_CurrentSphericalBillboard.second == entry.second)
-                {
-                    m_CurrentSphericalBillboard.first = "";
-                    m_CurrentSphericalBillboard.second = nullptr;
-                }
-                else
-                {
-                    m_CurrentSphericalBillboard.first = entry.first;
-                    m_CurrentSphericalBillboard.second = entry.second;
-                }
-            }
-        }
-    }
-    // Cylindrical billboards UI
-    if (!current_scene.second->getCylindricalBillboardMap().empty())
-    {
-        ImGui::SeparatorText("Cylindrical billboards");
-
-        auto items = current_scene.second->getCylindricalBillboardMap();
-
-        for (const auto& entry : items)
-        {
-            ImGui::Separator();
-            if (ImGui::Selectable(entry.first.c_str()))
-            {
-                if (m_CurrentCylindricalBillboard.second == entry.second)
-                {
-                    m_CurrentCylindricalBillboard.first = "";
-                    m_CurrentCylindricalBillboard.second = nullptr;
-                }
-                else
-                {
-                    m_CurrentCylindricalBillboard.first = entry.first;
-                    m_CurrentCylindricalBillboard.second = entry.second;
+                    // Selecting renderable
+                    m_CurrentRenderable.second->is_selected = true;
                 }
             }
         }
@@ -167,22 +113,46 @@ void GUI::showCurrentRigidBodyGuiWindow()
 
 void GUI::showCurrentCylBillboard()
 {
-    ImGui::Begin((m_CurrentCylindricalBillboard.first + " config").c_str());
+    ImGui::Begin((m_CurrentCylBill.first + " config").c_str());
 
     ImGui::Separator();
-    ImGui::DragFloat3("Position", (float*)&m_CurrentCylindricalBillboard.second->m_Position, 0.5f);
+    ImGui::DragFloat3("Position", (float*)&m_CurrentCylBill.second->m_Position, 0.5f);
 
     ImGui::End();
 }
 
 void GUI::showCurrentSphericalBillboard()
 {
-    ImGui::Begin((m_CurrentSphericalBillboard.first + " config").c_str());
+    ImGui::Begin((m_CurrentSphBill.first + " config").c_str());
 
     ImGui::Separator();
-    ImGui::DragFloat3("Position", (float*)&m_CurrentSphericalBillboard.second->m_Position, 0.5f);
+    ImGui::DragFloat3("Position", (float*)&m_CurrentSphBill.second->m_Position, 0.5f);
 
     ImGui::End();
+}
+
+void GUI::cleanCurrents()
+{
+    if (m_CurrentModel.second != nullptr)
+    {
+        m_CurrentModel.first = "";
+        m_CurrentModel.second = nullptr;
+    }
+    if (m_CurrentRigidBody.second != nullptr)
+    {
+        m_CurrentRigidBody.first = "";
+        m_CurrentRigidBody.second = nullptr;
+    }
+    if (m_CurrentCylBill.second != nullptr)
+    {
+        m_CurrentCylBill.first = "";
+        m_CurrentCylBill.second = nullptr;
+    }
+    if (m_CurrentSphBill.second != nullptr)
+    {
+        m_CurrentSphBill.first = "";
+        m_CurrentSphBill.second = nullptr;
+    }
 }
 
 GUI& GUI::Instance(GLFWwindow* window)
@@ -202,10 +172,42 @@ GUI& GUI::Instance(GLFWwindow* window)
 
 void GUI::mainGUILoop()
 {
+    cleanCurrents();
+    if (m_CurrentRenderable.second != nullptr) 
+    {
+        switch (m_CurrentRenderable.second->type)
+        {
+        case(RenderableType::RIGID_BODY):
+            m_CurrentRigidBody.first = m_CurrentRenderable.first;
+            m_CurrentRigidBody.second = std::static_pointer_cast<RigidBody>(m_CurrentRenderable.second);
+
+            break;
+        case(RenderableType::MODEL):
+            m_CurrentModel.first = m_CurrentRenderable.first;
+            m_CurrentModel.second = std::static_pointer_cast<Model>(m_CurrentRenderable.second);
+
+            break;
+        case(RenderableType::CYL_BILL):
+            m_CurrentCylBill.first = m_CurrentRenderable.first;
+            m_CurrentCylBill.second = std::static_pointer_cast<CylindricalBillboard>(m_CurrentRenderable.second);
+
+            break;
+        case(RenderableType::SPH_BILL):
+            m_CurrentSphBill.first = m_CurrentRenderable.first;
+            m_CurrentSphBill.second = std::static_pointer_cast<SphericalBillboard>(m_CurrentRenderable.second);
+
+            break;
+        default:
+
+            std::cerr << "ERROR::GUI::RENDERABLE_TYPE NOT FOUND" << std::endl;
+            break;
+        }
+    }
+
     if (m_CurrentRigidBody.second != nullptr)
         showCurrentRigidBodyGuiWindow();
-    if (m_CurrentCylindricalBillboard.second != nullptr)
+    if (m_CurrentCylBill.second != nullptr)
         showCurrentCylBillboard();
-    if (m_CurrentSphericalBillboard.second != nullptr)
+    if (m_CurrentSphBill.second != nullptr)
         showCurrentSphericalBillboard();
 }

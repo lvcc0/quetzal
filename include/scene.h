@@ -13,19 +13,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <utility>
+
 #include "resource_manager.h"
 #include "post_processing.h"
 #include "camera.h"
 #include "lights.h"
 
-#include "shader.h"
-#include "model.h"
 #include "texture.h"
 #include "billboards.h"
 #include "physics.h"
 
-enum class ObjectType { SHADER, TEXTURE, MODEL, CYL_BILLBOARD, SPH_BILLBOARD };
-enum class CurrentShaderType { MAIN, STENCIL };
+enum class ObjectType { SHADER, TEXTURE, RENDERABLE };
 
 class Scene
 {
@@ -35,14 +34,9 @@ public:
 
     bool m_IsPostProcessing = false; // postprocessing bool
     bool m_IsPhysics = true; // physics bool
-    bool m_IsPreworking = true; 
-    bool m_StartInit = true; // start bool for preworking
 
     // Matricies
     glm::mat4 m_ProjectionMatrix;
-
-    // Stencil shader for models
-    std::shared_ptr<Shader> m_StencilShader = nullptr;
 
     // Constructor
     Scene(Camera& camera);
@@ -64,11 +58,8 @@ public:
 
     // Enable physics
     void enablePhysics();
-
-    // Enable preworking
-    void enablePreworking();
     
-    void setShader(const std::string& name, CurrentShaderType type);                     // set shader to draw stuff with (only one for now (ig it'll always be only one)) //IMHO: There could be more than one shader
+    void setShader(const std::string& name, ShaderType type);                     // set shader to draw stuff with (only one for now (ig it'll always be only one)) //IMHO: There could be more than one shader
     void setScreenShader(const std::string& name, bool enabled); // set postprocessing shader on or off
 
     const std::string        getShader();        // get active shader name
@@ -76,18 +67,15 @@ public:
     
     std::map<const std::string, std::shared_ptr<Shader>>               getShaderMap();
     std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap();
-    std::map<const std::string, std::shared_ptr<Model>>                getModelMap();
-    std::map<const std::string, std::shared_ptr<RigidBody>>            getRigidBodyMap();
-    std::map<const std::string, std::shared_ptr<CylindricalBillboard>> getCylindricalBillboardMap();
-    std::map<const std::string, std::shared_ptr<SphericalBillboard>>   getSphericalBiillboardMap();
+    std::map<const std::string, std::shared_ptr<Renderable>>           getRenderableMap();
 
     // Some stuff to add to the scene
     std::shared_ptr<Shader>               addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
     std::shared_ptr<Texture>              addTexture(std::string name, std::string type, const std::string& texture_rel_path);
     std::shared_ptr<Model>                addModel(std::string name, const std::string& model_rel_path);
     std::shared_ptr<RigidBody>            addRigidBody(std::string name, const std::string& model_rel_path, Collision& collision);
-    std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
-    std::shared_ptr<SphericalBillboard>   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path);
+    std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts);
+    std::shared_ptr<SphericalBillboard>   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts);
 
     // Some stuff to copy in the scene
     std::shared_ptr<Model>                copyModel(std::string name, const std::shared_ptr<Model> model);
@@ -95,15 +83,12 @@ public:
     std::shared_ptr<SphericalBillboard>   copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard);
 
     // Some stuff to delete in the scene
-    void deleteModel(std::string name, std::shared_ptr<Model>& model);
-    void deleteRigidBody(std::string name, std::shared_ptr<RigidBody>& rigid_body);
-    void deleteCylBillboard(std::string name, std::shared_ptr<CylindricalBillboard>& cyl_billboard);
-    void deleteSphBillboard(std::string name, std::shared_ptr<SphericalBillboard>& sph_billboard);
+    void deleteRenderable(std::string name, std::shared_ptr<Renderable>& renderable_object);
 
     // Add lights to the scene
     std::shared_ptr<DirLight>   addDirLight(DirLight& dir_light);
-    std::shared_ptr<PointLight> addPointLight(PointLight& point_light);
-    std::shared_ptr<SpotLight>  addSpotLight(SpotLight& spot_light);
+    std::shared_ptr<PointLight> addPointLight(PointLight& point_light, std::vector<Vertex> verts);
+    std::shared_ptr<SpotLight>  addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts);
 
     // Print objects in maps
     void printObjectsInMaps(ObjectType objectType);
@@ -115,15 +100,13 @@ private:
     std::vector<std::shared_ptr<PointLight>> m_PointLights;
     std::vector<std::shared_ptr<SpotLight>>  m_SpotLights;
 
-    std::shared_ptr<Shader>              m_CurrentMainShader;        // a shader to draw stuff with
-    std::shared_ptr<Shader>              m_CurrentStencilShader;        // a shader for outlining while picking
+    // TODO: redo it to better array
+    std::shared_ptr<Shader> m_CurrentShaders[to_underlying(ShaderType::END)]; // static massive of shaders
     std::vector<std::shared_ptr<Shader>> m_CurrentScreenShaders; // vector of postprocessing shaders
 
     // Maps of loaded objects
     std::map<const std::string, std::shared_ptr<Shader>>               m_ShaderMap;
     std::map<const std::string, std::shared_ptr<Texture>>              m_TextureMap;
-    std::map<const std::string, std::shared_ptr<Model>>                m_ModelMap;
-    std::map<const std::string, std::shared_ptr<RigidBody>>            m_RigidBodyMap;
-    std::map<const std::string, std::shared_ptr<CylindricalBillboard>> m_CylBillboardMap;
-    std::map<const std::string, std::shared_ptr<SphericalBillboard>>   m_SphBillboardMap;
+    std::map<const std::string, std::shared_ptr<Renderable>>           m_RenderableMap;
+    std::map<const std::string, std::shared_ptr<Collision>>            m_CollisionMap;
 };

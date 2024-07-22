@@ -12,9 +12,6 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "model.h"
-#include "rigid_body.h"
-#include "billboards.h"
 #include "scene.h"
 
 // Singleton
@@ -38,12 +35,18 @@ public:
     // ------------------ //
 
     // TODO:: Make only one object selectable at time
-    std::pair<std::string, std::shared_ptr<RigidBody>> m_CurrentRigidBody = std::pair<std::string, std::shared_ptr<RigidBody>>("", nullptr);
-    std::pair<std::string, std::shared_ptr<CylindricalBillboard>> m_CurrentCylindricalBillboard = std::pair<std::string, std::shared_ptr<CylindricalBillboard>>("", nullptr);
-    std::pair<std::string, std::shared_ptr<SphericalBillboard>> m_CurrentSphericalBillboard = std::pair<std::string, std::shared_ptr<SphericalBillboard>>("", nullptr);
+    std::pair<std::string, std::shared_ptr<Renderable>> m_CurrentRenderable = std::pair<std::string, std::shared_ptr<Renderable>>("", nullptr);
 
 private:
+
     void showCurrentRigidBodyGuiWindow();
     void showCurrentCylBillboard();
     void showCurrentSphericalBillboard();
+
+    void cleanCurrents();
+
+    std::pair<std::string, std::shared_ptr<RigidBody>> m_CurrentRigidBody = std::pair<std::string, std::shared_ptr<RigidBody>>("", nullptr);
+    std::pair<std::string, std::shared_ptr<Model>> m_CurrentModel = std::pair<std::string, std::shared_ptr<Model>>("", nullptr);
+    std::pair<std::string, std::shared_ptr<CylindricalBillboard>> m_CurrentCylBill = std::pair<std::string, std::shared_ptr<CylindricalBillboard>>("", nullptr);
+    std::pair<std::string, std::shared_ptr<SphericalBillboard>> m_CurrentSphBill = std::pair<std::string, std::shared_ptr<SphericalBillboard>>("", nullptr);
 };

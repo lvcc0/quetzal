@@ -25,9 +25,5 @@ class Physics
 public:
     static bool checkCollision(Collision& one, Collision& two);
 
-    static void simplePhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two);
-    static void advancedPhysics(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two);
-    static void absolutelyInelasticImpact(std::shared_ptr<RigidBody>& one, std::shared_ptr<RigidBody>& two);
-
-    static void processPhysics(std::map<const std::string, std::shared_ptr<RigidBody>>& rig_body_map); // Called every tick
+    static void processPhysics(std::map<const std::string, std::shared_ptr<Collision>>& rig_body_map); // Called every tick
 };

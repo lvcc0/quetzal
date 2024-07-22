@@ -70,7 +70,6 @@ std::pair<glm::vec3, glm::vec3> ExpMath::makeAABB(const std::vector<Vertex>& coo
 				max_corner.z = item.Position.z;
 		}
 	}
-	
 	return std::make_pair(min_corner, max_corner);
 }
 

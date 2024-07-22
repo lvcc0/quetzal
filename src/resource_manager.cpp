@@ -214,16 +214,16 @@ std::shared_ptr<Model> ResourceManager::makeModel(std::string name, const std::s
     return model;
 }
 
-std::shared_ptr<CylindricalBillboard> ResourceManager::makeCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
+std::shared_ptr<CylindricalBillboard> ResourceManager::makeCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
 {
-    std::shared_ptr<CylindricalBillboard>& cyl_billboard = std::make_shared<CylindricalBillboard>(pos, size, makeTexture(name + "_texture", "texture_diffuse", texture_path));
+    std::shared_ptr<CylindricalBillboard>& cyl_billboard = std::make_shared<CylindricalBillboard>(pos, size, makeTexture(name + "_texture", "texture_diffuse", texture_path), verts);
 
     return cyl_billboard;
 }
 
-std::shared_ptr<SphericalBillboard> ResourceManager::makeSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
+std::shared_ptr<SphericalBillboard> ResourceManager::makeSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
 {
-    std::shared_ptr<SphericalBillboard>& sph_billboard = std::make_shared<SphericalBillboard>(pos, size, makeTexture(name + "_texture", "texture_diffuse", texture_path));
+    std::shared_ptr<SphericalBillboard>& sph_billboard = std::make_shared<SphericalBillboard>(pos, size, makeTexture(name + "_texture", "texture_diffuse", texture_path), verts);
 
     return sph_billboard;
 }

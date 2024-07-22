@@ -2,6 +2,16 @@
 
 int main()
 {
+    // Setting these verts as static part of billboard isnt working (idk why)
+    std::vector<Vertex> billboard_verts = {
+        Vertex(glm::vec3(0.5f,  0.5f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
+        Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
+        Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper left
+        Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
+        Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower left
+        Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // upper left
+    };
+
     const unsigned int WIN_WIDTH = 1280;
     const unsigned int WIN_HEIGHT = 720;
 
@@ -18,8 +28,8 @@ int main()
     auto catCube3 = first_scene->addRigidBody("catcube3", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     auto catSphere1 = first_scene->addRigidBody("catsphere1", "objects/catsphere/catsphere.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
 
-    auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
-    auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
+    auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png", billboard_verts);
+    auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png", billboard_verts);
 
     first_scene->addDirLight(DirLight(
         true,
@@ -42,7 +52,7 @@ int main()
         0.09f,
         0.032f,
         glm::vec3(1.0f, 0.0f, 0.0f)
-    ));
+    ), billboard_verts);
 
     first_scene->addSpotLight(SpotLight(
         true,
@@ -58,7 +68,7 @@ int main()
         7.5f,
         10.0f,
         glm::vec3(0.0f, 0.0f, 1.0f)
-    ));
+    ), billboard_verts);
 
     // Main loop
     while (engine.isRunning())

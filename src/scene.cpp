@@ -24,122 +24,106 @@ void Scene::update()
     glm::mat4 view = this->m_Camera->getViewMatrix();
 
     // Default shader
-    setShader("default_shader", CurrentShaderType::MAIN);
+    setShader("default_shader", ShaderType::MAIN);
+    std::shared_ptr<Shader> currentMainShader = m_CurrentShaders[to_underlying(ShaderType::MAIN)];
 
-    this->m_CurrentMainShader->setVec3("viewPos", this->m_Camera->m_pos);
-    this->m_CurrentMainShader->setFloat("material.shininess", 32.0f);
+    currentMainShader->setVec3("viewPos", this->m_Camera->m_pos);
+    currentMainShader->setFloat("material.shininess", 32.0f);
 
-    this->m_CurrentMainShader->setMat4("projection", m_ProjectionMatrix);
-    this->m_CurrentMainShader->setMat4("view", view);
+    currentMainShader->setMat4("projection", m_ProjectionMatrix);
+    currentMainShader->setMat4("view", view);
 
     // Stencil shader
-    setShader("stencil_shader", CurrentShaderType::STENCIL);
+    setShader("stencil_shader", ShaderType::STENCIL);
+    std::shared_ptr<Shader> currentStencilShader = m_CurrentShaders[to_underlying(ShaderType::STENCIL)];
 
-    this->m_CurrentStencilShader->setMat4("projection", m_ProjectionMatrix);
-    this->m_CurrentStencilShader->setMat4("view", view);
+    currentStencilShader->setMat4("projection", m_ProjectionMatrix);
+    currentStencilShader->setMat4("view", view);
 
     // Rendering
-    setShader("default_shader", CurrentShaderType::MAIN);
+    setShader("default_shader", ShaderType::MAIN);
+
+    // Vector of all working shaders(except screen shaders)
+    std::vector<std::shared_ptr<Shader>> curr_shaders{ currentMainShader, currentStencilShader };
 
     // Rendering lights' influence
     if (!this->m_DirLights.empty())
     {
         for (auto i = 0; i < this->m_DirLights.size(); i++)
         {
-            this->m_DirLights[i]->updateUni(this->m_CurrentMainShader, i);
+            this->m_DirLights[i]->updateUni(currentMainShader, i);
         }
     }
     if (!this->m_PointLights.empty())
     {
         for (auto i = 0; i < this->m_PointLights.size(); i++)
         {
-            this->m_PointLights[i]->updateUni(this->m_CurrentMainShader, i);
+            this->m_PointLights[i]->updateUni(currentMainShader, i);
 
-            this->m_SphBillboardMap.at(m_PointLights[i]->m_name)->translate(this->m_PointLights[i]->m_pos);
-            this->m_SphBillboardMap.at(m_PointLights[i]->m_name)->draw(m_CurrentMainShader, m_Camera->m_pos);
+            std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(this->m_RenderableMap.at(m_PointLights[i]->m_name));
+
+            sph_bill->translate(this->m_PointLights[i]->m_pos);
+            sph_bill->m_Target = m_Camera->m_pos;
+            sph_bill->draw(curr_shaders);
         }
     }
     if (!this->m_SpotLights.empty())
     {
         for (auto i = 0; i < this->m_SpotLights.size(); i++)
         {
-            this->m_SpotLights[i]->updateUni(this->m_CurrentMainShader, i);
+            this->m_SpotLights[i]->updateUni(currentMainShader, i);
+            
+            std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(this->m_RenderableMap.at(m_PointLights[i]->m_name));
 
-            this->m_SphBillboardMap.at(m_SpotLights[i]->m_name)->translate(this->m_SpotLights[i]->m_pos);
-            this->m_SphBillboardMap.at(m_SpotLights[i]->m_name)->draw(m_CurrentMainShader, m_Camera->m_pos);
+            sph_bill->translate(this->m_SpotLights[i]->m_pos);
+            sph_bill->m_Target = m_Camera->m_pos;
+            sph_bill->draw(curr_shaders);
         }
     }
-
-    // Draw all models 
-    if (!this->m_ModelMap.empty())
+    // Draw all renderable
+    if (!this->m_RenderableMap.empty())
     {
-        std::map<std::string, std::shared_ptr<Model>>::iterator it = this->m_ModelMap.begin();
-        while (it != this->m_ModelMap.end())
+        std::map<std::string, std::shared_ptr<Renderable>>::iterator it = this->m_RenderableMap.begin();
+        while (it != this->m_RenderableMap.end())
         {
-            it->second->draw(m_CurrentMainShader, m_CurrentStencilShader);
-            it++;
+            if (it->second->type == RenderableType::SPH_BILL) 
+            {
+                std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(it->second);
+                sph_bill->m_Target = m_Camera->m_pos;
+                sph_bill->draw(curr_shaders);
+                it++;
+            }
+            else if (it->second->type == RenderableType::CYL_BILL)
+            {
+                std::shared_ptr<CylindricalBillboard> cyl_bill = std::static_pointer_cast<CylindricalBillboard>(it->second);
+                cyl_bill->m_Target = m_Camera->m_pos;
+                cyl_bill->draw(curr_shaders);
+                it++;
+            }
+            else 
+            {
+                it->second->draw(curr_shaders);
+                it++;
+            }
         }
     }
-    // Draw all rigid bodies
-    if (!this->m_RigidBodyMap.empty())
-    {
-        std::map<std::string, std::shared_ptr<RigidBody>>::iterator it = this->m_RigidBodyMap.begin();
-        while (it != this->m_RigidBodyMap.end())
-        {
-            it->second->draw(m_CurrentMainShader, m_CurrentStencilShader);
-            it++;
-        }
-    }
-    // Draw all cylindrical billboards
-    if (!this->m_CylBillboardMap.empty())
-    {
-        std::map<std::string, std::shared_ptr<CylindricalBillboard>>::iterator it = this->m_CylBillboardMap.begin();
-        while (it != this->m_CylBillboardMap.end())
-        {
-            it->second->draw(m_CurrentMainShader, this->m_Camera->m_pos);
-            it++;
-        }
-    }
-    // Draw all spherical billboards
-    if (!this->m_SphBillboardMap.empty())
-    {
-        std::map<std::string, std::shared_ptr<SphericalBillboard>>::iterator it = this->m_SphBillboardMap.begin();
-        while (it != this->m_SphBillboardMap.end())
-        {
-            it->second->draw(m_CurrentMainShader, this->m_Camera->m_pos);
-            it++;
-        }
-    }
-
     if (!m_CurrentScreenShaders.empty() && m_IsPostProcessing)
         this->m_PostProcessing->activate(m_CurrentScreenShaders);
 }
 
 void Scene::doPhysicsProcessing()
 {
-    Physics::processPhysics(m_RigidBodyMap);
+    // TODO::Change this
+    Physics::processPhysics(m_CollisionMap);
 }
 
 void Scene::doProcessing()
 {
-    // Let objects moving or smth else
-    if (!m_IsPreworking) {
-        // Example
-        // Let rigid bodies moving()
-        if (!this->m_RigidBodyMap.empty())
-        {
-            std::map<std::string, std::shared_ptr<RigidBody>>::iterator it = this->m_RigidBodyMap.begin();
-            while (it != this->m_RigidBodyMap.end())
-            {
-                it->second->move();
-                it++;
-            }
-        }
+    // Do smth
 
-        // Turning on physics if not preworking
-        if (m_IsPhysics) {
-            doPhysicsProcessing();
-        }
+    // Turning on physics 
+    if (m_IsPhysics) {
+        doPhysicsProcessing();
     }
 }
 
@@ -153,24 +137,19 @@ void Scene::enablePhysics()
     this->m_IsPhysics = !this->m_IsPhysics;
 }
 
-void Scene::enablePreworking()
-{
-    this->m_IsPreworking = !this->m_IsPreworking;
-}
-
-void Scene::setShader(const std::string& name, CurrentShaderType type)
+void Scene::setShader(const std::string& name, ShaderType type)
 {
     if (m_ShaderMap.find(name) != m_ShaderMap.end()) {
         switch (type)
         {
-        case (CurrentShaderType::MAIN):
-            this->m_CurrentMainShader = this->m_ShaderMap.at(name);
-            this->m_CurrentMainShader->activateShader();
+        case (ShaderType::MAIN):
+            this->m_CurrentShaders[to_underlying(ShaderType::MAIN)] = this->m_ShaderMap.at(name);
+            this->m_CurrentShaders[to_underlying(ShaderType::MAIN)]->activateShader();
             break;
 
-        case (CurrentShaderType::STENCIL):
-            this->m_CurrentStencilShader = this->m_ShaderMap.at(name);
-            this->m_CurrentStencilShader->activateShader();
+        case (ShaderType::STENCIL):
+            this->m_CurrentShaders[to_underlying(ShaderType::STENCIL)] = this->m_ShaderMap.at(name);
+            this->m_CurrentShaders[to_underlying(ShaderType::STENCIL)]->activateShader();
             break;
         }
     }
@@ -192,7 +171,7 @@ void Scene::setScreenShader(const std::string& name, bool enabled)
 const std::string Scene::getShader()
 {
     for (const auto& entry : this->m_ShaderMap)
-        if (entry.second == this->m_CurrentMainShader)
+        if (entry.second == this->m_CurrentShaders[to_underlying(ShaderType::MAIN)])
             return entry.first;
 
     return "";
@@ -219,24 +198,9 @@ std::map<const std::string, std::shared_ptr<Texture>> Scene::getTextureMap()
     return this->m_TextureMap;
 }
 
-std::map<const std::string, std::shared_ptr<Model>> Scene::getModelMap()
+std::map<const std::string, std::shared_ptr<Renderable>> Scene::getRenderableMap()
 {
-    return this->m_ModelMap;
-}
-
-std::map<const std::string, std::shared_ptr<RigidBody>> Scene::getRigidBodyMap()
-{
-    return this->m_RigidBodyMap;
-}
-
-std::map<const std::string, std::shared_ptr<CylindricalBillboard>> Scene::getCylindricalBillboardMap()
-{
-    return this->m_CylBillboardMap;
-}
-
-std::map<const std::string, std::shared_ptr<SphericalBillboard>> Scene::getSphericalBiillboardMap()
-{
-    return this->m_SphBillboardMap;
+    return this->m_RenderableMap;
 }
 
 std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
@@ -244,7 +208,7 @@ std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& ve
     auto shader = ResourceManager::makeShaderProgram(name, vertex_shader_rel_path, fragment_shader_rel_path);
     
     if (m_ShaderMap.empty()) // automatically set this shader if it's the first one in the map
-        this->m_CurrentMainShader = shader;
+        this->m_CurrentShaders[to_underlying(ShaderType::MAIN)] = shader;
 
     m_ShaderMap.emplace(name, shader);
     return shader;
@@ -261,7 +225,8 @@ std::shared_ptr<Texture> Scene::addTexture(std::string name, std::string type, c
 std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& model_rel_path)
 {
     auto model = ResourceManager::makeModel(name, model_rel_path);
-    m_ModelMap.emplace(name, model);
+    //m_ModelMap.emplace(name, model);
+    m_RenderableMap.emplace(name, model);
 
     return model;
 }
@@ -269,23 +234,23 @@ std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& mode
 std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::string& model_rel_path, Collision &collision)
 {
     auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name, model_rel_path), collision);
-    m_RigidBodyMap.emplace(name, rigid_body);
+    m_RenderableMap.emplace(name, rigid_body);
     
     return rigid_body;
 }
 
-std::shared_ptr<CylindricalBillboard> Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
+std::shared_ptr<CylindricalBillboard> Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
 {
-    auto cyl_billboard = ResourceManager::makeCylBillboard(name, pos, size, texture_path);
-    m_CylBillboardMap.emplace(name, cyl_billboard);
+    auto cyl_billboard = ResourceManager::makeCylBillboard(name, pos, size, texture_path, verts);
+    m_RenderableMap.emplace(name, cyl_billboard);
 
     return cyl_billboard;
 }
 
-std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path)
+std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
 {
-    auto sph_billboard = ResourceManager::makeSphBillboard(name, pos, size, texture_path);
-    m_SphBillboardMap.emplace(name, sph_billboard);
+    auto sph_billboard = ResourceManager::makeSphBillboard(name, pos, size, texture_path, verts);
+    m_RenderableMap.emplace(name, sph_billboard);
 
     return sph_billboard;
 }
@@ -293,7 +258,7 @@ std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm
 std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<Model> model)
 {
     auto c_model = std::make_shared<Model>(*model);
-    m_ModelMap.emplace(name, c_model);
+    m_RenderableMap.emplace(name, c_model);
 
     return c_model;
 }
@@ -301,7 +266,7 @@ std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<
 std::shared_ptr<CylindricalBillboard> Scene::copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard)
 {
     auto c_cyl_billboard = std::make_shared<CylindricalBillboard>(*cyl_billboard);
-    m_CylBillboardMap.emplace(name, c_cyl_billboard);
+    m_RenderableMap.emplace(name, c_cyl_billboard);
 
     return c_cyl_billboard;
 }
@@ -309,33 +274,15 @@ std::shared_ptr<CylindricalBillboard> Scene::copyCylBillboard(std::string name, 
 std::shared_ptr<SphericalBillboard> Scene::copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard)
 {
     auto c_sph_billboard = std::make_shared<SphericalBillboard>(*sph_billboard);
-    m_SphBillboardMap.emplace(name, c_sph_billboard);
+    m_RenderableMap.emplace(name, c_sph_billboard);
 
     return c_sph_billboard;
 }
 
-void Scene::deleteModel(std::string name, std::shared_ptr<Model>& model)
+void Scene::deleteRenderable(std::string name, std::shared_ptr<Renderable>& renderable_object)
 {
-    m_ModelMap.erase(name);
-    model.reset();
-}
-
-void Scene::deleteRigidBody(std::string name, std::shared_ptr<RigidBody>& rigid_body)
-{
-    m_RigidBodyMap.erase(name);
-    rigid_body.reset();
-}
-
-void Scene::deleteCylBillboard(std::string name, std::shared_ptr<CylindricalBillboard>& cyl_billboard)
-{
-    m_CylBillboardMap.erase(name);
-    cyl_billboard.reset();
-}
-
-void Scene::deleteSphBillboard(std::string name, std::shared_ptr<SphericalBillboard>& sph_billboard)
-{
-    m_SphBillboardMap.erase(name);
-    sph_billboard.reset();
+    m_RenderableMap.erase(name);
+    renderable_object.reset();
 }
 
 std::shared_ptr<DirLight> Scene::addDirLight(DirLight& dir_light)
@@ -346,22 +293,22 @@ std::shared_ptr<DirLight> Scene::addDirLight(DirLight& dir_light)
     return light;
 }
 
-std::shared_ptr<PointLight> Scene::addPointLight(PointLight& point_light)
+std::shared_ptr<PointLight> Scene::addPointLight(PointLight& point_light, std::vector<Vertex> verts)
 {
     std::shared_ptr<PointLight> light = std::make_shared<PointLight>(point_light);
     this->m_PointLights.push_back(light);
 
-    this->addSphBillboard(point_light.m_name, point_light.m_pos, glm::vec2(1.0f), "textures/lightbulb.png");
+    this->addSphBillboard(point_light.m_name, point_light.m_pos, glm::vec2(1.0f), "textures/lightbulb.png", verts);
 
     return light;
 }
 
-std::shared_ptr<SpotLight> Scene::addSpotLight(SpotLight& spot_light)
+std::shared_ptr<SpotLight> Scene::addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts)
 {
     std::shared_ptr<SpotLight> light = std::make_shared<SpotLight>(spot_light);
     this->m_SpotLights.push_back(light);
 
-    this->addSphBillboard(spot_light.m_name, spot_light.m_pos, glm::vec2(1.0f), "textures/highlight.png");
+    this->addSphBillboard(spot_light.m_name, spot_light.m_pos, glm::vec2(1.0f), "textures/highlight.png", verts);
 
     return light;
 }
@@ -390,32 +337,12 @@ void Scene::printObjectsInMaps(ObjectType objectType)
         }
         break;
     }
-    case ObjectType::MODEL:
+    case ObjectType::RENDERABLE:
     {
-        std::map<std::string, std::shared_ptr<Model>>::iterator it = m_ModelMap.begin();
-        while (it != m_ModelMap.end())
+        std::map<std::string, std::shared_ptr<Renderable>>::iterator it = m_RenderableMap.begin();
+        while (it != m_RenderableMap.end())
         {
-            std::cout << "model \"" << it->first << "\"" << std::endl;
-            it++;
-        }
-        break;
-    }
-    case ObjectType::CYL_BILLBOARD:
-    {
-        std::map<std::string, std::shared_ptr<CylindricalBillboard>>::iterator it = m_CylBillboardMap.begin();
-        while (it != m_CylBillboardMap.end())
-        {
-            std::cout << "cylindrical billboard \"" << it->first << "\"" << std::endl;
-            it++;
-        }
-        break;
-    }
-    case ObjectType::SPH_BILLBOARD:
-    {
-        std::map<std::string, std::shared_ptr<SphericalBillboard>>::iterator it = m_SphBillboardMap.begin();
-        while (it != m_SphBillboardMap.end())
-        {
-            std::cout << "spherical billboard \"" << it->first << "\"" << std::endl;
+            std::cout << "renderable \"" << it->first << "\" with vao " << it->second->getVAO() << std::endl;
             it++;
         }
         break;

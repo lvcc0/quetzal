@@ -3,21 +3,20 @@
 Model::Model(std::vector<Vertex>& vertices,
              std::vector<unsigned int>& indices,
              std::vector<std::shared_ptr<Texture>>& textures)
-    : m_Textures(textures)
+    :Renderable(vertices, indices), m_Textures(textures)
 {
-    m_Vertices.swap(vertices);
-    m_Indices.swap(indices);
+    this->type = RenderableType::MODEL;
 
-    setupModel(); // setup VAO, VBO, EBO
+    setupRender(); // setup VAO, VBO, EBO
 }
 
 Model::Model(const Model& obj)
-    : m_Indices(obj.m_Indices),
-      m_Textures(obj.m_Textures),
-      m_Vertices(obj.m_Vertices),
-      m_ModelMatrix(obj.m_ModelMatrix)
+    : Renderable(obj),
+      m_Textures(obj.m_Textures)
 { 
-    setupModel();
+    this->type = RenderableType::MODEL;
+
+    setupRender();
 }
 
 Model::~Model()
@@ -33,8 +32,11 @@ Model::~Model()
     VAO = 0;
 }
 
-void Model::draw(std::shared_ptr<Shader>& main_shader, std::shared_ptr<Shader>& stencil_shader)
+void Model::draw(std::vector<std::shared_ptr<Shader>>& shader_vector) // First - main shader, second - stencil shader
 {
+    std::shared_ptr<Shader> main_shader = shader_vector[to_underlying(ShaderType::MAIN)];
+    std::shared_ptr<Shader> stencil_shader = shader_vector[to_underlying(ShaderType::STENCIL)];
+
     #ifdef DEBUG
     if (main_shader != nullptr)
         std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::MAIN_SHADER STATE::SET" << std::endl;
@@ -47,6 +49,13 @@ void Model::draw(std::shared_ptr<Shader>& main_shader, std::shared_ptr<Shader>& 
         std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::STENCIL_SHADER STATE::MISSING" << std::endl;
     #endif
     
+    // Inheritor methods can be called
+    this->translate(m_Position);
+    this->scale(m_Scale);
+    this->rotate(m_RotationDegrees.x, glm::vec3(1.0, 0.0, 0.0));
+    this->rotate(m_RotationDegrees.y, glm::vec3(0.0, 1.0, 0.0));
+    this->rotate(m_RotationDegrees.z, glm::vec3(0.0, 0.0, 1.0));
+
     unsigned int diffuseNum = 1;
     unsigned int specularNum = 1;
 
@@ -116,6 +125,8 @@ void Model::draw(std::shared_ptr<Shader>& main_shader, std::shared_ptr<Shader>& 
         glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
+
+    m_ModelMatrix = glm::mat4(1.0f);
 }
 
 void Model::translate(glm::vec3 vector)
@@ -133,7 +144,19 @@ void Model::rotate(float degrees, glm::vec3 vector)
     m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees), vector);
 }
 
-void Model::setupModel()
+glm::mat4 Model::getModelMatrix()
+{
+    glm::mat4 return_matrix = glm::mat4(1.0f);
+    return_matrix = glm::translate(return_matrix, m_Position);
+    return_matrix = glm::scale(return_matrix, m_Scale);
+    return_matrix = glm::rotate(return_matrix, glm::radians(m_RotationDegrees.x), glm::vec3(1.0, 0.0, 0.0));
+    return_matrix = glm::rotate(return_matrix, glm::radians(m_RotationDegrees.y), glm::vec3(0.0, 1.0, 0.0));
+    return_matrix = glm::rotate(return_matrix, glm::radians(m_RotationDegrees.z), glm::vec3(0.0, 0.0, 1.0));
+
+    return return_matrix;
+}
+
+void Model::setupRender()
 {
     // Vertex Array Object
     glGenVertexArrays(1, &VAO);

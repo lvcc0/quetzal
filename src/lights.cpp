@@ -43,7 +43,7 @@ void PointLight::enableBillboard()
 void SpotLight::updateUni(std::shared_ptr<Shader>& shader, int index) const
 {
     std::string name = "spotLights[" + std::to_string(index) + "]";
-
+    
     shader->setVec3(name + ".position", m_pos);
     shader->setVec3(name + ".direction", m_dir);
 

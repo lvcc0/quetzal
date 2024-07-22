@@ -23,11 +23,11 @@ enum class CollisionType { BOX, SPHERE };
 class Collision
 {
 public:
-    CollisionType m_Type; // collision type
+    CollisionType m_col_Type; // collision type
 
-    glm::vec3 m_Position; // for both
-    glm::vec3 m_Size;     // for box collision
-    float m_Radius;       // for sphere collision       
+    glm::vec3 m_col_Position; // for both
+    glm::vec3 m_col_Size;     // for box collision
+    float m_col_Radius;       // for sphere collision       
 
     // Constructor
     Collision(CollisionType type, glm::vec3 position, glm::vec3 size); // box collider

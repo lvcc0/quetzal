@@ -9,6 +9,17 @@
 #include <iostream>
 #include <cerrno>
 
+
+enum class ShaderType { MAIN, STENCIL, END };
+
+// TODO: Maybe move this code to another file?
+// 
+// Auxillary function (its here mostly for using enums in vectors [])
+template <typename E>
+constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
+    return static_cast<typename std::underlying_type<E>::type>(e);
+}
+
 class Shader
 {
 public:

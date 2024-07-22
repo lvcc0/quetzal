@@ -41,6 +41,9 @@ Shader::~Shader()
 
 void Shader::activateShader() const
 {
+    #ifdef DEBUG
+    std::cout << "DEBUG::SHADER::ACTIVATE " << ID << std::endl;
+    #endif // DEBUG
     glUseProgram(ID);
 }
 

@@ -110,34 +110,33 @@ void Engine::pickObject(GUI& gui)
     Ray ray(cam_coords, direction);
     
     // At this section checking models of rigid bodies (two corners of model make square)
-    std::vector <std::pair<std::pair<std::string, std::shared_ptr<RigidBody>>, GLfloat >> inter_rigid_body_vector; // pair (pair (string, RigidBody), float)
+    std::vector <std::pair<std::pair<std::string, std::shared_ptr<Renderable>>, GLfloat >> inter_render_body_vector; // pair (pair (string, RigidBody), float)
 
-    for (auto item : this->scenes.at(currentScene)->getRigidBodyMap()) 
+    for (auto item : this->scenes.at(currentScene)->getRenderableMap()) 
     {
         GLfloat intersection_distance;
-        if (ray.TestRayOBBIntersection(ExpMath::makeAABB(item.second->m_Model->m_Vertices).first, ExpMath::makeAABB(item.second->m_Model->m_Vertices).second, item.second->m_Model->m_ModelMatrix, intersection_distance))
+        if (ray.TestRayOBBIntersection(ExpMath::makeAABB(item.second->m_Vertices).first, ExpMath::makeAABB(item.second->m_Vertices).second, item.second->getModelMatrix(), intersection_distance))
         {
-            inter_rigid_body_vector.push_back(std::pair(std::pair(item.first, item.second), intersection_distance));
+            inter_render_body_vector.push_back(std::pair(std::pair(item.first, item.second), intersection_distance));
         }
     }
     
     // Picking object with lesser intersection_distance
-    std::pair<std::string, std::shared_ptr<RigidBody>> curr_rigid_body_ptr = ExpMath::getItemWithMinimumFloat<std::pair<std::string, std::shared_ptr<RigidBody>>>(inter_rigid_body_vector).first;
+    std::pair<std::string, std::shared_ptr<Renderable>> curr_renderable_ptr = ExpMath::getItemWithMinimumFloat<std::pair<std::string, std::shared_ptr<Renderable>>>(inter_render_body_vector).first;
 
-    if (curr_rigid_body_ptr.second != nullptr) 
+    if (curr_renderable_ptr.second != nullptr)
     {
         // Deselecting current object before (if it has sense)
-        if (gui.m_CurrentRigidBody.second != nullptr && gui.m_CurrentRigidBody.second != curr_rigid_body_ptr.second)
+        if (gui.m_CurrentRenderable.second != nullptr && gui.m_CurrentRenderable.second != curr_renderable_ptr.second)
         {
-            gui.m_CurrentRigidBody.second->m_Model->is_selected = false;
+            gui.m_CurrentRenderable.second->is_selected = false;
         }
-
         // Setting the current variable  for IMGUI
-        gui.m_CurrentRigidBody.first = curr_rigid_body_ptr.first;
-        gui.m_CurrentRigidBody.second = curr_rigid_body_ptr.second;
+        gui.m_CurrentRenderable.first = curr_renderable_ptr.first;
+        gui.m_CurrentRenderable.second = curr_renderable_ptr.second;
 
         // Selecting model
-        gui.m_CurrentRigidBody.second->m_Model->is_selected = true;
+        gui.m_CurrentRenderable.second->is_selected = true;
     }
 }
 
@@ -171,6 +170,7 @@ void Engine::process(GUI& gui)
         gui.showCurrentSceneGUI(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)));
 
     gui.mainGUILoop();
+
     // --------- //
     float curFrame = (float)glfwGetTime();
     this->deltaTime = curFrame - lastFrame;
@@ -181,14 +181,14 @@ void Engine::process(GUI& gui)
     glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // clearing stuff in the default framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //
     glStencilMask(0x00); // turn off writing to the stencil buffer
-
+    
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
     {
         this->scenes.at(this->currentScene)->doProcessing();
         this->scenes.at(this->currentScene)->update();
     }
-
+    
     // GUI PART // 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
