@@ -9,29 +9,29 @@ Shader::Shader(std::string& vertexCode, std::string& fragmentCode)
     // SHADERS
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vShaderSrc, NULL);
-    glCompileShader(vertexShader);
+    GLCall(glShaderSource(vertexShader, 1, &vShaderSrc, NULL));
+    GLCall(glCompileShader(vertexShader));
 
     compileErrors(vertexShader, "");
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fShaderSrc, NULL);
-    glCompileShader(fragmentShader);
+    GLCall(glShaderSource(fragmentShader, 1, &fShaderSrc, NULL));
+    GLCall(glCompileShader(fragmentShader));
 
     compileErrors(fragmentShader, "");
 
     // SHADER PROGRAM
 
     ID = glCreateProgram();
-    glAttachShader(ID, vertexShader);
-    glAttachShader(ID, fragmentShader);
+    GLCall(glAttachShader(ID, vertexShader));
+    GLCall(glAttachShader(ID, fragmentShader));
 
     glLinkProgram(ID);
 
     compileErrors(ID, "PROGRAM");
 
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);    
+    GLCall(glDeleteShader(vertexShader));
+    GLCall(glDeleteShader(fragmentShader));
 }
 
 Shader::~Shader()
@@ -44,12 +44,12 @@ void Shader::activateShader() const
     #ifdef DEBUG
     std::cout << "DEBUG::SHADER::ACTIVATE " << ID << std::endl;
     #endif // DEBUG
-    glUseProgram(ID);
+    GLCall(glUseProgram(ID));
 }
 
 void Shader::deleteShader() const
 {
-    glDeleteProgram(ID);
+    GLCall(glDeleteProgram(ID));
 }
 
 void Shader::compileErrors(unsigned int shader, const char* type)

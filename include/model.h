@@ -21,13 +21,8 @@ public:
     Model(std::vector<Vertex>& vertices,
           std::vector<unsigned int>& indices,
           std::vector<std::shared_ptr<Texture>>& textures);
-    
-    // Copy constructor
-    // NOT MADE WORKING AT NOW
-    Model(const Model& obj);
 
-    // Destructor
-    ~Model();
+    Model(const Model& obj);
 
     // Draw model
     virtual void draw(std::vector<std::shared_ptr<Shader>>& shader_vector) override;

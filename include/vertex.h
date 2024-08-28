@@ -5,6 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+enum class VERTEX_VARIABLE{ NONE ,POS, TEX, NOR };
+
 struct Vertex {
     glm::vec3 Position;
     glm::vec2 TexCoord;

@@ -9,8 +9,10 @@
 
 #include <vector>
 
-#include "vertex.h"
 #include "shader.h"
+#include "renderer.h"
+#include "buffers_objects.h"
+#include "vertex_array.h"
 
 enum class RenderableType{RENDERABLE, MODEL, BILLBOARD, RIGID_BODY, CYL_BILL, SPH_BILL};
 
@@ -37,7 +39,10 @@ public:
 	virtual glm::mat4 getModelMatrix();  // Sometimes model matrix could be identity matrix, so for getting true matrix we using this func
 
 protected:
-	GLuint VAO = 0, VBO = 0, EBO = 0;
+	std::unique_ptr<VBO> vbo_ptr{ nullptr };
+	std::unique_ptr<IBO> ibo_ptr{ nullptr };
+	std::unique_ptr<VAO> vao_ptr{ nullptr };
+
 	glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 	
 	virtual void setupRender()  = 0;

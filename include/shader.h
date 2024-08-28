@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cerrno>
 
+#include "renderer.h"
 
 enum class ShaderType { MAIN, STENCIL, END };
 

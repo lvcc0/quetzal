@@ -12,42 +12,17 @@ Model::Model(std::vector<Vertex>& vertices,
 
 Model::Model(const Model& obj)
     : Renderable(obj),
-      m_Textures(obj.m_Textures)
-{ 
+    m_Textures(obj.m_Textures)
+{
     this->type = RenderableType::MODEL;
 
     setupRender();
-}
-
-Model::~Model()
-{
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &VAO);
-    glDeleteBuffers(1, &EBO);
-    
-    std::cout << "model deleted with VAO::" << VAO << std::endl;
-
-    VBO = 0;
-    EBO = 0;
-    VAO = 0;
 }
 
 void Model::draw(std::vector<std::shared_ptr<Shader>>& shader_vector) // First - main shader, second - stencil shader
 {
     std::shared_ptr<Shader> main_shader = shader_vector[to_underlying(ShaderType::MAIN)];
     std::shared_ptr<Shader> stencil_shader = shader_vector[to_underlying(ShaderType::STENCIL)];
-
-    #ifdef DEBUG
-    if (main_shader != nullptr)
-        std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::MAIN_SHADER STATE::SET" << std::endl;
-    else
-        std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::MAIN_SHADER STATE::MISSING" << std::endl;
-
-    if (stencil_shader != nullptr)
-        std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::STENCIL_SHADER STATE::SET" << std::endl;
-    else
-        std::cerr << "DEBUG::MODEL::WITH VAO " << this->VAO << " ::STENCIL_SHADER STATE::MISSING" << std::endl;
-    #endif
     
     // Inheritor methods can be called
     this->translate(m_Position);
@@ -64,7 +39,7 @@ void Model::draw(std::vector<std::shared_ptr<Shader>>& shader_vector) // First -
     // Assign all texture fragment shader uniforms
     for (auto i = 0; i < m_Textures.size(); i++)
     {
-        glActiveTexture(GL_TEXTURE0 + i);
+        GLCall(glActiveTexture(GL_TEXTURE0 + i));
 
         std::string number;
         std::string name = m_Textures[i]->m_type;
@@ -75,10 +50,10 @@ void Model::draw(std::vector<std::shared_ptr<Shader>>& shader_vector) // First -
             number = std::to_string(specularNum++);
 
         main_shader->setInt(("material." + name + number).c_str(), i);
-        glBindTexture(GL_TEXTURE_2D, m_Textures[i]->ID);
+        GLCall(glBindTexture(GL_TEXTURE_2D, m_Textures[i]->ID));
     }
 
-    glActiveTexture(GL_TEXTURE0);
+    GLCall(glActiveTexture(GL_TEXTURE0));
 
     // Convert local coordinates to world coordinates
     main_shader->setMat4("model", m_ModelMatrix);
@@ -89,41 +64,41 @@ void Model::draw(std::vector<std::shared_ptr<Shader>>& shader_vector) // First -
     if (is_selected && stencil_shader != nullptr)
     {
         // 1st. render pass, draw objects as normal, writing to the stencil buffer
-        glStencilFunc(GL_ALWAYS, 1, 0xFF); 
-        glStencilMask(0xFF);
+        GLCall(glStencilFunc(GL_ALWAYS, 1, 0xFF));
+        GLCall(glStencilMask(0xFF));
 
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+        vao_ptr->bind();
+        GLCall(glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0));
 
         // 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);   
-        glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
+        GLCall(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
+        GLCall(glStencilMask(0x00));
+        GLCall(glDisable(GL_DEPTH_TEST));
 
         stencil_shader->activateShader(); // Using special stencil shader
         for (auto i = 0; i < m_Textures.size(); i++)
         {
-            glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(GL_TEXTURE_2D, m_Textures[i]->ID);
+            GLCall(glActiveTexture(GL_TEXTURE0 + i));
+            GLCall(glBindTexture(GL_TEXTURE_2D, m_Textures[i]->ID));
         }
 
         // Convert local coordinates to world coordinates
         stencil_shader->setMat4("model", glm::scale(m_ModelMatrix, glm::vec3(m_StencilScaling, m_StencilScaling, m_StencilScaling)));
-        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        GLCall(glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0));
+        vao_ptr->unbind();
 
-        glStencilFunc(GL_ALWAYS, 0, 0xFF);
-        glStencilMask(0xFF);
-        glEnable(GL_DEPTH_TEST);
+        GLCall(glStencilFunc(GL_ALWAYS, 0, 0xFF));
+        GLCall(glStencilMask(0xFF));
+        GLCall(glEnable(GL_DEPTH_TEST));
 
         main_shader->activateShader(); // Return default shader
     }
     // Part working if model not selected
     else 
     {
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        vao_ptr->bind();
+        GLCall(glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0));
+        vao_ptr->unbind();
     }
 
     m_ModelMatrix = glm::mat4(1.0f);
@@ -159,28 +134,18 @@ glm::mat4 Model::getModelMatrix()
 void Model::setupRender()
 {
     // Vertex Array Object
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    vao_ptr = std::make_unique<VAO>();
 
-    // Vertex Array Buffer
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(Vertex), &m_Vertices[0], GL_STATIC_DRAW);
+    // Vertex Buffer Object
+    vbo_ptr = std::make_unique<VBO>(&m_Vertices[0], m_Vertices.size() * sizeof(Vertex));
 
     // Element Array Buffer
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(unsigned int), &m_Indices[0], GL_STATIC_DRAW);
+    ibo_ptr = std::make_unique<IBO>(&m_Indices[0], m_Indices.size());
 
-    // Vertex positions
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-    // Vertex texture coords
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
-    // Vertex normals
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+    VB_Vertex_Layout layout;
+    layout.push<GLfloat>(3, offsetof(Vertex, Position));
+    layout.push<GLfloat>(2, offsetof(Vertex, TexCoord));
+    layout.push<GLfloat>(3, offsetof(Vertex, Normal));
 
-    glBindVertexArray(0);
+    vao_ptr->addBuffer(*vbo_ptr, layout);
 }

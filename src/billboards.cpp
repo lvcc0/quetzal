@@ -32,7 +32,7 @@ void CylindricalBillboard::draw(std::vector<std::shared_ptr<Shader>>& shader_vec
 
     m_ModelMatrix = glm::mat4(1.0f);
 
-    glBindVertexArray(VAO);
+    vao_ptr->bind();
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glBindVertexArray(0);
@@ -90,7 +90,7 @@ void SphericalBillboard::draw(std::vector<std::shared_ptr<Shader>>& shader_vecto
 
     m_ModelMatrix = glm::mat4(1.0f);
 
-    glBindVertexArray(VAO);
+    vao_ptr->bind();
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glBindVertexArray(0);
@@ -127,24 +127,17 @@ void Billboard::scale(glm::vec2 vector)
 
 void Billboard::setupRender()
 {
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    // Vertex Array Object
+    vao_ptr = std::make_unique<VAO>();
 
-    // Vertex Array Buffer
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(Vertex), &m_Vertices[0], GL_STATIC_DRAW);
+    // Vertex Buffer Object
+    vbo_ptr = std::make_unique<VBO>(&m_Vertices[0], m_Vertices.size() * sizeof(Vertex));
 
-    // Vertex positions
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-    // Vertex texture coords
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
-    // Vertex normals
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+    VB_Vertex_Layout layout;
+    layout.push<GLfloat>(3, offsetof(Vertex, Position));
+    layout.push<GLfloat>(2, offsetof(Vertex, TexCoord));
+    layout.push<GLfloat>(3, offsetof(Vertex, Normal));
 
-    glBindVertexArray(0);
+    vao_ptr->addBuffer(*vbo_ptr, layout);
 }
 // --- //

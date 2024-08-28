@@ -7,23 +7,22 @@ Renderable::Renderable(std::vector<Vertex>& vertices, std::vector<unsigned int>&
 }
 
 Renderable::Renderable(const Renderable& obj)
-	: m_Vertices(obj.m_Vertices), m_Indices(obj.m_Indices), VAO(obj.VAO), VBO(obj.VBO), EBO(obj.EBO)
+	: m_Vertices(obj.m_Vertices), m_Indices(obj.m_Indices)
 {
 	this->m_ModelMatrix = glm::mat4(1.0f);
+	
 }
 
 Renderable::~Renderable()
 {
-	glDeleteBuffers(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-
-	if (EBO != 0)
-		glDeleteBuffers(1, &EBO);
+	vao_ptr = nullptr;
+	vbo_ptr = nullptr;
+	ibo_ptr = nullptr;
 }
 
 GLuint Renderable::getVAO()
 {
-	return this->VAO;
+	return this->vao_ptr->getID();
 }
 
 glm::mat4 Renderable::getModelMatrix()
