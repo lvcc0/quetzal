@@ -92,9 +92,7 @@ void Engine::processInput(GUI& gui)
         glfwSetWindowShouldClose(this->window, true);
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-    {
         pickObject(gui);
-    }
 
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
@@ -157,6 +155,8 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_0 && action == GLFW_PRESS)
         this->shouldDrawGui = !this->shouldDrawGui;
+    if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
+        ResourceManager::displayLoadedObjects();
 }
 
 void Engine::process(GUI& gui)

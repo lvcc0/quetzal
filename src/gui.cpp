@@ -16,7 +16,7 @@ GUI::~GUI()
 void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene)
 {
     ImGui::Begin((current_scene.first + " config").c_str());
-
+    
     ImGui::Checkbox("Physics Enabled", &current_scene.second->m_IsPhysics);
 
     ImGui::Separator();
@@ -88,45 +88,6 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", current_scene.second->m_Camera->m_pos.x, current_scene.second->m_Camera->m_pos.y, current_scene.second->m_Camera->m_pos.z);
     ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", current_scene.second->m_Camera->m_orientation.x, current_scene.second->m_Camera->m_orientation.y, current_scene.second->m_Camera->m_orientation.z);
     ImGui::Text("%.3f ms (%.1f FPS)", delta_time * 1000.0f, 1.0f / delta_time);
-
-    ImGui::End();
-}
-
-void GUI::showCurrentRigidBodyGuiWindow()
-{
-    ImGui::Begin((m_CurrentRigidBody.first + " config").c_str());
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Position", (float*)&m_CurrentRigidBody.second->m_Position, 0.5f);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Move speed", (float*)&m_CurrentRigidBody.second->m_MoveVector, 0.001f);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Scale", (float*)&m_CurrentRigidBody.second->m_Scale, 0.2f);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Rotation", (float*)&m_CurrentRigidBody.second->m_RotationDegrees, 1.0f);
-
-    ImGui::End();
-}
-
-void GUI::showCurrentCylBillboard()
-{
-    ImGui::Begin((m_CurrentCylBill.first + " config").c_str());
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Position", (float*)&m_CurrentCylBill.second->m_Position, 0.5f);
-
-    ImGui::End();
-}
-
-void GUI::showCurrentSphericalBillboard()
-{
-    ImGui::Begin((m_CurrentSphBill.first + " config").c_str());
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Position", (float*)&m_CurrentSphBill.second->m_Position, 0.5f);
 
     ImGui::End();
 }
@@ -205,9 +166,9 @@ void GUI::mainGUILoop()
     }
 
     if (m_CurrentRigidBody.second != nullptr)
-        showCurrentRigidBodyGuiWindow();
+        showCurrentObjectGUI<RigidBody>();
     if (m_CurrentCylBill.second != nullptr)
-        showCurrentCylBillboard();
+        showCurrentObjectGUI<CylindricalBillboard>();
     if (m_CurrentSphBill.second != nullptr)
-        showCurrentSphericalBillboard();
+        showCurrentObjectGUI<SphericalBillboard>();
 }

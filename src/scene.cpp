@@ -216,7 +216,7 @@ std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& ve
 
 std::shared_ptr<Texture> Scene::addTexture(std::string name, std::string type, const std::string& texture_rel_path)
 {
-    auto texture = ResourceManager::makeTexture(name, type, texture_rel_path);
+    auto texture = ResourceManager::makeTexture(type, texture_rel_path);
     m_TextureMap.emplace(name, texture);
 
     return texture;
@@ -224,8 +224,7 @@ std::shared_ptr<Texture> Scene::addTexture(std::string name, std::string type, c
 
 std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& model_rel_path)
 {
-    auto model = ResourceManager::makeModel(name, model_rel_path);
-    //m_ModelMap.emplace(name, model);
+    auto model = ResourceManager::makeModel(model_rel_path);
     m_RenderableMap.emplace(name, model);
 
     return model;
@@ -233,7 +232,7 @@ std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& mode
 
 std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::string& model_rel_path, Collision &collision)
 {
-    auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name, model_rel_path), collision);
+    auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(model_rel_path), collision);
     m_RenderableMap.emplace(name, rigid_body);
     
     return rigid_body;
@@ -241,7 +240,7 @@ std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::stri
 
 std::shared_ptr<CylindricalBillboard> Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
 {
-    auto cyl_billboard = ResourceManager::makeCylBillboard(name, pos, size, texture_path, verts);
+    auto cyl_billboard = ResourceManager::makeCylBillboard(pos, size, texture_path, verts);
     m_RenderableMap.emplace(name, cyl_billboard);
 
     return cyl_billboard;
@@ -249,7 +248,7 @@ std::shared_ptr<CylindricalBillboard> Scene::addCylBillboard(std::string name, g
 
 std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
 {
-    auto sph_billboard = ResourceManager::makeSphBillboard(name, pos, size, texture_path, verts);
+    auto sph_billboard = ResourceManager::makeSphBillboard(pos, size, texture_path, verts);
     m_RenderableMap.emplace(name, sph_billboard);
 
     return sph_billboard;

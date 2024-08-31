@@ -30,7 +30,7 @@ std::vector<std::shared_ptr<Texture>> ResourceManager::pullTexturesFromMtl(const
         if (linetype == "map_Kd")
         {
             std::string str = line.substr(line.find(" ") + 1);
-            std::shared_ptr<Texture> texture = makeTexture(str, "texture_diffuse", (full_path.substr(0, full_path.find_last_of('/') + 1) + str).erase(0, relResPath.length()));
+            std::shared_ptr<Texture> texture = makeTexture("texture_diffuse", (full_path.substr(0, full_path.find_last_of('/') + 1) + str).erase(0, relResPath.length()));
             textures.push_back(texture);
         }
     }
@@ -73,13 +73,17 @@ std::shared_ptr<Shader> ResourceManager::makeShaderProgram(std::string name, con
     std::string vertex_shader_src = getFileString(vertex_shader_rel_path);
     std::string fragment_shader_src = getFileString(fragment_shader_rel_path);
 
-    std::shared_ptr<Shader>& shader_program = std::make_shared<Shader>(vertex_shader_src, fragment_shader_src);
-
-    return shader_program;
+    return std::make_shared<Shader>(vertex_shader_src, fragment_shader_src);
 }
 
-std::shared_ptr<Texture> ResourceManager::makeTexture(std::string name, std::string type, const std::string& image_rel_path)
+std::shared_ptr<Texture> ResourceManager::makeTexture(std::string type, const std::string& image_rel_path)
 {
+    std::string name = image_rel_path.substr(image_rel_path.find_last_of("/") + 1) + "_texture";
+
+    // If the same texture was loaded - return it (copying isnt necessary)
+    if (m_LoadedObjects.find(name) != m_LoadedObjects.end())
+        return std::static_pointer_cast<Texture>(m_LoadedObjects.at(name));
+
     std::string full_path = relResPath + image_rel_path;
 
     int width, height, numComponents;
@@ -92,11 +96,18 @@ std::shared_ptr<Texture> ResourceManager::makeTexture(std::string name, std::str
 
     stbi_image_free(image);
 
+    m_LoadedObjects.emplace(name, texture);
     return texture;
 }
 
-std::shared_ptr<Model> ResourceManager::makeModel(std::string name, const std::string& model_rel_path)
+std::shared_ptr<Model> ResourceManager::makeModel(const std::string& model_rel_path)
 {
+    std::string name = model_rel_path.substr(model_rel_path.find_last_of("/") + 1) + "_model";
+
+    // If the same model was loaded - copy it
+    if (m_LoadedObjects.find(name) != m_LoadedObjects.end())
+        return std::make_shared<Model>(*std::static_pointer_cast<Model>(m_LoadedObjects.at(name)));
+
     std::string full_path = relResPath + model_rel_path;
 
     std::ifstream file(full_path);
@@ -208,22 +219,42 @@ std::shared_ptr<Model> ResourceManager::makeModel(std::string name, const std::s
             continue;
         }
     }
+    std::shared_ptr <Model> model = std::make_shared<Model>(vertices, indices, textures);
 
-    std::shared_ptr<Model>& model = std::make_shared<Model>(vertices, indices, textures);
-
+    m_LoadedObjects.emplace(name, model);
     return model;
 }
 
-std::shared_ptr<CylindricalBillboard> ResourceManager::makeCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
+std::shared_ptr<CylindricalBillboard> ResourceManager::makeCylBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
 {
-    std::shared_ptr<CylindricalBillboard>& cyl_billboard = std::make_shared<CylindricalBillboard>(pos, size, makeTexture(name + "_texture", "texture_diffuse", texture_path), verts);
+    std::string name = texture_path.substr(texture_path.find_last_of("/") + 1) + "_cylBil";
 
+    // If the same Billboard was loaded - copy it
+    if (m_LoadedObjects.find(name) != m_LoadedObjects.end())
+        return std::make_shared<CylindricalBillboard>(*std::static_pointer_cast<CylindricalBillboard>(m_LoadedObjects.at(name)));
+
+    std::shared_ptr<CylindricalBillboard> cyl_billboard =  std::make_shared<CylindricalBillboard>(pos, size, makeTexture("texture_diffuse", texture_path), verts);
+
+    m_LoadedObjects.emplace(name, cyl_billboard);
     return cyl_billboard;
 }
 
-std::shared_ptr<SphericalBillboard> ResourceManager::makeSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
+std::shared_ptr<SphericalBillboard> ResourceManager::makeSphBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts)
 {
-    std::shared_ptr<SphericalBillboard>& sph_billboard = std::make_shared<SphericalBillboard>(pos, size, makeTexture(name + "_texture", "texture_diffuse", texture_path), verts);
+    std::string name = texture_path.substr(texture_path.find_last_of("/") + 1) + "_sphBil";
 
+    // If the same Billboard was loaded - copy it
+    if (m_LoadedObjects.find(name) != m_LoadedObjects.end())
+        return std::make_shared<SphericalBillboard>(*std::static_pointer_cast<SphericalBillboard>(m_LoadedObjects.at(name)));
+
+    std::shared_ptr<SphericalBillboard> sph_billboard = std::make_shared<SphericalBillboard>(pos, size, makeTexture("texture_diffuse", texture_path), verts);
+
+    m_LoadedObjects.emplace(name, sph_billboard);
     return sph_billboard;
+}
+
+void ResourceManager::displayLoadedObjects()
+{
+    for (auto item : m_LoadedObjects)
+        std::cout << item.first << std::endl;
 }

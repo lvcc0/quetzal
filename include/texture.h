@@ -11,7 +11,7 @@
 class Texture
 {
 public:
-    unsigned int ID;
+    GLuint ID;
     std::string m_type;
 
     // Constructor

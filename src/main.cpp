@@ -23,13 +23,14 @@ int main()
     first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag");
     first_scene->addShader("stencil_shader", "shaders/stencil.vert", "shaders/stencil.frag");
 
-    auto catCube1 = first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    auto catCube2 = first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    auto catCube3 = first_scene->addRigidBody("catcube3", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    auto catSphere1 = first_scene->addRigidBody("catsphere1", "objects/catsphere/catsphere.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    first_scene->addRigidBody("catcube3", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    first_scene->addRigidBody("catcube4", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    first_scene->addRigidBody("catsphere1", "objects/catsphere/catsphere.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
 
-    auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png", billboard_verts);
-    auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png", billboard_verts);
+    first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png", billboard_verts);
+    first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png", billboard_verts);
 
     first_scene->addDirLight(DirLight(
         true,

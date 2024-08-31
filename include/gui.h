@@ -35,13 +35,54 @@ public:
     // ------------------ //
 
     // TODO:: Make only one object selectable at time
-    std::pair<std::string, std::shared_ptr<Renderable>> m_CurrentRenderable = std::pair<std::string, std::shared_ptr<Renderable>>("", nullptr);
+    std::pair<std::string, std::shared_ptr<Renderable>> m_CurrentRenderable = std::make_pair<std::string, std::shared_ptr<Renderable>>("", nullptr);
 
 private:
 
-    void showCurrentRigidBodyGuiWindow();
-    void showCurrentCylBillboard();
-    void showCurrentSphericalBillboard();
+    template <typename T>
+    void showCurrentObjectGUI() 
+    {
+        static_assert(false);
+    }
+    template<>
+    void showCurrentObjectGUI<RigidBody>() 
+    {
+        ImGui::Begin((m_CurrentRigidBody.first + " config").c_str());
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Position", (float*)&m_CurrentRigidBody.second->m_Position, 0.5f);
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Move speed", (float*)&m_CurrentRigidBody.second->m_MoveVector, 0.001f);
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Scale", (float*)&m_CurrentRigidBody.second->m_Scale, 0.2f);
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Rotation", (float*)&m_CurrentRigidBody.second->m_RotationDegrees, 1.0f);
+
+        ImGui::End();
+    }
+    template<>
+    void showCurrentObjectGUI<CylindricalBillboard>()
+    {
+        ImGui::Begin((m_CurrentCylBill.first + " config").c_str());
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Position", (float*)&m_CurrentCylBill.second->m_Position, 0.5f);
+
+        ImGui::End();
+    }
+    template<>
+    void showCurrentObjectGUI<SphericalBillboard>()
+    {
+        ImGui::Begin((m_CurrentSphBill.first + " config").c_str());
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Position", (float*)&m_CurrentSphBill.second->m_Position, 0.5f);
+
+        ImGui::End();
+    }
 
     void cleanCurrents();
 
