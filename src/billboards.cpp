@@ -5,7 +5,7 @@
 CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts)
     : Billboard(pos, scale, texture, verts)
 {
-    this->type = RenderableType::CYL_BILL;
+
 }
 
 void CylindricalBillboard::draw(std::vector<std::shared_ptr<Shader>>& shader_vector)
@@ -53,7 +53,7 @@ glm::mat4 CylindricalBillboard::getModelMatrix()
 SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts)
     : Billboard(pos, scale, texture, verts)
 {
-    this->type = RenderableType::SPH_BILL;
+
 }
 
 void SphericalBillboard::draw(std::vector<std::shared_ptr<Shader>>& shader_vector)
@@ -111,7 +111,6 @@ glm::mat4 SphericalBillboard::getModelMatrix()
 Billboard::Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts)
     : m_Position(pos), m_Scale(scale), m_Texture(texture), Renderable(verts)
 {
-    this->type = RenderableType::BILLBOARD;
     setupRender();
 }
 

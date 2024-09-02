@@ -14,8 +14,6 @@
 #include "buffers_objects.h"
 #include "vertex_array.h"
 
-enum class RenderableType{RENDERABLE, MODEL, BILLBOARD, RIGID_BODY, CYL_BILL, SPH_BILL};
-
 // Abstract class
 class Renderable {
 public:
@@ -25,13 +23,12 @@ public:
 	Renderable(const Renderable& obj);
 
 	// Destructor
-	~Renderable();
+	virtual ~Renderable();
 
 	std::vector<Vertex>      m_Vertices;
 	std::vector<unsigned int> m_Indices;
 
 	bool is_selected = false;
-	RenderableType type = RenderableType::RENDERABLE;
 
 	virtual void draw(std::vector<std::shared_ptr<Shader>>& shader_vector) = 0;
 

@@ -5,8 +5,6 @@ Model::Model(std::vector<Vertex>& vertices,
              std::vector<std::shared_ptr<Texture>>& textures)
     :Renderable(vertices, indices), m_Textures(textures)
 {
-    this->type = RenderableType::MODEL;
-
     setupRender(); // setup VAO, VBO, EBO
 }
 
@@ -14,8 +12,6 @@ Model::Model(const Model& obj)
     : Renderable(obj),
     m_Textures(obj.m_Textures)
 {
-    this->type = RenderableType::MODEL;
-
     setupRender();
 }
 

@@ -92,30 +92,6 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     ImGui::End();
 }
 
-void GUI::cleanCurrents()
-{
-    if (m_CurrentModel.second != nullptr)
-    {
-        m_CurrentModel.first = "";
-        m_CurrentModel.second = nullptr;
-    }
-    if (m_CurrentRigidBody.second != nullptr)
-    {
-        m_CurrentRigidBody.first = "";
-        m_CurrentRigidBody.second = nullptr;
-    }
-    if (m_CurrentCylBill.second != nullptr)
-    {
-        m_CurrentCylBill.first = "";
-        m_CurrentCylBill.second = nullptr;
-    }
-    if (m_CurrentSphBill.second != nullptr)
-    {
-        m_CurrentSphBill.first = "";
-        m_CurrentSphBill.second = nullptr;
-    }
-}
-
 GUI& GUI::Instance(GLFWwindow* window)
 {
     static GUI gui;
@@ -133,42 +109,19 @@ GUI& GUI::Instance(GLFWwindow* window)
 
 void GUI::mainGUILoop()
 {
-    cleanCurrents();
     if (m_CurrentRenderable.second != nullptr) 
     {
-        switch (m_CurrentRenderable.second->type)
+        auto current_renderable = m_CurrentRenderable.second;
+        if (typeid(*current_renderable) == typeid(RigidBody))
+            showCurrentObjectGUI<RigidBody>();
+        else if (typeid(*current_renderable) == typeid(CylindricalBillboard))
+            showCurrentObjectGUI<CylindricalBillboard>();
+        else if (typeid(*current_renderable) == typeid(SphericalBillboard))
+            showCurrentObjectGUI<SphericalBillboard>();
+        else if (typeid(*current_renderable) == typeid(Model))
         {
-        case(RenderableType::RIGID_BODY):
-            m_CurrentRigidBody.first = m_CurrentRenderable.first;
-            m_CurrentRigidBody.second = std::static_pointer_cast<RigidBody>(m_CurrentRenderable.second);
-
-            break;
-        case(RenderableType::MODEL):
-            m_CurrentModel.first = m_CurrentRenderable.first;
-            m_CurrentModel.second = std::static_pointer_cast<Model>(m_CurrentRenderable.second);
-
-            break;
-        case(RenderableType::CYL_BILL):
-            m_CurrentCylBill.first = m_CurrentRenderable.first;
-            m_CurrentCylBill.second = std::static_pointer_cast<CylindricalBillboard>(m_CurrentRenderable.second);
-
-            break;
-        case(RenderableType::SPH_BILL):
-            m_CurrentSphBill.first = m_CurrentRenderable.first;
-            m_CurrentSphBill.second = std::static_pointer_cast<SphericalBillboard>(m_CurrentRenderable.second);
-
-            break;
-        default:
-
-            std::cerr << "ERROR::GUI::RENDERABLE_TYPE NOT FOUND" << std::endl;
-            break;
+            // Nothing
         }
     }
-
-    if (m_CurrentRigidBody.second != nullptr)
-        showCurrentObjectGUI<RigidBody>();
-    if (m_CurrentCylBill.second != nullptr)
-        showCurrentObjectGUI<CylindricalBillboard>();
-    if (m_CurrentSphBill.second != nullptr)
-        showCurrentObjectGUI<SphericalBillboard>();
+    
 }

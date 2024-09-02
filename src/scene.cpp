@@ -86,14 +86,15 @@ void Scene::update()
         std::map<std::string, std::shared_ptr<Renderable>>::iterator it = this->m_RenderableMap.begin();
         while (it != this->m_RenderableMap.end())
         {
-            if (it->second->type == RenderableType::SPH_BILL) 
+            auto object = it->second;
+            if (typeid(*object) == typeid(SphericalBillboard))
             {
                 std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(it->second);
                 sph_bill->m_Target = m_Camera->m_pos;
                 sph_bill->draw(curr_shaders);
                 it++;
             }
-            else if (it->second->type == RenderableType::CYL_BILL)
+            else if (typeid(*object) == typeid(CylindricalBillboard))
             {
                 std::shared_ptr<CylindricalBillboard> cyl_bill = std::static_pointer_cast<CylindricalBillboard>(it->second);
                 cyl_bill->m_Target = m_Camera->m_pos;
@@ -188,17 +189,17 @@ std::vector<std::string> Scene::getScreenShaders()
     return result;
 }
 
-std::map<const std::string, std::shared_ptr<Shader>> Scene::getShaderMap()
+std::map<const std::string, std::shared_ptr<Shader>> Scene::getShaderMap() const
 {
     return this->m_ShaderMap;
 }
 
-std::map<const std::string, std::shared_ptr<Texture>> Scene::getTextureMap()
+std::map<const std::string, std::shared_ptr<Texture>> Scene::getTextureMap() const
 {
     return this->m_TextureMap;
 }
 
-std::map<const std::string, std::shared_ptr<Renderable>> Scene::getRenderableMap()
+std::map<const std::string, std::shared_ptr<Renderable>> Scene::getRenderableMap() const
 {
     return this->m_RenderableMap;
 }
@@ -232,7 +233,10 @@ std::shared_ptr<Model> Scene::addModel(std::string name, const std::string& mode
 
 std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, const std::string& model_rel_path, Collision &collision)
 {
-    auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(model_rel_path), collision);
+    std::vector<Vertex> vertices; std::vector<unsigned int> indices; std::vector<std::shared_ptr<Texture>> textures;
+    ResourceManager::makeModel(model_rel_path, vertices, indices, textures);
+
+    auto rigid_body = std::make_shared<RigidBody>(vertices, indices, textures, collision);
     m_RenderableMap.emplace(name, rigid_body);
     
     return rigid_body;

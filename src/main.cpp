@@ -14,7 +14,7 @@ int main()
 
     const unsigned int WIN_WIDTH = 1280;
     const unsigned int WIN_HEIGHT = 720;
-
+    
     Engine& engine = Engine::Instance(WIN_WIDTH, WIN_HEIGHT);
     GUI& gui = GUI::Instance(engine.window);
 

@@ -65,9 +65,9 @@ public:
     const std::string        getShader();        // get active shader name
     std::vector<std::string> getScreenShaders(); // get vector of active screen shader names
     
-    std::map<const std::string, std::shared_ptr<Shader>>               getShaderMap();
-    std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap();
-    std::map<const std::string, std::shared_ptr<Renderable>>           getRenderableMap();
+    std::map<const std::string, std::shared_ptr<Shader>>               getShaderMap() const;
+    std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap() const;
+    std::map<const std::string, std::shared_ptr<Renderable>>           getRenderableMap() const;
 
     // Some stuff to add to the scene
     std::shared_ptr<Shader>               addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);

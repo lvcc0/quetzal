@@ -253,6 +253,134 @@ std::shared_ptr<SphericalBillboard> ResourceManager::makeSphBillboard(glm::vec3 
     return sph_billboard;
 }
 
+void ResourceManager::makeModel(const std::string& model_rel_path, std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<std::shared_ptr<Texture>>& textures)
+{
+    std::string name = model_rel_path.substr(model_rel_path.find_last_of("/") + 1) + "_model";
+
+    // If the same model was loaded - copy it
+    if (m_LoadedObjects.find(name) != m_LoadedObjects.end()) 
+    {
+        std::shared_ptr<Model> model = std::static_pointer_cast<Model>(m_LoadedObjects.at(name));
+        vertices = model->m_Vertices;
+        indices = model->m_Indices;
+        textures = model->m_Textures;
+    }
+    
+    else {
+        std::string full_path = relResPath + model_rel_path;
+
+        std::ifstream file(full_path);
+
+        std::vector<glm::vec3> positions;
+        std::vector<glm::vec2> texCoords;
+        std::vector<glm::vec3> normals;
+
+        std::vector<std::string> triplets; // vector for face vertices ("v/vt/vn")
+        glm::vec3 vector3{};                 // vec3 for v, vn
+        glm::vec2 vector2{};                 // vec2 for vt
+
+        std::string line;
+
+        // TODO: do something like reserve() or similar with these big ass vectors
+
+        while (std::getline(file, line))
+        {
+            std::string linetype = line.substr(0, line.find(" "));
+
+            if (linetype == "#") // comment
+                continue;
+
+            if (linetype == "o") // object (mesh)
+            {
+                // think something
+            }
+
+            if (linetype == "v") // vertex
+            {
+                std::istringstream v(line.substr(line.find(" ")));
+
+                v >> vector3.x >> vector3.y >> vector3.z;
+                positions.push_back(vector3);
+
+                continue;
+            }
+
+            if (linetype == "vt") // texture
+            {
+                std::istringstream v(line.substr(line.find(" ")));
+
+                v >> vector2.x >> vector2.y;
+                texCoords.push_back(vector2);
+
+                continue;
+            }
+
+            if (linetype == "vn") // normal
+            {
+                std::istringstream v(line.substr(line.find(" ")));
+
+                v >> vector3.x >> vector3.y >> vector3.z;
+                normals.push_back(vector3);
+
+                continue;
+            }
+
+            if (linetype == "f") // face
+            {
+                /**
+                 *  v - "v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3"
+                 *  points - {"v1/vt1/vn1", "v2/vt2/vn2", "v3/vt3/vn3"}
+                 *  token - temporal string to get point's v, vt, vn
+                 *  tokens - temporal vector to store point's v, vt, vn and push them to vertex
+                 */
+
+                std::istringstream v(line.substr(line.find(" ")));
+
+                std::string points[3];
+                std::string token;
+                std::vector<int> tokens;
+
+                v >> points[0];
+                v >> points[1];
+                v >> points[2];
+
+                for (unsigned int i = 0; i < 3; i++)
+                {
+                    std::stringstream point(points[i]);
+
+                    // Check for already existing triplets (v/vt/vn) and push index of the first mention of them to indices
+                    triplets.push_back(point.str());
+                    indices.push_back(std::find(triplets.begin(), triplets.end(), point.str()) - triplets.begin());
+
+                    // "v/vt/vn" -> {v, vt, vn}
+                    while (getline(point, token, '/'))
+                        tokens.push_back(std::stoi(token));
+
+                    vertices.push_back(Vertex(positions[--tokens[0]],
+                        texCoords[--tokens[1]],
+                        normals[--tokens[2]]));
+
+                    tokens.clear();
+                }
+
+                continue;
+            }
+
+            if (linetype == "mtllib") // corresponding material file
+            {
+                std::istringstream file_name(line.substr(line.find(" ") + 1));
+                textures = pullTexturesFromMtl(full_path.substr(0, full_path.find_last_of('/') + 1) + file_name.str());
+
+                continue;
+            }
+        }
+
+        std::shared_ptr <Model> model = std::make_shared<Model>(vertices, indices, textures);
+
+        m_LoadedObjects.emplace(name, model);
+    }
+}
+
 void ResourceManager::displayLoadedObjects()
 {
     for (auto item : m_LoadedObjects)

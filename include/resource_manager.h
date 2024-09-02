@@ -19,7 +19,6 @@
 class ResourceManager
 {
 public:
-
     // Delete all constructors
     ResourceManager() = delete;
     ResourceManager(const ResourceManager& obj) = delete;
@@ -35,6 +34,8 @@ public:
     static std::shared_ptr<CylindricalBillboard> makeCylBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts);
     static std::shared_ptr<SphericalBillboard>   makeSphBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts);
 
+    static void                                  makeModel(const std::string& model_rel_path, std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<std::shared_ptr<Texture>>& textures);
+    
     static void displayLoadedObjects();
 private:
     inline static const std::string relResPath = RES_PATH; // full path to res directory
