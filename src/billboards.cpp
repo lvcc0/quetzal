@@ -8,9 +8,9 @@ CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::
 
 }
 
-void CylindricalBillboard::draw(std::vector<std::shared_ptr<Shader>>& shader_vector)
+void CylindricalBillboard::draw(const Shaders_pack& shaders)
 {
-    std::shared_ptr<Shader> main_shader = shader_vector[to_underlying(ShaderType::MAIN)];
+    std::shared_ptr<Shader> main_shader = shaders.MAIN_SHADER;
 
     glm::vec3 proj_to_obj = glm::normalize(glm::vec3(m_Target.x - m_Position.x, 0.0f, m_Target.z - m_Position.z)); // projection of vector to object in the XZ plane
     up = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), proj_to_obj); // flips the up vector if going the second half of the loop
@@ -21,6 +21,8 @@ void CylindricalBillboard::draw(std::vector<std::shared_ptr<Shader>>& shader_vec
     m_ModelMatrix = glm::translate(m_ModelMatrix, m_Position);
     m_ModelMatrix = glm::rotate(m_ModelMatrix, angle_in_rad, up);
     m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(m_Scale, 1.0f));
+
+    main_shader->activateShader();
 
     main_shader->setInt("material.texture_diffuse1", 0);
     glBindTexture(GL_TEXTURE_2D, m_Texture->ID);
@@ -56,9 +58,9 @@ SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shar
 
 }
 
-void SphericalBillboard::draw(std::vector<std::shared_ptr<Shader>>& shader_vector)
+void SphericalBillboard::draw(const Shaders_pack& shaders)
 {
-    std::shared_ptr<Shader> main_shader = shader_vector[to_underlying(ShaderType::MAIN)];
+    std::shared_ptr<Shader> main_shader = shaders.MAIN_SHADER;
 
     glm::vec3 vector_to_obj = glm::normalize(m_Target - m_Position); // vector to the object
     glm::vec3 proj_to_obj = glm::normalize(glm::vec3(m_Target.x - m_Position.x, 0.0f, m_Target.z - m_Position.z)); // projection of vector to object in the XZ plane
@@ -78,6 +80,8 @@ void SphericalBillboard::draw(std::vector<std::shared_ptr<Shader>>& shader_vecto
     m_ModelMatrix = glm::rotate(m_ModelMatrix, vert_angle_in_rad, up);
     m_ModelMatrix = glm::rotate(m_ModelMatrix, hor_angle_in_rad, right);
     m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(m_Scale, 1.0f));
+
+    main_shader->activateShader();
 
     main_shader->setInt("material.texture_diffuse1", 0);
 

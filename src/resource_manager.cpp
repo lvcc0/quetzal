@@ -61,19 +61,25 @@ std::map<const std::string, std::shared_ptr<Shader>> ResourceManager::makePostPr
     for (const auto& frag_path : frag_paths)
     {
         std::string file_name = frag_path.substr(frag_path.find_last_of("/") + 1, frag_path.size() - frag_path.find_last_of("/") - (frag_path.size() - frag_path.find(".") + 1));
-        shader_map.emplace(file_name, makeShaderProgram("screen_shader " + file_name, vert_path, frag_path));
+        shader_map.emplace(file_name, makeShaderProgram(vert_path, frag_path));
     }
 
     return shader_map;
 }
 
-std::shared_ptr<Shader> ResourceManager::makeShaderProgram(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
+std::shared_ptr<Shader> ResourceManager::makeShaderProgram(const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
 {
+    if (m_LoadedShaders.find(vertex_shader_rel_path + "||" + fragment_shader_rel_path) != m_LoadedShaders.end())
+        return m_LoadedShaders.at(vertex_shader_rel_path + "||" + fragment_shader_rel_path);
+
     // Getting shader files (.vert and .frag)
     std::string vertex_shader_src = getFileString(vertex_shader_rel_path);
     std::string fragment_shader_src = getFileString(fragment_shader_rel_path);
 
-    return std::make_shared<Shader>(vertex_shader_src, fragment_shader_src);
+    auto shader = std::make_shared<Shader>(vertex_shader_src, fragment_shader_src);
+
+    m_LoadedShaders.emplace(vertex_shader_rel_path + "||" + fragment_shader_rel_path, shader);
+    return shader;
 }
 
 std::shared_ptr<Texture> ResourceManager::makeTexture(std::string type, const std::string& image_rel_path)

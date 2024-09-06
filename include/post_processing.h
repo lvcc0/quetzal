@@ -15,6 +15,7 @@ class PostProcessing
 public:
     // Map of shaders
     std::map<const std::string, std::shared_ptr<Shader>> m_ShaderMap;
+    std::vector<std::shared_ptr<Shader>> m_ActiveShaders;
 
     // Constructor
     PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>& shaderMap, GLfloat width, GLfloat height);
@@ -23,8 +24,12 @@ public:
     ~PostProcessing();
 
     void deactivate() const;                                                        // deactivating postprocessing (must be used BEFORE any postprocessing funcs and objects drawing)
-    void activate(const std::vector<std::shared_ptr<Shader>>& screenShaders) const; // postprocessing funcs
+    void activate() const; // postprocessing funcs
     void recreate(GLuint width, GLuint height) const;                               // recreate framebuffer's attachments
+
+    void setScreenShader(const std::string& name, bool enabled); // set postprocessing shader on or off
+
+    std::vector<std::string> getScreenShaders(); // get vector of active screen shader names
 
 private:
     // Buffers

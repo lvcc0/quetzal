@@ -20,8 +20,8 @@ int main()
 
     auto first_scene = engine.createScene("first_scene");
 
-    first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag");
-    first_scene->addShader("stencil_shader", "shaders/stencil.vert", "shaders/stencil.frag");
+    first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag", ShaderType::MAIN);
+    first_scene->addShader("stencil_shader", "shaders/stencil.vert", "shaders/stencil.frag", ShaderType::STENCIL);
 
     first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
     first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));

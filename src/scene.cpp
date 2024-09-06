@@ -7,77 +7,66 @@ Scene::Scene(Camera& camera)
 
 Scene::~Scene()
 {
-    std::map<std::string, std::shared_ptr<Shader>>::iterator it = this->m_ShaderMap.begin();
-    while (it != this->m_ShaderMap.end())
-    {
-        it->second->deleteShader();
-        it++;
-    }
+    
 }
 
 void Scene::update()
 {
-    if (!m_CurrentScreenShaders.empty() && m_IsPostProcessing)
+    if (!m_PostProcessing->m_ActiveShaders.empty() && m_IsPostProcessing)
         this->m_PostProcessing->deactivate();
 
     m_ProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)this->m_Camera->m_width / (float)this->m_Camera->m_height, 0.1f, 100.0f);
     glm::mat4 view = this->m_Camera->getViewMatrix();
 
     // Default shader
-    setShader("default_shader", ShaderType::MAIN);
-    std::shared_ptr<Shader> currentMainShader = m_CurrentShaders[to_underlying(ShaderType::MAIN)];
+    shaders_active.MAIN_SHADER->activateShader();
+    
+    shaders_active.MAIN_SHADER->setVec3("viewPos", this->m_Camera->m_pos);
+    shaders_active.MAIN_SHADER->setFloat("material.shininess", 32.0f);
 
-    currentMainShader->setVec3("viewPos", this->m_Camera->m_pos);
-    currentMainShader->setFloat("material.shininess", 32.0f);
-
-    currentMainShader->setMat4("projection", m_ProjectionMatrix);
-    currentMainShader->setMat4("view", view);
+    shaders_active.MAIN_SHADER->setMat4("projection", m_ProjectionMatrix);
+    shaders_active.MAIN_SHADER->setMat4("view", view);
 
     // Stencil shader
-    setShader("stencil_shader", ShaderType::STENCIL);
-    std::shared_ptr<Shader> currentStencilShader = m_CurrentShaders[to_underlying(ShaderType::STENCIL)];
+    shaders_active.STENCIL_SHADER->activateShader();
 
-    currentStencilShader->setMat4("projection", m_ProjectionMatrix);
-    currentStencilShader->setMat4("view", view);
+    shaders_active.STENCIL_SHADER->setMat4("projection", m_ProjectionMatrix);
+    shaders_active.STENCIL_SHADER->setMat4("view", view);
 
     // Rendering
-    setShader("default_shader", ShaderType::MAIN);
-
-    // Vector of all working shaders(except screen shaders)
-    std::vector<std::shared_ptr<Shader>> curr_shaders{ currentMainShader, currentStencilShader };
 
     // Rendering lights' influence
     if (!this->m_DirLights.empty())
     {
         for (auto i = 0; i < this->m_DirLights.size(); i++)
         {
-            this->m_DirLights[i]->updateUni(currentMainShader, i);
+            this->m_DirLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
         }
     }
     if (!this->m_PointLights.empty())
     {
         for (auto i = 0; i < this->m_PointLights.size(); i++)
         {
-            this->m_PointLights[i]->updateUni(currentMainShader, i);
+            this->m_PointLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
 
             std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(this->m_RenderableMap.at(m_PointLights[i]->m_name));
 
             sph_bill->translate(this->m_PointLights[i]->m_pos);
             sph_bill->m_Target = m_Camera->m_pos;
-            sph_bill->draw(curr_shaders);
+            sph_bill->draw(shaders_active);
         }
     }
     if (!this->m_SpotLights.empty())
     {
         for (auto i = 0; i < this->m_SpotLights.size(); i++)
         {
-            this->m_SpotLights[i]->updateUni(currentMainShader, i);
+            this->m_SpotLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
             
             std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(this->m_RenderableMap.at(m_PointLights[i]->m_name));
 
             sph_bill->translate(this->m_SpotLights[i]->m_pos);
             sph_bill->m_Target = m_Camera->m_pos;
-            sph_bill->draw(curr_shaders);
+            sph_bill->draw(shaders_active);
         }
     }
     // Draw all renderable
@@ -91,25 +80,25 @@ void Scene::update()
             {
                 std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(it->second);
                 sph_bill->m_Target = m_Camera->m_pos;
-                sph_bill->draw(curr_shaders);
+                sph_bill->draw(shaders_active);
                 it++;
             }
             else if (typeid(*object) == typeid(CylindricalBillboard))
             {
                 std::shared_ptr<CylindricalBillboard> cyl_bill = std::static_pointer_cast<CylindricalBillboard>(it->second);
                 cyl_bill->m_Target = m_Camera->m_pos;
-                cyl_bill->draw(curr_shaders);
+                cyl_bill->draw(shaders_active);
                 it++;
             }
             else 
             {
-                it->second->draw(curr_shaders);
+                it->second->draw(shaders_active);
                 it++;
             }
         }
     }
-    if (!m_CurrentScreenShaders.empty() && m_IsPostProcessing)
-        this->m_PostProcessing->activate(m_CurrentScreenShaders);
+    if (!m_PostProcessing->m_ActiveShaders.empty() && m_IsPostProcessing)
+        this->m_PostProcessing->activate();
 }
 
 void Scene::doPhysicsProcessing()
@@ -138,60 +127,9 @@ void Scene::enablePhysics()
     this->m_IsPhysics = !this->m_IsPhysics;
 }
 
-void Scene::setShader(const std::string& name, ShaderType type)
+Shaders_pack Scene::getActiveShaders() const
 {
-    if (m_ShaderMap.find(name) != m_ShaderMap.end()) {
-        switch (type)
-        {
-        case (ShaderType::MAIN):
-            this->m_CurrentShaders[to_underlying(ShaderType::MAIN)] = this->m_ShaderMap.at(name);
-            this->m_CurrentShaders[to_underlying(ShaderType::MAIN)]->activateShader();
-            break;
-
-        case (ShaderType::STENCIL):
-            this->m_CurrentShaders[to_underlying(ShaderType::STENCIL)] = this->m_ShaderMap.at(name);
-            this->m_CurrentShaders[to_underlying(ShaderType::STENCIL)]->activateShader();
-            break;
-        }
-    }
-
-    else
-        std::cout << "ERROR::SHADER WITH NAME " << name << "NOT FOUND " << std::endl;
-}
-
-void Scene::setScreenShader(const std::string& name, bool enabled)
-{
-    std::vector<std::string>& currentScreenShaderNames = getScreenShaders();
-
-    if (enabled)
-        this->m_CurrentScreenShaders.push_back(this->m_PostProcessing->m_ShaderMap.at(name));
-    else if (std::find(currentScreenShaderNames.begin(), currentScreenShaderNames.end(), name) != currentScreenShaderNames.end())
-        this->m_CurrentScreenShaders.erase(std::find(m_CurrentScreenShaders.begin(), m_CurrentScreenShaders.end(), this->m_PostProcessing->m_ShaderMap.at(name)));
-} 
-
-const std::string Scene::getShader()
-{
-    for (const auto& entry : this->m_ShaderMap)
-        if (entry.second == this->m_CurrentShaders[to_underlying(ShaderType::MAIN)])
-            return entry.first;
-
-    return "";
-}
-
-std::vector<std::string> Scene::getScreenShaders()
-{
-    std::vector<std::string> result;
-
-    for (const auto& entry : this->m_PostProcessing->m_ShaderMap)
-        if (std::find(this->m_CurrentScreenShaders.begin(), this->m_CurrentScreenShaders.end(), entry.second) != this->m_CurrentScreenShaders.end())
-            result.push_back(entry.first);
-
-    return result;
-}
-
-std::map<const std::string, std::shared_ptr<Shader>> Scene::getShaderMap() const
-{
-    return this->m_ShaderMap;
+    return this->shaders_active;
 }
 
 std::map<const std::string, std::shared_ptr<Texture>> Scene::getTextureMap() const
@@ -204,14 +142,12 @@ std::map<const std::string, std::shared_ptr<Renderable>> Scene::getRenderableMap
     return this->m_RenderableMap;
 }
 
-std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path)
+std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type)
 {
-    auto shader = ResourceManager::makeShaderProgram(name, vertex_shader_rel_path, fragment_shader_rel_path);
+    auto shader = ResourceManager::makeShaderProgram(vertex_shader_rel_path, fragment_shader_rel_path);
     
-    if (m_ShaderMap.empty()) // automatically set this shader if it's the first one in the map
-        this->m_CurrentShaders[to_underlying(ShaderType::MAIN)] = shader;
+    shaders_active.push(shader, type);
 
-    m_ShaderMap.emplace(name, shader);
     return shader;
 }
 
@@ -320,16 +256,6 @@ void Scene::printObjectsInMaps(ObjectType objectType)
 {
     switch (objectType)
     {
-    case ObjectType::SHADER:
-    {
-        std::map<std::string, std::shared_ptr<Shader>>::iterator it = m_ShaderMap.begin();
-        while (it != m_ShaderMap.end())
-        {
-            std::cout << "shader \"" << it->first << "\" with id " << it->second->ID << std::endl;
-            it++;
-        }
-        break;
-    }
     case ObjectType::TEXTURE:
     {
         std::map<std::string, std::shared_ptr<Texture>>::iterator it = m_TextureMap.begin();

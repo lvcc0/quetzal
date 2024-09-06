@@ -28,7 +28,7 @@ public:
     static std::map<const std::string, std::shared_ptr<Shader>> makePostProcessingShaders(const std::string& path_to_folder);
 
     // Make shared ptrs
-    static std::shared_ptr<Shader>               makeShaderProgram(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
+    static std::shared_ptr<Shader>               makeShaderProgram(const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
     static std::shared_ptr<Texture>              makeTexture(std::string type, const std::string& texture_rel_path);
     static std::shared_ptr<Model>                makeModel(const std::string& model_rel_path);
     static std::shared_ptr<CylindricalBillboard> makeCylBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts);
@@ -44,6 +44,9 @@ private:
 
     // Map of loaded resources (First - name of file, second - ptrs of objects)
     inline static std::map<std::string, std::shared_ptr<void>> m_LoadedObjects;
+
+    // Map of loaded shaders (First - sum of path, second - ptrs of shaders)
+    inline static std::map<std::string, std::shared_ptr<Shader>> m_LoadedShaders;
 
     static std::string getFileString(const std::string& file_rel_path); // gets file contents as a string
     static std::vector<std::shared_ptr<Texture>> pullTexturesFromMtl(const std::string& fullfilepath);

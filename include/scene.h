@@ -59,18 +59,14 @@ public:
     // Enable physics
     void enablePhysics();
     
-    void setShader(const std::string& name, ShaderType type);                     // set shader to draw stuff with (only one for now (ig it'll always be only one)) //IMHO: There could be more than one shader
-    void setScreenShader(const std::string& name, bool enabled); // set postprocessing shader on or off
-
-    const std::string        getShader();        // get active shader name
-    std::vector<std::string> getScreenShaders(); // get vector of active screen shader names
+    //void setShader(const std::string& name, ShaderType type);                     // set shader to draw stuff with (only one for now (ig it'll always be only one)) //IMHO: There could be more than one shader
     
-    std::map<const std::string, std::shared_ptr<Shader>>               getShaderMap() const;
+    Shaders_pack                                                       getActiveShaders() const;
     std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap() const;
     std::map<const std::string, std::shared_ptr<Renderable>>           getRenderableMap() const;
 
     // Some stuff to add to the scene
-    std::shared_ptr<Shader>               addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path);
+    std::shared_ptr<Shader>               addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type);
     std::shared_ptr<Texture>              addTexture(std::string name, std::string type, const std::string& texture_rel_path);
     std::shared_ptr<Model>                addModel(std::string name, const std::string& model_rel_path);
     std::shared_ptr<RigidBody>            addRigidBody(std::string name, const std::string& model_rel_path, Collision& collision);
@@ -101,11 +97,9 @@ private:
     std::vector<std::shared_ptr<SpotLight>>  m_SpotLights;
 
     // TODO: redo it to better array
-    std::shared_ptr<Shader> m_CurrentShaders[to_underlying(ShaderType::END)]; // static massive of shaders
-    std::vector<std::shared_ptr<Shader>> m_CurrentScreenShaders; // vector of postprocessing shaders
+    Shaders_pack shaders_active;
 
     // Maps of loaded objects
-    std::map<const std::string, std::shared_ptr<Shader>>               m_ShaderMap;
     std::map<const std::string, std::shared_ptr<Texture>>              m_TextureMap;
     std::map<const std::string, std::shared_ptr<Renderable>>           m_RenderableMap;
     std::map<const std::string, std::shared_ptr<Collision>>            m_CollisionMap;

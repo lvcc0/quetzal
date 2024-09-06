@@ -55,7 +55,7 @@ public:
     CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
 
     // Draw billboard and change it's model matrix
-    void draw(std::vector<std::shared_ptr<Shader>>& shader_vector) override;
+    void draw(const Shaders_pack& shaders) override;
 
     virtual glm::mat4 getModelMatrix() override;
 };
@@ -72,7 +72,7 @@ public:
     SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
 
     // Draw billboard and change it's model matrix
-    void draw(std::vector<std::shared_ptr<Shader>>& shader_vector) override;
+    void draw(const Shaders_pack& shaders) override;
 
     virtual glm::mat4 getModelMatrix() override;
 };

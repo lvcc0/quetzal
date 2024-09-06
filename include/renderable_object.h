@@ -30,7 +30,7 @@ public:
 
 	bool is_selected = false;
 
-	virtual void draw(std::vector<std::shared_ptr<Shader>>& shader_vector) = 0;
+	virtual void draw(const Shaders_pack& shaders) = 0;
 
 	virtual GLuint getVAO() final;
 	virtual glm::mat4 getModelMatrix();  // Sometimes model matrix could be identity matrix, so for getting true matrix we using this func

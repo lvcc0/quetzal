@@ -15,10 +15,10 @@ Model::Model(const Model& obj)
     setupRender();
 }
 
-void Model::draw(std::vector<std::shared_ptr<Shader>>& shader_vector) // First - main shader, second - stencil shader
+void Model::draw(const Shaders_pack& shaders) 
 {
-    std::shared_ptr<Shader> main_shader = shader_vector[to_underlying(ShaderType::MAIN)];
-    std::shared_ptr<Shader> stencil_shader = shader_vector[to_underlying(ShaderType::STENCIL)];
+    std::shared_ptr<Shader> main_shader = shaders.MAIN_SHADER;
+    std::shared_ptr<Shader> stencil_shader = shaders.STENCIL_SHADER;
     
     // Inheritor methods can be called
     this->translate(m_Position);

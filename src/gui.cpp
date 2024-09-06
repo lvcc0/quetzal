@@ -28,7 +28,7 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     {
         ImGui::Separator();
 
-        std::vector<std::string> names = current_scene.second->getScreenShaders(); // current screen shader names
+        std::vector<std::string> names = current_scene.second->m_PostProcessing->getScreenShaders(); // current screen shader names
 
         for (const auto& entry : current_scene.second->m_PostProcessing->m_ShaderMap)
         {
@@ -36,7 +36,7 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
 
             if (ImGui::Selectable(entry.first.c_str(), (it != names.end())))
             {
-                current_scene.second->setScreenShader(entry.first, (it == names.end()));
+                current_scene.second->m_PostProcessing->setScreenShader(entry.first, (it == names.end()));
                 glEnable(GL_DEPTH_TEST); // postprocessing disables depth test after as it's final step, so we need to turn it back on
             }
             ImGui::SameLine(ImGui::GetWindowSize().x - 64); ImGui::Text((it != names.end()) ? "enabled" : "disabled");

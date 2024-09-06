@@ -29,23 +29,25 @@ PostProcessing::~PostProcessing()
     }
 }
 
-void PostProcessing::activate(const std::vector<std::shared_ptr<Shader>>& screenShaders) const
+void PostProcessing::activate() const
 {
     // So called "ping-pong shading" ahead!
 
     auto i = 0;
-    for (i; i < screenShaders.size(); i++)
+    for (auto item: m_ActiveShaders)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, (i % 2) ? m_FirstFBO : m_SecondFBO); // if i is odd, then we bind first fbo else we bind the second one
         glDisable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        screenShaders[i]->activateShader();
-        screenShaders[i]->setInt("screenTexture", 0);
+        item->activateShader();
+        item->setInt("screenTexture", 0);
 
         glBindVertexArray(VAO);
         glBindTexture(GL_TEXTURE_2D, (i % 2) ? m_SecondColorAttachment : m_FirstColorAttachment); // if i is odd, then we bind second color attachment else we bind the first one
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        i++;
     }
     
     // Don't forget to attach the default fbo to actually draw stuff on the screen
@@ -104,6 +106,27 @@ void PostProcessing::recreate(GLuint width, GLuint height) const
 
     // Bind default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void PostProcessing::setScreenShader(const std::string& name, bool enabled)
+{
+    std::vector<std::string>& currentScreenShaderNames = getScreenShaders();
+
+    if (enabled)
+        this->m_ActiveShaders.push_back(this->m_ShaderMap.at(name));
+    else if (std::find(currentScreenShaderNames.begin(), currentScreenShaderNames.end(), name) != currentScreenShaderNames.end())
+        this->m_ActiveShaders.erase(std::find(m_ActiveShaders.begin(), m_ActiveShaders.end(), this->m_ShaderMap.at(name)));
+} 
+
+std::vector<std::string> PostProcessing::getScreenShaders()
+{
+    std::vector<std::string> result;
+
+    for (const auto& entry : this->m_ShaderMap)
+        if (std::find(this->m_ActiveShaders.begin(), this->m_ActiveShaders.end(), entry.second) != this->m_ActiveShaders.end())
+            result.push_back(entry.first);
+
+    return result;
 }
 
 void PostProcessing::setupBuffers(GLuint& VAO, GLuint& VBO)

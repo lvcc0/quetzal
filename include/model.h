@@ -25,7 +25,7 @@ public:
     Model(const Model& obj);
 
     // Draw model
-    virtual void draw(std::vector<std::shared_ptr<Shader>>& shader_vector) override;
+    virtual void draw(const Shaders_pack& shaders) override;
 
     // Abstract variables for using in world space
     glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);        // position in the world space
