@@ -1,6 +1,6 @@
 #include "texture.h"
 
-Texture::Texture(std::string type, unsigned char* image, int width, int height, int numComponents)
+Texture::Texture(unsigned char* image, int width, int height, int numComponents, std::string type)
     : m_type(type)
 {
     GLenum format{};

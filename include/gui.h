@@ -30,6 +30,7 @@ class GUI {
 
 public:
     static GUI& Instance(GLFWwindow* window); // INIT CRUTCH
+
     // main funcs //
     void mainGUILoop();
     void showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene);
@@ -39,11 +40,39 @@ public:
     std::pair<std::string, std::shared_ptr<Renderable>> m_CurrentRenderable = std::make_pair<std::string, std::shared_ptr<Renderable>>("", nullptr);
 
 private:
+    template<typename T>
+    void addObject(std::string name, std::shared_ptr<Scene> scene)
+    {
+        ASSERT(false);
+    }
+    template<>
+    void addObject<Model>(std::string name, std::shared_ptr<Scene> scene)
+    {
+        scene->addModel(name);
+    }
 
     template <typename T>
     void showCurrentObjectGUI() 
     {
-        static_assert(false);
+        ASSERT(false);
+    }
+    template<>
+    void showCurrentObjectGUI<Model>()
+    {
+        std::shared_ptr<Model> m_CurrentModelBody = std::static_pointer_cast<Model>(m_CurrentRenderable.second);
+
+        ImGui::Begin((m_CurrentRenderable.first + " config").c_str());
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Position", (float*)&m_CurrentModelBody->m_Position, 0.5f);
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Scale", (float*)&m_CurrentModelBody->m_Scale, 0.2f);
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Rotation", (float*)&m_CurrentModelBody->m_RotationDegrees, 1.0f);
+
+        ImGui::End();
     }
     template<>
     void showCurrentObjectGUI<RigidBody>() 

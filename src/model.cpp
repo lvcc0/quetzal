@@ -2,10 +2,12 @@
 
 Model::Model(std::vector<Vertex>& vertices,
              std::vector<unsigned int>& indices,
-             std::vector<std::shared_ptr<Texture>>& textures)
+             std::vector<std::shared_ptr<Texture>>& textures,
+             bool is_preload)
     :Renderable(vertices, indices), m_Textures(textures)
 {
-    setupRender(); // setup VAO, VBO, EBO
+    if (!is_preload)
+        setupRender(); // setup VAO, VBO, EBO
 }
 
 Model::Model(const Model& obj)

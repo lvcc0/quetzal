@@ -19,8 +19,9 @@ public:
 
     // Constructor
     Model(std::vector<Vertex>& vertices,
-          std::vector<unsigned int>& indices,
-          std::vector<std::shared_ptr<Texture>>& textures);
+        std::vector<unsigned int>& indices,
+        std::vector<std::shared_ptr<Texture>>& textures,
+        bool is_preload = false);
 
     Model(const Model& obj);
 

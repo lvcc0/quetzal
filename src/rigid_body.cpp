@@ -1,15 +1,9 @@
 #include "rigid_body.h"
 
-RigidBody::RigidBody(std::shared_ptr<Model>& model, Collision& collision) : Model (*model), Collision (collision)
+RigidBody::RigidBody(const Model& model, Collision& collision) : Model (model), Collision (collision)
 {
-
 }
 
-RigidBody::RigidBody(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::vector<std::shared_ptr<Texture>>& textures, Collision& collision):
-    Model(vertices, indices, textures), Collision(collision)
-{
-
-}
 
 void RigidBody::translate(glm::vec3 vector)
 {

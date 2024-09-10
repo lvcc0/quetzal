@@ -67,11 +67,11 @@ public:
 
     // Some stuff to add to the scene
     std::shared_ptr<Shader>               addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type);
-    std::shared_ptr<Texture>              addTexture(std::string name, std::string type, const std::string& texture_rel_path);
-    std::shared_ptr<Model>                addModel(std::string name, const std::string& model_rel_path);
-    std::shared_ptr<RigidBody>            addRigidBody(std::string name, const std::string& model_rel_path, Collision& collision);
-    std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts);
-    std::shared_ptr<SphericalBillboard>   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_path, std::vector<Vertex> verts);
+    std::shared_ptr<Texture>              addTexture(std::string name, std::string type);
+    std::shared_ptr<Model>                addModel(std::string name);
+    std::shared_ptr<RigidBody>            addRigidBody(std::string name, Collision& collision);
+    std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
+    std::shared_ptr<SphericalBillboard>   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
 
     // Some stuff to copy in the scene
     std::shared_ptr<Model>                copyModel(std::string name, const std::shared_ptr<Model> model);

@@ -11,11 +11,7 @@ public:
     GLfloat m_Mass = 1.0f;
 
     // Constructor
-    RigidBody(std::shared_ptr<Model>& model, Collision& collision);
-    RigidBody(std::vector<Vertex>& vertices,
-        std::vector<unsigned int>& indices,
-        std::vector<std::shared_ptr<Texture>>& textures, 
-        Collision& collision);
+    RigidBody(const Model& model, Collision& collision);
 
     // Moving in world space
     virtual void translate(glm::vec3 vector) override;

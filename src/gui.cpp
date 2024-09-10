@@ -44,6 +44,18 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
 
         ImGui::Separator();
     }
+
+    ImGui::SeparatorText("Create models");
+
+    for (const auto& entry : ResourceManager::takeModels())
+    {
+        ImGui::Separator();
+        if (ImGui::Selectable(entry.first.c_str()))
+        {
+            current_scene.second->addModel(entry.first.c_str());
+        }
+    }
+
     ImGui::SeparatorText("Objects");
 
     // Renderable UI
@@ -51,9 +63,7 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     {
         ImGui::SeparatorText("Renderables");
 
-        auto items = current_scene.second->getRenderableMap();
-
-        for (const auto& entry : items)
+        for (const auto& entry : current_scene.second->getRenderableMap())
         {
             ImGui::Separator();
             if (ImGui::Selectable(entry.first.c_str()))
@@ -119,9 +129,7 @@ void GUI::mainGUILoop()
         else if (typeid(*current_renderable) == typeid(SphericalBillboard))
             showCurrentObjectGUI<SphericalBillboard>();
         else if (typeid(*current_renderable) == typeid(Model))
-        {
-            // Nothing
-        }
+            showCurrentObjectGUI<Model>();
     }
     
 }

@@ -18,19 +18,18 @@ int main()
     Engine& engine = Engine::Instance(WIN_WIDTH, WIN_HEIGHT);
     GUI& gui = GUI::Instance(engine.window);
 
+    ResourceManager::preLoadResources();
+
     auto first_scene = engine.createScene("first_scene");
 
     first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag", ShaderType::MAIN);
     first_scene->addShader("stencil_shader", "shaders/stencil.vert", "shaders/stencil.frag", ShaderType::STENCIL);
 
-    first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    first_scene->addRigidBody("catcube3", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    first_scene->addRigidBody("catcube4", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    first_scene->addRigidBody("catsphere1", "objects/catsphere/catsphere.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    first_scene->addModel("catsphere");
+    first_scene->addRigidBody("catcube", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
 
-    first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png", billboard_verts);
-    first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png", billboard_verts);
+    first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "pepe", billboard_verts);
+    first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "container", billboard_verts);
 
     first_scene->addDirLight(DirLight(
         true,

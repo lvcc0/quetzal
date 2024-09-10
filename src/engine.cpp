@@ -155,8 +155,7 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_0 && action == GLFW_PRESS)
         this->shouldDrawGui = !this->shouldDrawGui;
-    if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
-        ResourceManager::displayLoadedObjects();
+
 }
 
 void Engine::process(GUI& gui)
