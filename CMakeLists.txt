@@ -22,6 +22,7 @@ add_subdirectory(deps/stb_truetype)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/imgui-docking)
 
+
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_executable("${CMAKE_PROJECT_NAME}")

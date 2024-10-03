@@ -1,6 +1,5 @@
 #pragma once
 
-#include "debugger.h"
 #include "scene.h"
 #include "gui.h"
 
