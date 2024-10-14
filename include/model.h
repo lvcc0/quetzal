@@ -5,51 +5,42 @@
 #include <sstream>
 #include <fstream>
 #include <map>
-#include <vector>
 #include <algorithm>
 
-#include <glad/glad.h>
-#include <stb_image/stb_image.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
-
-#include "shader.h"
 #include "texture.h"
-#include "vertex.h"
+#include "renderable_object.h"
 
-class Model
+class Model : public Renderable
 {
 public:
-    glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
+    float m_StencilScaling = 1.4f;
 
-    std::vector<Vertex> m_Vertices;
-    std::vector<unsigned int> m_Indices;
     std::vector<std::shared_ptr<Texture>> m_Textures;
 
     // Constructor
     Model(std::vector<Vertex>& vertices,
-          std::vector<unsigned int>& indices,
-          std::vector<std::shared_ptr<Texture>>& textures);
-    
-    // Copy constructor
+        std::vector<unsigned int>& indices,
+        std::vector<std::shared_ptr<Texture>>& textures,
+        bool is_preload = false);
+
     Model(const Model& obj);
 
-    // Destructor
-    ~Model();
-
     // Draw model
-    void draw(std::shared_ptr<Shader>& shader);
+    virtual void draw(const Shaders_pack& shaders) override;
+
+    // Abstract variables for using in world space
+    glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);        // position in the world space
+    glm::vec3 m_Scale = glm::vec3(1.0f, 1.0f, 1.0f);           // scaling in the world space
+    glm::vec3 m_RotationDegrees = glm::vec3(0.0f, 0.0f, 0.0f); // rotation in all 3 axes respectively in the world space
 
     // Moving in world space
-    void translate(glm::vec3 vector);
-    void scale(glm::vec3 vector);
-    void rotate(float degrees, glm::vec3 vector);
+    virtual void translate(glm::vec3 vector);
+    virtual void scale(glm::vec3 vector);
+    virtual void rotate(float degrees, glm::vec3 vector);
 
-private:
-    GLuint VAO, VBO, EBO;
+    virtual glm::mat4 getModelMatrix() override;
+protected:
 
     // Setup VAO, VBO, EBO
-    void setupModel();
+    void setupRender() override;
 };

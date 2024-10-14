@@ -9,29 +9,29 @@ Shader::Shader(std::string& vertexCode, std::string& fragmentCode)
     // SHADERS
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vShaderSrc, NULL);
-    glCompileShader(vertexShader);
+    GLCall(glShaderSource(vertexShader, 1, &vShaderSrc, NULL));
+    GLCall(glCompileShader(vertexShader));
 
     compileErrors(vertexShader, "");
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fShaderSrc, NULL);
-    glCompileShader(fragmentShader);
+    GLCall(glShaderSource(fragmentShader, 1, &fShaderSrc, NULL));
+    GLCall(glCompileShader(fragmentShader));
 
     compileErrors(fragmentShader, "");
 
     // SHADER PROGRAM
 
     ID = glCreateProgram();
-    glAttachShader(ID, vertexShader);
-    glAttachShader(ID, fragmentShader);
+    GLCall(glAttachShader(ID, vertexShader));
+    GLCall(glAttachShader(ID, fragmentShader));
 
     glLinkProgram(ID);
 
     compileErrors(ID, "PROGRAM");
 
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);    
+    GLCall(glDeleteShader(vertexShader));
+    GLCall(glDeleteShader(fragmentShader));
 }
 
 Shader::~Shader()
@@ -41,12 +41,15 @@ Shader::~Shader()
 
 void Shader::activateShader() const
 {
-    glUseProgram(ID);
+    #ifdef DEBUG
+    std::cout << "DEBUG::SHADER::ACTIVATE " << ID << std::endl;
+    #endif // DEBUG
+    GLCall(glUseProgram(ID));
 }
 
 void Shader::deleteShader() const
 {
-    glDeleteProgram(ID);
+    GLCall(glDeleteProgram(ID));
 }
 
 void Shader::compileErrors(unsigned int shader, const char* type)
@@ -74,47 +77,77 @@ void Shader::compileErrors(unsigned int shader, const char* type)
     }
 }
 
+bool Shader::is_active() const
+{
+    GLint shader_id;
+    glGetIntegerv(GL_ACTIVE_PROGRAM, &shader_id);
+    if (shader_id == this->ID)
+        return true;
+
+    return false;
+}
+
 void Shader::setBool(const std::string& name, bool value) const
 {
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+    ACTIVATE_SHADER(GLCall(glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value)));
 }
 
 void Shader::setInt(const std::string& name, int value) const
 {
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+    ACTIVATE_SHADER(GLCall(glUniform1i(glGetUniformLocation(ID, name.c_str()), value)));
 }
 
 void Shader::setFloat(const std::string& name, float value) const
 {
-    glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+    ACTIVATE_SHADER(GLCall(glUniform1f(glGetUniformLocation(ID, name.c_str()), value)));
 }
 
 void Shader::setVec2(const std::string& name, const glm::vec2& value) const
 {
-    glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    ACTIVATE_SHADER(GLCall(glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0])));
 }
 
 void Shader::setVec3(const std::string& name, const glm::vec3& value) const
 {
-    glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    ACTIVATE_SHADER(GLCall(glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0])));
 }
 
 void Shader::setVec4(const std::string& name, const glm::vec4& value) const
 {
-    glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    ACTIVATE_SHADER(GLCall(glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0])));
 }
 
 void Shader::setMat2(const std::string& name, const glm::mat2& value) const
 {
-    glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    ACTIVATE_SHADER(GLCall(glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0])));
 }
 
 void Shader::setMat3(const std::string& name, const glm::mat3& value) const
 {
-    glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    ACTIVATE_SHADER(GLCall(glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0])));
 }
 
 void Shader::setMat4(const std::string& name, const glm::mat4& value) const
 {
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
+    ACTIVATE_SHADER(GLCall(glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0])));
+}
+
+std::shared_ptr<Shader> Shaders_pack::push(std::shared_ptr<Shader> shader, ShaderType type)
+{
+    std::shared_ptr<Shader> p_shader{ nullptr };
+    
+    if (type == ShaderType::MAIN)
+    {
+        p_shader = MAIN_SHADER;
+        MAIN_SHADER = shader;
+    }
+    else if (type == ShaderType::STENCIL)
+    {
+        p_shader = STENCIL_SHADER;
+        STENCIL_SHADER = shader;
+    }
+    else
+        ASSERT(false);
+
+    return p_shader;
 }

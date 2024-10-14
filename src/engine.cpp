@@ -1,25 +1,31 @@
 #include "engine.h"
 
-Engine::Engine(unsigned int width, unsigned int height)
-    : winWidth(width), winHeight(height)
+Engine::Engine()
 {
+}
+
+Engine::~Engine()
+{
+    // GLFW stuff
+    glfwDestroyWindow(this->window);
+    glfwTerminate();
+}
+
+Engine& Engine::Instance(unsigned int width, unsigned int height)
+{
+    static Engine engine;
+    engine.winHeight = height;
+    engine.winWidth = width;
+
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    this->createWindow();
+    engine.createWindow();
 
     gladLoadGL();
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
 
     stbi_set_flip_vertically_on_load(true);
 
@@ -32,25 +38,15 @@ Engine::Engine(unsigned int width, unsigned int height)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Stencil testing
-    glEnable(GL_STENCIL);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
 
     // Face culling
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
-}
 
-Engine::~Engine()
-{
-    // ImGui stuff
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    // GLFW stuff
-    glfwDestroyWindow(this->window);
-    glfwTerminate();
+    return engine;
 }
 
 bool Engine::isRunning() const
@@ -87,7 +83,7 @@ void Engine::createWindow()
 }
 
 // Gets called every frame
-void Engine::processInput()
+void Engine::processInput(GUI& gui)
 {
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
         this->scenes.at(this->currentScene)->m_Camera->Inputs(this->window, deltaTime);
@@ -95,66 +91,51 @@ void Engine::processInput()
     if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(this->window, true);
 
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        pickObject(gui);
+
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
 
-void Engine::showGuiWindow()
+void Engine::pickObject(GUI& gui)
 {
-    ImGui::Begin((this->currentScene + " config").c_str());
+    GLdouble mouse_x, mouse_y;
+    glfwGetCursorPos(window, &mouse_x, &mouse_y);
 
-    if (ImGui::Checkbox("Preworking Enabled", &this->scenes.at(this->currentScene)->m_IsPreworking))
+    glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Camera->m_pos;
+    glm::vec3 direction = ExpMath::getGlobalCoordsFromScreen(mouse_x, mouse_y, this->scenes.at(currentScene)->m_Camera->m_width, this->scenes.at(currentScene)->m_Camera->m_height, this->scenes.at(currentScene)->m_ProjectionMatrix, this->scenes.at(currentScene)->m_Camera->getViewMatrix());
+    
+    Ray ray(cam_coords, direction);
+    
+    // At this section checking models of rigid bodies (two corners of model make square)
+    std::vector <std::pair<std::pair<std::string, std::shared_ptr<Renderable>>, GLfloat >> inter_render_body_vector; // pair (pair (string, RigidBody), float)
 
-    ImGui::Separator();
-
-    if (ImGui::Checkbox("Physics Enabled", &this->scenes.at(this->currentScene)->m_IsPhysics))
-
-    ImGui::Separator();
-
-    if (ImGui::Checkbox("Postprocessing Enabled", &this->scenes.at(this->currentScene)->m_IsPostProcessing))
-        glEnable(GL_DEPTH_TEST);
-
-    if (this->scenes.at(this->currentScene)->m_IsPostProcessing)
+    for (auto item : this->scenes.at(currentScene)->getRenderableMap()) 
     {
-        ImGui::Separator();
-
-        std::vector<std::string> names = this->scenes.at(this->currentScene)->getScreenShaders(); // current screen shader names
-
-        for (const auto& entry : this->scenes.at(this->currentScene)->m_PostProcessing->m_ShaderMap)
+        GLfloat intersection_distance;
+        if (ray.TestRayOBBIntersection(ExpMath::makeAABB(item.second->m_Vertices).first, ExpMath::makeAABB(item.second->m_Vertices).second, item.second->getModelMatrix(), intersection_distance))
         {
-            auto it = std::find(names.begin(), names.end(), entry.first);
-
-            if (ImGui::Selectable(entry.first.c_str(), (it != names.end())))
-            {
-                this->scenes.at(this->currentScene)->setScreenShader(entry.first, (it == names.end()));
-                glEnable(GL_DEPTH_TEST); // postprocessing disables depth test after as it's final step, so we need to turn it back on
-            }
-            ImGui::SameLine(ImGui::GetWindowSize().x - 64); ImGui::Text((it != names.end()) ? "enabled" : "disabled");
-        }
-
-        ImGui::Separator();
-    }
-    ImGui::SeparatorText("RigidBodies");
-    if (!this->scenes.at(this->currentScene)->m_RigidBodies.empty()) 
-    {
-        ImGui::Separator();
-
-        auto items = this->scenes.at(this->currentScene)->getRigidBodyMap();
-
-        for (const auto& entry : items) 
-        {
-            ImGui::DragFloat3(entry.first.c_str(), (float*)&entry.second->m_Position, 0.5f);
-            
+            inter_render_body_vector.push_back(std::pair(std::pair(item.first, item.second), intersection_distance));
         }
     }
+    
+    // Picking object with lesser intersection_distance
+    std::pair<std::string, std::shared_ptr<Renderable>> curr_renderable_ptr = ExpMath::getItemWithMinimumFloat<std::pair<std::string, std::shared_ptr<Renderable>>>(inter_render_body_vector).first;
 
-    ImGui::SeparatorText("Engine");
+    if (curr_renderable_ptr.second != nullptr)
+    {
+        // Deselecting current object before (if it has sense)
+        if (gui.m_CurrentRenderable.second != nullptr && gui.m_CurrentRenderable.second != curr_renderable_ptr.second)
+        {
+            gui.m_CurrentRenderable.second->is_selected = false;
+        }
+        // Setting the current variable  for IMGUI
+        gui.m_CurrentRenderable.first = curr_renderable_ptr.first;
+        gui.m_CurrentRenderable.second = curr_renderable_ptr.second;
 
-    // TODO: rewrite this stuff more compact
-    ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", this->scenes.at(this->currentScene)->m_Camera->m_pos.x, this->scenes.at(this->currentScene)->m_Camera->m_pos.y, this->scenes.at(this->currentScene)->m_Camera->m_pos.z);
-    ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", this->scenes.at(this->currentScene)->m_Camera->m_orientation.x, this->scenes.at(this->currentScene)->m_Camera->m_orientation.y, this->scenes.at(this->currentScene)->m_Camera->m_orientation.z);
-    ImGui::Text("%.3f ms (%.1f FPS)", this->deltaTime * 1000.0f, 1.0f / this->deltaTime);
-
-    ImGui::End();
+        // Selecting model
+        gui.m_CurrentRenderable.second->is_selected = true;
+    }
 }
 
 // Gets called upon window resize
@@ -174,35 +155,43 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_0 && action == GLFW_PRESS)
         this->shouldDrawGui = !this->shouldDrawGui;
+
 }
 
-void Engine::process()
+void Engine::process(GUI& gui)
 {
+    // GUI PART //
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
-        this->showGuiWindow();
+        gui.showCurrentSceneGUI(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)));
 
+    gui.mainGUILoop();
+
+    // --------- //
     float curFrame = (float)glfwGetTime();
     this->deltaTime = curFrame - lastFrame;
     this->lastFrame = curFrame;
 
-    this->processInput();
+    this->processInput(gui);
 
     glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // clearing stuff in the default framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //
-
+    glStencilMask(0x00); // turn off writing to the stencil buffer
+    
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
     {
         this->scenes.at(this->currentScene)->doProcessing();
         this->scenes.at(this->currentScene)->update();
     }
-
+    
+    // GUI PART // 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    // -------- //
 
     glfwSwapBuffers(this->window);
     glfwPollEvents();
@@ -213,10 +202,12 @@ std::shared_ptr<Scene> Engine::createScene(std::string name)
     std::shared_ptr<Scene> scene = std::make_shared<Scene>(Camera(this->winWidth, this->winHeight, glm::vec3(0.0f)));
 
     this->scenes.emplace(name, scene);
+
     this->currentScene = name; // don't forget to change the current scene
 
     return scene;
 }
+
 
 static void framebufferSizeCallbackWrapper(GLFWwindow* window, int width, int height)
 {

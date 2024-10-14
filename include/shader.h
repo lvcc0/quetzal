@@ -8,6 +8,23 @@
 #include <sstream>
 #include <iostream>
 #include <cerrno>
+#include <map>
+
+#include "renderer.h"
+
+#define ACTIVATE_SHADER(x);\
+    if(!(is_active())) activateShader();\
+    x
+
+enum class ShaderType { MAIN, STENCIL, END };
+
+// TODO: Maybe move this code to another file?
+// 
+// Auxillary function (its here mostly for using enums in vectors [])
+template <typename E>
+constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
+    return static_cast<typename std::underlying_type<E>::type>(e);
+}
 
 class Shader
 {
@@ -36,4 +53,13 @@ public:
 
 private:
     void compileErrors(unsigned int shader, const char* type);
+    bool is_active() const;
+};
+
+struct Shaders_pack
+{
+    std::shared_ptr<Shader> MAIN_SHADER;
+    std::shared_ptr<Shader> STENCIL_SHADER;
+
+    std::shared_ptr<Shader> push(std::shared_ptr<Shader> shader, ShaderType type);
 };

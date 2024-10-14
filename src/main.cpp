@@ -2,20 +2,34 @@
 
 int main()
 {
+    // Setting these verts as static part of billboard isnt working (idk why)
+    std::vector<Vertex> billboard_verts = {
+        Vertex(glm::vec3(0.5f,  0.5f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
+        Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
+        Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper left
+        Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
+        Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower left
+        Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // upper left
+    };
+
     const unsigned int WIN_WIDTH = 1280;
     const unsigned int WIN_HEIGHT = 720;
+    
+    Engine& engine = Engine::Instance(WIN_WIDTH, WIN_HEIGHT);
+    GUI& gui = GUI::Instance(engine.window);
 
-    Engine engine(WIN_WIDTH, WIN_HEIGHT);
+    ResourceManager::preLoadResources();
 
     auto first_scene = engine.createScene("first_scene");
 
-    first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag");
+    first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag", ShaderType::MAIN);
+    first_scene->addShader("stencil_shader", "shaders/stencil.vert", "shaders/stencil.frag", ShaderType::STENCIL);
 
-    auto catCube1 = first_scene->addRigidBody("catcube1", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
-    auto catCube2 = first_scene->addRigidBody("catcube2", "objects/catcube/catcube.obj", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
+    first_scene->addModel("catsphere");
+    first_scene->addRigidBody("catcube", Collision(CollisionType::BOX, glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(2.0f, 2.0f, 2.0f)));
 
-    auto pepeBoard = first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "textures/pepe.png");
-    auto containerBillboard = first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "textures/container.png");
+    first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "pepe", billboard_verts);
+    first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "container", billboard_verts);
 
     first_scene->addDirLight(DirLight(
         true,
@@ -38,7 +52,7 @@ int main()
         0.09f,
         0.032f,
         glm::vec3(1.0f, 0.0f, 0.0f)
-    ));
+    ), billboard_verts);
 
     first_scene->addSpotLight(SpotLight(
         true,
@@ -54,16 +68,11 @@ int main()
         7.5f,
         10.0f,
         glm::vec3(0.0f, 0.0f, 1.0f)
-    ));
+    ), billboard_verts);
 
-    // TODO: Set all components into imgui window
-    catCube1->m_MoveVector = glm::vec3(0.001, 0.0, 0.0);
-    catCube2->m_MoveVector = glm::vec3(-0.005, 0.0, 0.0);
-    // ----------
     // Main loop
     while (engine.isRunning())
     {
-        pepeBoard->translate(glm::vec3(cos(engine.getLastFrame()), 0.0f, sin(engine.getLastFrame())) * 10.0f);
-        engine.process();
+        engine.process(gui);
     }
 }

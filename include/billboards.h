@@ -19,67 +19,60 @@
 #include "shader.h"
 #include "texture.h"
 #include "vertex.h"
+#include "renderable_object.h"
 
 // TODO: technically they're almost the same, so we can do something like inheritance here
 
-class CylindricalBillboard
+// Abstract class (draw functuion which is pure virtual isnt declared here)
+class Billboard : public Renderable
 {
 public:
-    std::vector<Vertex>      m_Vertices;
-    std::shared_ptr<Texture> m_Texture;
+    // Constructors
+    Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
 
-    glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
+    std::shared_ptr<Texture> m_Texture;
 
     glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec2 m_Scale = glm::vec2(1.0f, 1.0f);
-    
-    // Constructor
-    CylindricalBillboard(glm::vec3 pos, glm::vec2 size, std::shared_ptr<Texture>& texture);
-
-    // Destructor
-    ~CylindricalBillboard();
-
-    // Draw billboard and change it's model matrix
-    void draw(std::shared_ptr<Shader>& shader, glm::vec3 object_pos);
+    glm::vec3 m_Target = glm::vec3(0.0f, 0.0f, 0.0f);
 
     // Moving in the world space
-    void translate(glm::vec3 vector);
-    void scale(glm::vec2 vector);
+    virtual void translate(glm::vec3 vector);
+    virtual void scale(glm::vec2 vector);
 
-private:
-    GLuint VAO, VBO;
+protected:
 
-    // Setup VAO, VBO
-    void setupBillboard();
+    virtual void setupRender() override;
 };
 
-class SphericalBillboard
+class CylindricalBillboard : public Billboard
 {
+    // These vars using in draw and getModelMatrix
+    glm::vec3 up = glm::vec3(0.0f);
+    float angle_in_rad = 0.0f;
+
 public:
-    std::vector<Vertex>      m_Vertices;
-    std::shared_ptr<Texture> m_Texture;
-
-    glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-
-    glm::vec3 m_Position;
-    glm::vec2 m_Scale;
-
-    // Constructor
-    SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture);
-
-    // Destructor
-    ~SphericalBillboard();
+    CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
 
     // Draw billboard and change it's model matrix
-    void draw(std::shared_ptr<Shader>& shader, glm::vec3 target_position);
+    void draw(const Shaders_pack& shaders) override;
 
-    // Moving in the world space
-    void translate(glm::vec3 vector);
-    void scale(glm::vec2 vector);
+    virtual glm::mat4 getModelMatrix() override;
+};
 
-private:
-    GLuint VAO, VBO;
+class SphericalBillboard : public Billboard
+{
+    // These vars using in draw and getModelMatrix
+    float vert_angle_in_rad = 0.0f;
+    float hor_angle_in_rad = 0.0f;
+    glm::vec3 up = glm::vec3(0.0f);
+    glm::vec3 right = glm::vec3(0.0f);
 
-    // Setup VAO, VBO
-    void setupBillboard();
+public:
+    SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
+
+    // Draw billboard and change it's model matrix
+    void draw(const Shaders_pack& shaders) override;
+
+    virtual glm::mat4 getModelMatrix() override;
 };

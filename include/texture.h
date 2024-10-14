@@ -6,12 +6,15 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "renderer.h"
+
 class Texture
 {
 public:
-    unsigned int ID;
+    GLuint ID;
     std::string m_type;
 
     // Constructor
-    Texture(std::string type, unsigned char* image, int width, int height, int numComponents);
+    Texture(unsigned char* image, int width, int height, int numComponents, std::string type = "");
+    
 };
