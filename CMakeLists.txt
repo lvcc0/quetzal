@@ -21,6 +21,7 @@ add_subdirectory(deps/stb_image)
 add_subdirectory(deps/stb_truetype)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/imgui-docking)
+add_subdirectory(deps/assimp-5.4.3)
 
 
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
@@ -53,4 +54,4 @@ if(MSVC)
 endif()
 
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glm glfw glad stb_image stb_truetype imgui)
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glm glfw glad stb_image stb_truetype imgui assimp)
