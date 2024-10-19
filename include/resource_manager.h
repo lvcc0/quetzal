@@ -35,12 +35,14 @@ public:
     // Return maps
     inline static std::map<const std::string, Model> takeModels() { return m_LoadedModels; }
 
-    // Make shared ptrs
+    // Make shared_ptrs
     static std::shared_ptr<Shader>               makeShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
     static std::shared_ptr<Texture>              makeTexture(const std::string& name);
+
+    // Make objects
     static Model                makeModel(const std::string& name);
-    static std::shared_ptr<CylindricalBillboard> makeCylBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
-    static std::shared_ptr<SphericalBillboard>   makeSphBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
+    static CylindricalBillboard makeCylBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
+    static SphericalBillboard   makeSphBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
     
     static void displayLoadedObjects();
     static void preLoadResources();

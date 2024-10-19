@@ -32,8 +32,8 @@ public:
 
 	virtual void draw(const Shaders_pack& shaders) = 0;
 
-	virtual GLuint getVAO() final;
-	virtual glm::mat4 getModelMatrix();  // Sometimes model matrix could be identity matrix, so for getting true matrix we using this func
+	virtual GLuint getVAO() const final;
+	virtual glm::mat4 getModelMatrix() const;  // Sometimes model matrix could be identity matrix, so for getting true matrix we using this func
 
 protected:
 	std::unique_ptr<VBO> vbo_ptr{ nullptr };
@@ -41,6 +41,6 @@ protected:
 	std::unique_ptr<VAO> vao_ptr{ nullptr };
 
 	glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-	
-	virtual void setupRender()  = 0;
+
+	virtual void setupRender() = 0;
 };

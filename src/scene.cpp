@@ -142,16 +142,14 @@ std::map<const std::string, std::shared_ptr<Renderable>> Scene::getRenderableMap
     return this->m_RenderableMap;
 }
 
-std::shared_ptr<Shader> Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type)
+void Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type)
 {
     auto shader = ResourceManager::makeShaderProgram(vertex_shader_rel_path, fragment_shader_rel_path);
     
     shaders_active.push(shader, type);
-
-    return shader;
 }
 
-std::shared_ptr<Texture> Scene::addTexture(std::string name, std::string type)
+void Scene::addTexture(std::string name, std::string type)
 {
     auto texture = ResourceManager::makeTexture(name);
     texture->m_type = type;
@@ -169,11 +167,9 @@ std::shared_ptr<Texture> Scene::addTexture(std::string name, std::string type)
     }
 
     m_TextureMap.emplace(name, texture);
-
-    return texture;
 }
 
-std::shared_ptr<Model> Scene::addModel(std::string name)
+void Scene::addModel(std::string name)
 {
     auto model = std::make_shared<Model>(ResourceManager::makeModel(name));
 
@@ -190,11 +186,9 @@ std::shared_ptr<Model> Scene::addModel(std::string name)
     }
 
     m_RenderableMap.emplace(name, model);
-
-    return model;
 }
 
-std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, Collision &collision)
+void Scene::addRigidBody(std::string name, Collision &collision)
 {
     auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name), collision);
     
@@ -211,48 +205,36 @@ std::shared_ptr<RigidBody> Scene::addRigidBody(std::string name, Collision &coll
     }
 
     m_RenderableMap.emplace(name, rigid_body);
-    
-    return rigid_body;
 }
 
-std::shared_ptr<CylindricalBillboard> Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
+void Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
 {
-    auto cyl_billboard = ResourceManager::makeCylBillboard(pos, size, texture_name, verts);
+    auto cyl_billboard = std::make_shared<CylindricalBillboard>(ResourceManager::makeCylBillboard(pos, size, texture_name, verts));
     m_RenderableMap.emplace(name, cyl_billboard);
-
-    return cyl_billboard;
 }
 
-std::shared_ptr<SphericalBillboard> Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
+void Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
 {
-    auto sph_billboard = ResourceManager::makeSphBillboard(pos, size, texture_name, verts);
+    auto sph_billboard = std::make_shared<SphericalBillboard>(ResourceManager::makeSphBillboard(pos, size, texture_name, verts));
     m_RenderableMap.emplace(name, sph_billboard);
-
-    return sph_billboard;
 }
 
-std::shared_ptr<Model> Scene::copyModel(std::string name, const std::shared_ptr<Model> model)
+void Scene::copyModel(std::string name, const std::shared_ptr<Model> model)
 {
     auto c_model = std::make_shared<Model>(*model);
     m_RenderableMap.emplace(name, c_model);
-
-    return c_model;
 }
 
-std::shared_ptr<CylindricalBillboard> Scene::copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard)
+void Scene::copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard)
 {
     auto c_cyl_billboard = std::make_shared<CylindricalBillboard>(*cyl_billboard);
     m_RenderableMap.emplace(name, c_cyl_billboard);
-
-    return c_cyl_billboard;
 }
 
-std::shared_ptr<SphericalBillboard> Scene::copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard)
+void Scene::copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard)
 {
     auto c_sph_billboard = std::make_shared<SphericalBillboard>(*sph_billboard);
     m_RenderableMap.emplace(name, c_sph_billboard);
-
-    return c_sph_billboard;
 }
 
 void Scene::deleteRenderable(std::string name, std::shared_ptr<Renderable>& renderable_object)
@@ -261,32 +243,26 @@ void Scene::deleteRenderable(std::string name, std::shared_ptr<Renderable>& rend
     renderable_object.reset();
 }
 
-std::shared_ptr<DirLight> Scene::addDirLight(DirLight& dir_light)
+void Scene::addDirLight(DirLight& dir_light)
 {
     std::shared_ptr<DirLight> light = std::make_shared<DirLight>(dir_light);
     this->m_DirLights.push_back(light);
-
-    return light;
 }
 
-std::shared_ptr<PointLight> Scene::addPointLight(PointLight& point_light, std::vector<Vertex> verts)
+void Scene::addPointLight(PointLight& point_light, std::vector<Vertex> verts)
 {
     std::shared_ptr<PointLight> light = std::make_shared<PointLight>(point_light);
     this->m_PointLights.push_back(light);
 
     this->addSphBillboard(point_light.m_name, point_light.m_pos, glm::vec2(1.0f), "lightbulb", verts);
-
-    return light;
 }
 
-std::shared_ptr<SpotLight> Scene::addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts)
+void Scene::addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts)
 {
     std::shared_ptr<SpotLight> light = std::make_shared<SpotLight>(spot_light);
     this->m_SpotLights.push_back(light);
 
     this->addSphBillboard(spot_light.m_name, spot_light.m_pos, glm::vec2(1.0f), "highlight", verts);
-
-    return light;
 }
 
 void Scene::printObjectsInMaps(ObjectType objectType)

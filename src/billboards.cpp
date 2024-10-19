@@ -5,7 +5,11 @@
 CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts)
     : Billboard(pos, scale, texture, verts)
 {
+}
 
+CylindricalBillboard::CylindricalBillboard(const CylindricalBillboard& obj):
+    Billboard(obj)
+{
 }
 
 void CylindricalBillboard::draw(const Shaders_pack& shaders)
@@ -25,8 +29,8 @@ void CylindricalBillboard::draw(const Shaders_pack& shaders)
     main_shader->activateShader();
 
     main_shader->setInt("material.texture_diffuse1", 0);
-    glBindTexture(GL_TEXTURE_2D, m_Texture->ID);
-    glActiveTexture(GL_TEXTURE0);
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture->ID));
+    GLCall(glActiveTexture(GL_TEXTURE0));
     
     // Convert local coordinates to world coordinates
     main_shader->setMat4("model", m_ModelMatrix);
@@ -35,11 +39,11 @@ void CylindricalBillboard::draw(const Shaders_pack& shaders)
     m_ModelMatrix = glm::mat4(1.0f);
 
     vao_ptr->bind();
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    GLCall(glDrawArrays(GL_TRIANGLES, 0, 6));
 
-    glBindVertexArray(0);
+    vao_ptr->unbind();
 }
-glm::mat4 CylindricalBillboard::getModelMatrix()
+glm::mat4 CylindricalBillboard::getModelMatrix() const
 {
     glm::mat4 return_matrix = glm::mat4(1.0f);
     return_matrix = glm::translate(return_matrix, m_Position);
@@ -56,6 +60,11 @@ SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shar
     : Billboard(pos, scale, texture, verts)
 {
 
+}
+
+SphericalBillboard::SphericalBillboard(const SphericalBillboard& obj):
+    Billboard(obj)
+{
 }
 
 void SphericalBillboard::draw(const Shaders_pack& shaders)
@@ -85,8 +94,8 @@ void SphericalBillboard::draw(const Shaders_pack& shaders)
 
     main_shader->setInt("material.texture_diffuse1", 0);
 
-    glBindTexture(GL_TEXTURE_2D, m_Texture->ID);
-    glActiveTexture(GL_TEXTURE0);
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture->ID));
+    GLCall(glActiveTexture(GL_TEXTURE0));
 
     // Convert local coordinates to world coordinates
     main_shader->setMat4("model", m_ModelMatrix);
@@ -95,11 +104,11 @@ void SphericalBillboard::draw(const Shaders_pack& shaders)
     m_ModelMatrix = glm::mat4(1.0f);
 
     vao_ptr->bind();
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    GLCall(glDrawArrays(GL_TRIANGLES, 0, 6));
 
-    glBindVertexArray(0);
+    vao_ptr->unbind();
 }
-glm::mat4 SphericalBillboard::getModelMatrix()
+glm::mat4 SphericalBillboard::getModelMatrix() const
 {
     glm::mat4 return_matrix = glm::mat4(1.0f);
     return_matrix = glm::translate(return_matrix, m_Position);
@@ -114,6 +123,11 @@ glm::mat4 SphericalBillboard::getModelMatrix()
 // --- Billboard --- //
 Billboard::Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts)
     : m_Position(pos), m_Scale(scale), m_Texture(texture), Renderable(verts)
+{
+}
+
+Billboard::Billboard(const Billboard& obj):
+    Renderable(obj), m_Texture(obj.m_Texture)
 {
     setupRender();
 }

@@ -117,7 +117,7 @@ void Model::rotate(float degrees, glm::vec3 vector)
     m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees), vector);
 }
 
-glm::mat4 Model::getModelMatrix()
+glm::mat4 Model::getModelMatrix() const
 {
     glm::mat4 return_matrix = glm::mat4(1.0f);
     return_matrix = glm::translate(return_matrix, m_Position);

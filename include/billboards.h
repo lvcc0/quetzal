@@ -29,6 +29,7 @@ class Billboard : public Renderable
 public:
     // Constructors
     Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
+    Billboard(const Billboard& obj);
 
     std::shared_ptr<Texture> m_Texture;
 
@@ -52,12 +53,14 @@ class CylindricalBillboard : public Billboard
     float angle_in_rad = 0.0f;
 
 public:
+    // Constructors
     CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
+    CylindricalBillboard(const CylindricalBillboard& obj);
 
     // Draw billboard and change it's model matrix
     void draw(const Shaders_pack& shaders) override;
 
-    virtual glm::mat4 getModelMatrix() override;
+    virtual glm::mat4 getModelMatrix() const override;
 };
 
 class SphericalBillboard : public Billboard
@@ -69,10 +72,12 @@ class SphericalBillboard : public Billboard
     glm::vec3 right = glm::vec3(0.0f);
 
 public:
+    // Constructors
     SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
+    SphericalBillboard(const SphericalBillboard& obj);
 
     // Draw billboard and change it's model matrix
     void draw(const Shaders_pack& shaders) override;
 
-    virtual glm::mat4 getModelMatrix() override;
+    virtual glm::mat4 getModelMatrix() const override;
 };

@@ -258,24 +258,20 @@ Model ResourceManager::makeModel(const std::string& name)
     ASSERT(false);
 }
 
-std::shared_ptr<CylindricalBillboard> ResourceManager::makeCylBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
+CylindricalBillboard ResourceManager::makeCylBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
 {
     auto texture = makeTexture(texture_name);
     texture->m_type = "texture_diffuse";
 
-    std::shared_ptr<CylindricalBillboard> cyl_billboard =  std::make_shared<CylindricalBillboard>(pos, size, texture, verts);
-
-    return cyl_billboard;
+    return CylindricalBillboard(pos, size, texture, verts);
 }
 
-std::shared_ptr<SphericalBillboard> ResourceManager::makeSphBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
+SphericalBillboard ResourceManager::makeSphBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
 {
     auto texture = makeTexture(texture_name);
     texture->m_type = "texture_diffuse";
 
-    std::shared_ptr<SphericalBillboard> sph_billboard = std::make_shared<SphericalBillboard>(pos, size, texture, verts);
-
-    return sph_billboard;
+    return SphericalBillboard(pos, size, texture, verts);
 }
 
 void ResourceManager::displayLoadedObjects()

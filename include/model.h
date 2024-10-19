@@ -38,7 +38,7 @@ public:
     virtual void scale(glm::vec3 vector);
     virtual void rotate(float degrees, glm::vec3 vector);
 
-    virtual glm::mat4 getModelMatrix() override;
+    virtual glm::mat4 getModelMatrix() const override;
 protected:
 
     // Setup VAO, VBO, EBO

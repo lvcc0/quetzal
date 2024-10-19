@@ -9,7 +9,6 @@ Renderable::Renderable(std::vector<Vertex>& vertices, std::vector<unsigned int>&
 Renderable::Renderable(const Renderable& obj)
 	: m_Vertices(obj.m_Vertices), m_Indices(obj.m_Indices)
 {
-
 }
 
 Renderable::~Renderable()
@@ -19,12 +18,12 @@ Renderable::~Renderable()
 	ibo_ptr = nullptr;
 }
 
-GLuint Renderable::getVAO()
+GLuint Renderable::getVAO() const
 {
 	return this->vao_ptr->getID();
 }
 
-glm::mat4 Renderable::getModelMatrix()
+glm::mat4 Renderable::getModelMatrix() const
 {
 	return m_ModelMatrix;
 }

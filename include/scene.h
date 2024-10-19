@@ -66,25 +66,25 @@ public:
     std::map<const std::string, std::shared_ptr<Renderable>>           getRenderableMap() const;
 
     // Some stuff to add to the scene
-    std::shared_ptr<Shader>               addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type);
-    std::shared_ptr<Texture>              addTexture(std::string name, std::string type);
-    std::shared_ptr<Model>                addModel(std::string name);
-    std::shared_ptr<RigidBody>            addRigidBody(std::string name, Collision& collision);
-    std::shared_ptr<CylindricalBillboard> addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
-    std::shared_ptr<SphericalBillboard>   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
+    void   addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type);
+    void   addTexture(std::string name, std::string type);
+    void   addModel(std::string name);
+    void   addRigidBody(std::string name, Collision& collision);
+    void   addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
+    void   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
 
     // Some stuff to copy in the scene
-    std::shared_ptr<Model>                copyModel(std::string name, const std::shared_ptr<Model> model);
-    std::shared_ptr<CylindricalBillboard> copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard);
-    std::shared_ptr<SphericalBillboard>   copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard);
+    void  copyModel(std::string name, const std::shared_ptr<Model> model);
+    void  copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard);
+    void  copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard);
 
     // Some stuff to delete in the scene
     void deleteRenderable(std::string name, std::shared_ptr<Renderable>& renderable_object);
 
     // Add lights to the scene
-    std::shared_ptr<DirLight>   addDirLight(DirLight& dir_light);
-    std::shared_ptr<PointLight> addPointLight(PointLight& point_light, std::vector<Vertex> verts);
-    std::shared_ptr<SpotLight>  addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts);
+    void addDirLight(DirLight& dir_light);
+    void addPointLight(PointLight& point_light, std::vector<Vertex> verts);
+    void addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts);
 
     // Print objects in maps
     void printObjectsInMaps(ObjectType objectType);
