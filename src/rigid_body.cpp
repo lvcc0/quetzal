@@ -1,7 +1,8 @@
 #include "rigid_body.h"
 
-RigidBody::RigidBody(const Model& model, Collision& collision) : Model (model), Collision (collision)
+RigidBody::RigidBody(const Model& model, Collision& collision, std::string name) : Model (model), Collision (collision)
 {
+    setName(name);
 }
 
 

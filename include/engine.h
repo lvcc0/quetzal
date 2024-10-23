@@ -37,23 +37,25 @@ public:
     float getLastFrame() const;
 
     void createWindow(); // create the glfw window
-    void processInput(GUI& gui); // gets called every frame in the process() function below
+    void processInput(); // gets called every frame in the process() function below
 
     // Picking an object
-    void pickObject(GUI& gui);
+    void pickObject();
 
     // Callbacks
     void framebufferSizeCallback(GLFWwindow* window, int width, int height);
     void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
     // Main loop function
-    void process(GUI& gui);
+    void process();
 
     // Create a scene, add it to the scenes map and set currentScene to it
     std::shared_ptr<Scene> createScene(std::string name);
 
 private:
-    bool shouldDrawGui = false;
+    std::unique_ptr<GUI> gui;
+    bool shouldDrawGui = true;
 
     unsigned int winWidth;
     unsigned int winHeight;
@@ -65,3 +67,4 @@ private:
 // Callback static wrappers (because glfw doesn't know objects)
 static void framebufferSizeCallbackWrapper(GLFWwindow* window, int width, int height);
 static void keyCallbackWrapper(GLFWwindow* window, int key, int scancode, int action, int mods);
+static void mouseButtonCallbackWraper(GLFWwindow* window, int key, int action, int mods);

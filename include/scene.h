@@ -14,6 +14,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <utility>
+#include <algorithm>
 
 #include "resource_manager.h"
 #include "post_processing.h"
@@ -61,9 +62,9 @@ public:
     
     //void setShader(const std::string& name, ShaderType type);                     // set shader to draw stuff with (only one for now (ig it'll always be only one)) //IMHO: There could be more than one shader
     
-    Shaders_pack                                                       getActiveShaders() const;
-    std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap() const;
-    std::map<const std::string, std::shared_ptr<Renderable>>           getRenderableMap() const;
+    inline Shaders_pack                                                       getActiveShaders() const { return shaders_active; };
+    inline std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap() const { return m_TextureMap; };
+    inline std::vector<std::shared_ptr<Renderable>>                           getRenderableVec() const { return m_RenderableVec; };
 
     // Some stuff to add to the scene
     void   addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type);
@@ -72,14 +73,6 @@ public:
     void   addRigidBody(std::string name, Collision& collision);
     void   addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
     void   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
-
-    // Some stuff to copy in the scene
-    void  copyModel(std::string name, const std::shared_ptr<Model> model);
-    void  copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard);
-    void  copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard);
-
-    // Some stuff to delete in the scene
-    void deleteRenderable(std::string name, std::shared_ptr<Renderable>& renderable_object);
 
     // Add lights to the scene
     void addDirLight(DirLight& dir_light);
@@ -101,6 +94,9 @@ private:
 
     // Maps of loaded objects
     std::map<const std::string, std::shared_ptr<Texture>>              m_TextureMap;
-    std::map<const std::string, std::shared_ptr<Renderable>>           m_RenderableMap;
     std::map<const std::string, std::shared_ptr<Collision>>            m_CollisionMap;
+
+    // Vectors
+    std::vector<std::shared_ptr<Renderable>> m_RenderableVec;
+
 };

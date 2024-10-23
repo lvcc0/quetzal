@@ -1,13 +1,13 @@
 #include "renderable_object.h"
 
-Renderable::Renderable(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices) 
-	: m_Vertices(vertices), m_Indices(indices)
+Renderable::Renderable(std::string name, std::vector<Vertex>& vertices, std::vector<unsigned int>& indices) 
+	: Node(name), m_Vertices(vertices), m_Indices(indices)
 {
 	
 }
 
 Renderable::Renderable(const Renderable& obj)
-	: m_Vertices(obj.m_Vertices), m_Indices(obj.m_Indices)
+	: Node(obj.getName()), m_Vertices(obj.m_Vertices), m_Indices(obj.m_Indices)
 {
 }
 

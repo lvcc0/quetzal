@@ -28,7 +28,7 @@ class Billboard : public Renderable
 {
 public:
     // Constructors
-    Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
+    Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload = false, std::string name = "");
     Billboard(const Billboard& obj);
 
     std::shared_ptr<Texture> m_Texture;
@@ -54,7 +54,7 @@ class CylindricalBillboard : public Billboard
 
 public:
     // Constructors
-    CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
+    CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload = false, std::string name = "");
     CylindricalBillboard(const CylindricalBillboard& obj);
 
     // Draw billboard and change it's model matrix
@@ -73,7 +73,7 @@ class SphericalBillboard : public Billboard
 
 public:
     // Constructors
-    SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts);
+    SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload = false, std::string name = "");
     SphericalBillboard(const SphericalBillboard& obj);
 
     // Draw billboard and change it's model matrix

@@ -46,6 +46,8 @@ Engine& Engine::Instance(unsigned int width, unsigned int height)
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
+    engine.gui = std::make_unique<GUI>(engine.window);
+
     return engine;
 }
 
@@ -80,24 +82,19 @@ void Engine::createWindow()
 
     glfwSetFramebufferSizeCallback(this->window, framebufferSizeCallbackWrapper);
     glfwSetKeyCallback(this->window, keyCallbackWrapper);
+    glfwSetMouseButtonCallback(window, mouseButtonCallbackWraper);
 }
 
 // Gets called every frame
-void Engine::processInput(GUI& gui)
+void Engine::processInput()
 {
+    glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey( window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
+
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
         this->scenes.at(this->currentScene)->m_Camera->Inputs(this->window, deltaTime);
-
-    if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(this->window, true);
-
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-        pickObject(gui);
-
-    glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 }
 
-void Engine::pickObject(GUI& gui)
+void Engine::pickObject()
 {
     GLdouble mouse_x, mouse_y;
     glfwGetCursorPos(window, &mouse_x, &mouse_y);
@@ -110,31 +107,23 @@ void Engine::pickObject(GUI& gui)
     // At this section checking models of rigid bodies (two corners of model make square)
     std::vector <std::pair<std::pair<std::string, std::shared_ptr<Renderable>>, GLfloat >> inter_render_body_vector; // pair (pair (string, RigidBody), float)
 
-    for (auto item : this->scenes.at(currentScene)->getRenderableMap()) 
+    for (auto item : this->scenes.at(currentScene)->getRenderableVec()) 
     {
         GLfloat intersection_distance;
-        if (ray.TestRayOBBIntersection(ExpMath::makeAABB(item.second->m_Vertices).first, ExpMath::makeAABB(item.second->m_Vertices).second, item.second->getModelMatrix(), intersection_distance))
+        if (ray.TestRayOBBIntersection(ExpMath::makeAABB(item->m_Vertices).first, ExpMath::makeAABB(item->m_Vertices).second, item->getModelMatrix(), intersection_distance))
         {
-            inter_render_body_vector.push_back(std::pair(std::pair(item.first, item.second), intersection_distance));
+            inter_render_body_vector.push_back(std::pair(std::pair(item->getName(), item), intersection_distance));
         }
     }
     
     // Picking object with lesser intersection_distance
-    std::pair<std::string, std::shared_ptr<Renderable>> curr_renderable_ptr = ExpMath::getItemWithMinimumFloat<std::pair<std::string, std::shared_ptr<Renderable>>>(inter_render_body_vector).first;
+    if (inter_render_body_vector.size() != 0) {
+        std::pair<std::string, std::shared_ptr<Renderable>> curr_renderable_ptr = ExpMath::getItemWithMinimumFloat<std::pair<std::string, std::shared_ptr<Renderable>>>(inter_render_body_vector).first;
 
-    if (curr_renderable_ptr.second != nullptr)
-    {
-        // Deselecting current object before (if it has sense)
-        if (gui.m_CurrentRenderable.second != nullptr && gui.m_CurrentRenderable.second != curr_renderable_ptr.second)
+        if (curr_renderable_ptr.second != nullptr)
         {
-            gui.m_CurrentRenderable.second->is_selected = false;
+            gui->clickWindow(curr_renderable_ptr.second);
         }
-        // Setting the current variable  for IMGUI
-        gui.m_CurrentRenderable.first = curr_renderable_ptr.first;
-        gui.m_CurrentRenderable.second = curr_renderable_ptr.second;
-
-        // Selecting model
-        gui.m_CurrentRenderable.second->is_selected = true;
     }
 }
 
@@ -156,9 +145,17 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
     if (key == GLFW_KEY_0 && action == GLFW_PRESS)
         this->shouldDrawGui = !this->shouldDrawGui;
 
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(this->window, true);
 }
 
-void Engine::process(GUI& gui)
+void Engine::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+        pickObject();
+}
+
+void Engine::process()
 {
     // GUI PART //
     ImGui_ImplOpenGL3_NewFrame();
@@ -166,16 +163,15 @@ void Engine::process(GUI& gui)
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
-        gui.showCurrentSceneGUI(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)));
+        gui->guiLoop(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)));
 
-    gui.mainGUILoop();
 
     // --------- //
     float curFrame = (float)glfwGetTime();
     this->deltaTime = curFrame - lastFrame;
     this->lastFrame = curFrame;
 
-    this->processInput(gui);
+    this->processInput();
 
     glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // clearing stuff in the default framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //
@@ -223,4 +219,12 @@ static void keyCallbackWrapper(GLFWwindow* window, int key, int scancode, int ac
 
     if (engine)
         engine->keyCallback(window, key, scancode, action, mods);
+}
+
+void mouseButtonCallbackWraper(GLFWwindow* window, int key, int action, int mods)
+{
+    Engine* engine = reinterpret_cast<Engine*>(glfwGetWindowUserPointer(window));
+
+    if (engine)
+        engine->mouseButtonCallback(window, key, action, mods);
 }

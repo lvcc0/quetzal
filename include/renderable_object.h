@@ -13,13 +13,14 @@
 #include "renderer.h"
 #include "buffers_objects.h"
 #include "vertex_array.h"
+#include "node.h"
 
 // Abstract class
-class Renderable {
+class Renderable: public Node {
 public:
 
 	// Constructors
-	Renderable(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices = std::vector<unsigned int>{});
+	Renderable(std::string name, std::vector<Vertex>& vertices, std::vector<unsigned int>& indices = std::vector<unsigned int>{});
 	Renderable(const Renderable& obj);
 
 	// Destructor

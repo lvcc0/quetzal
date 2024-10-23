@@ -2,8 +2,8 @@
 
 // --- Cylindrical Billboard --- //
 
-CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts)
-    : Billboard(pos, scale, texture, verts)
+CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload, std::string name)
+    : Billboard(pos, scale, texture, verts, is_preload)
 {
 }
 
@@ -56,8 +56,8 @@ glm::mat4 CylindricalBillboard::getModelMatrix() const
 
 // --- Spherical Billboard --- //
 
-SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts)
-    : Billboard(pos, scale, texture, verts)
+SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload, std::string name)
+    : Billboard(pos, scale, texture, verts, is_preload, name)
 {
 
 }
@@ -121,9 +121,11 @@ glm::mat4 SphericalBillboard::getModelMatrix() const
 // --- //
 
 // --- Billboard --- //
-Billboard::Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts)
-    : m_Position(pos), m_Scale(scale), m_Texture(texture), Renderable(verts)
+Billboard::Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload, std::string name)
+    : m_Position(pos), m_Scale(scale), m_Texture(texture), Renderable(name, verts)
 {
+    if (!is_preload)
+        setupRender();
 }
 
 Billboard::Billboard(const Billboard& obj):

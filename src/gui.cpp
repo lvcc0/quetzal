@@ -1,8 +1,14 @@
 #include "gui.h"
 
-GUI::GUI()
+GUI::GUI(GLFWwindow* window)
 {
-    
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 }
 
 GUI::~GUI()
@@ -11,6 +17,14 @@ GUI::~GUI()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+}
+
+void GUI::guiLoop(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene)
+{
+    showCurrentSceneGUI(delta_time, current_scene);
+    
+    for (auto item : m_WindowsVec)
+        item->windowLoop();
 }
 
 void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene)
@@ -50,7 +64,8 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     for (const auto& entry : ResourceManager::takeModels())
     {
         ImGui::Separator();
-        if (ImGui::Selectable(entry.first.c_str()))
+        std::string name = "make " + entry.first;
+        if (ImGui::Selectable(name.c_str()))
         {
             current_scene.second->addModel(entry.first.c_str());
         }
@@ -59,35 +74,16 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     ImGui::SeparatorText("Objects");
 
     // Renderable UI
-    if (!current_scene.second->getRenderableMap().empty())
+    if (!current_scene.second->getRenderableVec().empty())
     {
         ImGui::SeparatorText("Renderables");
 
-        for (const auto& entry : current_scene.second->getRenderableMap())
+        for (const auto& entry : current_scene.second->getRenderableVec())
         {
             ImGui::Separator();
-            if (ImGui::Selectable(entry.first.c_str()))
+            if (ImGui::Selectable(entry->getName().c_str()))
             {
-                if (m_CurrentRenderable.second == entry.second)
-                {
-                    // Deselecting renderable
-                    m_CurrentRenderable.second->is_selected = false;
-
-                    m_CurrentRenderable.first = "";
-                    m_CurrentRenderable.second = nullptr;
-                }
-                else
-                {
-                    // Deselecting renderable
-                    if (m_CurrentRenderable.second != nullptr)
-                        m_CurrentRenderable.second->is_selected = false;
-
-                    m_CurrentRenderable.first = entry.first;
-                    m_CurrentRenderable.second = entry.second;
-
-                    // Selecting renderable
-                    m_CurrentRenderable.second->is_selected = true;
-                }
+                clickWindow(entry);
             }
         }
     }
@@ -102,34 +98,36 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     ImGui::End();
 }
 
-GUI& GUI::Instance(GLFWwindow* window)
+void GUI::clickWindow(const std::shared_ptr<Renderable> obj_in)
 {
-    static GUI gui;
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init();
-
-    return gui;
+    auto window_it = std::find_if(m_WindowsVec.begin(), m_WindowsVec.end(), [&obj_in](std::shared_ptr<GUI_Window_object_properties>obj) {if (obj->getRenderable() == obj_in) return true; return false; });
+    if (window_it == m_WindowsVec.end())
+        m_WindowsVec.push_back(std::make_shared<GUI_Window_object_properties>(obj_in));
+    else
+        m_WindowsVec.erase(window_it);
 }
 
-void GUI::mainGUILoop()
+GUI_Window_object_properties::GUI_Window_object_properties(const std::shared_ptr<Renderable> obj):
+    m_Renderable(obj)
 {
-    if (m_CurrentRenderable.second != nullptr) 
-    {
-        auto current_renderable = m_CurrentRenderable.second;
-        if (typeid(*current_renderable) == typeid(RigidBody))
-            showCurrentObjectGUI<RigidBody>();
-        else if (typeid(*current_renderable) == typeid(CylindricalBillboard))
-            showCurrentObjectGUI<CylindricalBillboard>();
-        else if (typeid(*current_renderable) == typeid(SphericalBillboard))
-            showCurrentObjectGUI<SphericalBillboard>();
-        else if (typeid(*current_renderable) == typeid(Model))
-            showCurrentObjectGUI<Model>();
-    }
-    
+
+}
+
+GUI_Window_object_properties::~GUI_Window_object_properties()
+{
+    m_Renderable->is_selected = false;
+}
+
+void GUI_Window_object_properties::windowLoop()
+{
+    m_Renderable->is_selected = true;
+
+    if (typeid(*m_Renderable) == typeid(RigidBody))
+        showCurrentObjectGUI<RigidBody>(m_Renderable);
+    else if (typeid(*m_Renderable) == typeid(CylindricalBillboard))
+        showCurrentObjectGUI<CylindricalBillboard>(m_Renderable);
+    else if (typeid(*m_Renderable) == typeid(SphericalBillboard))
+        showCurrentObjectGUI<SphericalBillboard>(m_Renderable);
+    else if (typeid(*m_Renderable) == typeid(Model))
+        showCurrentObjectGUI<Model>(m_Renderable);
 }

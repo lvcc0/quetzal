@@ -21,7 +21,7 @@ public:
     Model(std::vector<Vertex>& vertices,
         std::vector<unsigned int>& indices,
         std::vector<std::shared_ptr<Texture>>& textures,
-        bool is_preload = false);
+        bool is_preload = false, std::string name = "");
 
     Model(const Model& obj);
 

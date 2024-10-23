@@ -3,8 +3,8 @@
 Model::Model(std::vector<Vertex>& vertices,
              std::vector<unsigned int>& indices,
              std::vector<std::shared_ptr<Texture>>& textures,
-             bool is_preload)
-    :Renderable(vertices, indices), m_Textures(textures)
+             bool is_preload, std::string name)
+    :Renderable(name, vertices, indices), m_Textures(textures)
 {
     if (!is_preload)
         setupRender(); // setup VAO, VBO, EBO

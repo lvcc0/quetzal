@@ -48,8 +48,8 @@ void Scene::update()
         for (auto i = 0; i < this->m_PointLights.size(); i++)
         {
             this->m_PointLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
-
-            std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(this->m_RenderableMap.at(m_PointLights[i]->m_name));
+            std::string name = m_PointLights[i]->m_name;
+            std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(*std::find_if(m_RenderableVec.begin(), m_RenderableVec.end(), [name](std::shared_ptr<Renderable> item) {if (item->getName() == name) return true; return false; }));
 
             sph_bill->translate(this->m_PointLights[i]->m_pos);
             sph_bill->m_Target = m_Camera->m_pos;
@@ -62,7 +62,8 @@ void Scene::update()
         {
             this->m_SpotLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
             
-            std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(this->m_RenderableMap.at(m_PointLights[i]->m_name));
+            std::string name = m_SpotLights[i]->m_name;
+            std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(*std::find_if(m_RenderableVec.begin(), m_RenderableVec.end(), [name](std::shared_ptr<Renderable> item) {if (item->getName() == name) return true; return false; }));
 
             sph_bill->translate(this->m_SpotLights[i]->m_pos);
             sph_bill->m_Target = m_Camera->m_pos;
@@ -70,30 +71,26 @@ void Scene::update()
         }
     }
     // Draw all renderable
-    if (!this->m_RenderableMap.empty())
+    if (!this->m_RenderableVec.empty())
     {
-        std::map<std::string, std::shared_ptr<Renderable>>::iterator it = this->m_RenderableMap.begin();
-        while (it != this->m_RenderableMap.end())
+        for (auto it: m_RenderableVec)
         {
-            auto object = it->second;
+            auto object = it;
             if (typeid(*object) == typeid(SphericalBillboard))
             {
-                std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(it->second);
+                std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(it);
                 sph_bill->m_Target = m_Camera->m_pos;
                 sph_bill->draw(shaders_active);
-                it++;
             }
             else if (typeid(*object) == typeid(CylindricalBillboard))
             {
-                std::shared_ptr<CylindricalBillboard> cyl_bill = std::static_pointer_cast<CylindricalBillboard>(it->second);
+                std::shared_ptr<CylindricalBillboard> cyl_bill = std::static_pointer_cast<CylindricalBillboard>(it);
                 cyl_bill->m_Target = m_Camera->m_pos;
                 cyl_bill->draw(shaders_active);
-                it++;
             }
             else 
             {
-                it->second->draw(shaders_active);
-                it++;
+                it->draw(shaders_active);
             }
         }
     }
@@ -127,21 +124,6 @@ void Scene::enablePhysics()
     this->m_IsPhysics = !this->m_IsPhysics;
 }
 
-Shaders_pack Scene::getActiveShaders() const
-{
-    return this->shaders_active;
-}
-
-std::map<const std::string, std::shared_ptr<Texture>> Scene::getTextureMap() const
-{
-    return this->m_TextureMap;
-}
-
-std::map<const std::string, std::shared_ptr<Renderable>> Scene::getRenderableMap() const
-{
-    return this->m_RenderableMap;
-}
-
 void Scene::addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type)
 {
     auto shader = ResourceManager::makeShaderProgram(vertex_shader_rel_path, fragment_shader_rel_path);
@@ -156,7 +138,7 @@ void Scene::addTexture(std::string name, std::string type)
 
     unsigned int i{ 0 };
 
-    while (m_RenderableMap.find(name) != m_RenderableMap.end())
+    while (m_TextureMap.find(name) != m_TextureMap.end())
     {
         i++;
 
@@ -175,17 +157,19 @@ void Scene::addModel(std::string name)
 
     unsigned int i{ 0 };
 
-    while (m_RenderableMap.find(name) != m_RenderableMap.end())
+    for (auto item: m_RenderableVec)
     {
-        i++;
+        if (item->getName() == name) {
+            i++;
 
-        if (i == 1)
-            name += std::to_string(i);
-        else
-            name = name.substr(0, name.size() - std::to_string(i - 1).length()) + std::to_string(i);
+            if (i == 1)
+                name += std::to_string(i);
+            else
+                name = name.substr(0, name.size() - std::to_string(i - 1).length()) + std::to_string(i);
+        }
     }
-
-    m_RenderableMap.emplace(name, model);
+    model->setName(name);
+    m_RenderableVec.push_back(model);
 }
 
 void Scene::addRigidBody(std::string name, Collision &collision)
@@ -194,53 +178,34 @@ void Scene::addRigidBody(std::string name, Collision &collision)
     
     unsigned int i{ 0 };
 
-    while (m_RenderableMap.find(name) != m_RenderableMap.end())
+    for (auto item : m_RenderableVec)
     {
-        i++;
-        
-        if (i == 1)
-            name += std::to_string(i);
-        else
-            name = name.substr(0, name.size() - std::to_string(i-1).length()) + std::to_string(i);
-    }
+        if (item->getName() == name) {
+            i++;
 
-    m_RenderableMap.emplace(name, rigid_body);
+            if (i == 1)
+                name += std::to_string(i);
+            else
+                name = name.substr(0, name.size() - std::to_string(i - 1).length()) + std::to_string(i);
+        }
+    }
+    
+    rigid_body->setName(name);
+    m_RenderableVec.push_back(rigid_body);
 }
 
 void Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
 {
     auto cyl_billboard = std::make_shared<CylindricalBillboard>(ResourceManager::makeCylBillboard(pos, size, texture_name, verts));
-    m_RenderableMap.emplace(name, cyl_billboard);
+    cyl_billboard->setName(name);
+    m_RenderableVec.push_back(cyl_billboard);
 }
 
 void Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
 {
     auto sph_billboard = std::make_shared<SphericalBillboard>(ResourceManager::makeSphBillboard(pos, size, texture_name, verts));
-    m_RenderableMap.emplace(name, sph_billboard);
-}
-
-void Scene::copyModel(std::string name, const std::shared_ptr<Model> model)
-{
-    auto c_model = std::make_shared<Model>(*model);
-    m_RenderableMap.emplace(name, c_model);
-}
-
-void Scene::copyCylBillboard(std::string name, const std::shared_ptr<CylindricalBillboard> cyl_billboard)
-{
-    auto c_cyl_billboard = std::make_shared<CylindricalBillboard>(*cyl_billboard);
-    m_RenderableMap.emplace(name, c_cyl_billboard);
-}
-
-void Scene::copySphBillboard(std::string name, const std::shared_ptr<SphericalBillboard> sph_billboard)
-{
-    auto c_sph_billboard = std::make_shared<SphericalBillboard>(*sph_billboard);
-    m_RenderableMap.emplace(name, c_sph_billboard);
-}
-
-void Scene::deleteRenderable(std::string name, std::shared_ptr<Renderable>& renderable_object)
-{
-    m_RenderableMap.erase(name);
-    renderable_object.reset();
+    sph_billboard->setName(name);
+    m_RenderableVec.push_back(sph_billboard);
 }
 
 void Scene::addDirLight(DirLight& dir_light)
@@ -281,11 +246,9 @@ void Scene::printObjectsInMaps(ObjectType objectType)
     }
     case ObjectType::RENDERABLE:
     {
-        std::map<std::string, std::shared_ptr<Renderable>>::iterator it = m_RenderableMap.begin();
-        while (it != m_RenderableMap.end())
+        for (auto item: m_RenderableVec)
         {
-            std::cout << "renderable \"" << it->first << "\" with vao " << it->second->getVAO() << std::endl;
-            it++;
+            std::cout << "renderable \"" << item->getName() << "\" with vao " << item->getVAO() << std::endl;
         }
         break;
     }

@@ -15,31 +15,28 @@
 
 #include "scene.h"
 
-// Singleton
-class GUI {
+class GUI_Window_object_properties;
 
-    GUI(); 
+// Singleton (should be)
+class GUI {
+public:
+    GUI(GLFWwindow* window);
     GUI(const GUI& obj) = delete;
     GUI(GUI&& obj) = delete;
 
     // Destructor
     ~GUI();
 
-    // Delete operator for copying
-    GUI& operator= (GUI const&) = delete;
-
-public:
-    static GUI& Instance(GLFWwindow* window); // INIT CRUTCH
-
     // main funcs //
-    void mainGUILoop();
+    void guiLoop(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene);
+
     void showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene);
+    void clickWindow(const std::shared_ptr<Renderable> obj);
     // ------------------ //
 
-    // One selectable object
-    std::pair<std::string, std::shared_ptr<Renderable>> m_CurrentRenderable = std::make_pair<std::string, std::shared_ptr<Renderable>>("", nullptr);
-
 private:
+    std::vector<std::shared_ptr<GUI_Window_object_properties>> m_WindowsVec;
+
     template<typename T>
     void addObject(std::string name, std::shared_ptr<Scene> scene)
     {
@@ -50,36 +47,55 @@ private:
     {
         scene->addModel(name);
     }
+};
+
+class GUI_Window_object_properties {
+public:
+    // Constructors
+    GUI_Window_object_properties(const std::shared_ptr<Renderable> obj);
+    GUI_Window_object_properties(const GUI_Window_object_properties& window) = delete;
+    GUI_Window_object_properties(GUI_Window_object_properties&& window) = delete;
+
+    ~GUI_Window_object_properties();
+
+    // Operators
+    GUI_Window_object_properties& operator= (const GUI_Window_object_properties&) = delete;
+
+    void windowLoop();
+
+    inline const std::shared_ptr<Renderable> getRenderable() const { return m_Renderable; }
+private:
+    std::shared_ptr<Renderable> m_Renderable;
 
     template <typename T>
-    void showCurrentObjectGUI() 
+    void showCurrentObjectGUI(std::shared_ptr<Renderable> obj)
     {
         ASSERT(false);
     }
     template<>
-    void showCurrentObjectGUI<Model>()
+    void showCurrentObjectGUI<Model>(std::shared_ptr<Renderable> obj)
     {
-        std::shared_ptr<Model> m_CurrentModelBody = std::static_pointer_cast<Model>(m_CurrentRenderable.second);
+        std::shared_ptr<Model> m_CurrentModel = std::static_pointer_cast<Model>(obj);
 
-        ImGui::Begin((m_CurrentRenderable.first + " config").c_str());
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Position", (float*)&m_CurrentModelBody->m_Position, 0.5f);
+        ImGui::Begin((obj->getName() + " config").c_str());
 
         ImGui::Separator();
-        ImGui::DragFloat3("Scale", (float*)&m_CurrentModelBody->m_Scale, 0.2f);
+        ImGui::DragFloat3("Position", (float*)&m_CurrentModel->m_Position, 0.5f);
 
         ImGui::Separator();
-        ImGui::DragFloat3("Rotation", (float*)&m_CurrentModelBody->m_RotationDegrees, 1.0f);
+        ImGui::DragFloat3("Scale", (float*)&m_CurrentModel->m_Scale, 0.2f);
+
+        ImGui::Separator();
+        ImGui::DragFloat3("Rotation", (float*)&m_CurrentModel->m_RotationDegrees, 1.0f);
 
         ImGui::End();
     }
     template<>
-    void showCurrentObjectGUI<RigidBody>() 
+    void showCurrentObjectGUI<RigidBody>(std::shared_ptr<Renderable> obj)
     {
-        std::shared_ptr<RigidBody> m_CurrentRigidBody = std::static_pointer_cast<RigidBody>(m_CurrentRenderable.second);
+        std::shared_ptr<RigidBody> m_CurrentRigidBody = std::static_pointer_cast<RigidBody>(obj);
 
-        ImGui::Begin((m_CurrentRenderable.first + " config").c_str());
+        ImGui::Begin((obj->getName() + " config").c_str());
 
         ImGui::Separator();
         ImGui::DragFloat3("Position", (float*)&m_CurrentRigidBody->m_Position, 0.5f);
@@ -96,11 +112,11 @@ private:
         ImGui::End();
     }
     template<>
-    void showCurrentObjectGUI<CylindricalBillboard>()
+    void showCurrentObjectGUI<CylindricalBillboard>(std::shared_ptr<Renderable> obj)
     {
-        std::shared_ptr<CylindricalBillboard> m_CurrentCylBill = std::static_pointer_cast<CylindricalBillboard>(m_CurrentRenderable.second);
+        std::shared_ptr<CylindricalBillboard> m_CurrentCylBill = std::static_pointer_cast<CylindricalBillboard>(obj);
 
-        ImGui::Begin((m_CurrentRenderable.first + " config").c_str());
+        ImGui::Begin((obj->getName() + " config").c_str());
 
         ImGui::Separator();
         ImGui::DragFloat3("Position", (float*)&m_CurrentCylBill->m_Position, 0.5f);
@@ -108,11 +124,11 @@ private:
         ImGui::End();
     }
     template<>
-    void showCurrentObjectGUI<SphericalBillboard>()
+    void showCurrentObjectGUI<SphericalBillboard>(std::shared_ptr<Renderable> obj)
     {
-        std::shared_ptr<SphericalBillboard> m_CurrentSphBill = std::static_pointer_cast<SphericalBillboard>(m_CurrentRenderable.second);
+        std::shared_ptr<SphericalBillboard> m_CurrentSphBill = std::static_pointer_cast<SphericalBillboard>(obj);
 
-        ImGui::Begin((m_CurrentRenderable.first + " config").c_str());
+        ImGui::Begin((obj->getName() + " config").c_str());
 
         ImGui::Separator();
         ImGui::DragFloat3("Position", (float*)&m_CurrentSphBill->m_Position, 0.5f);

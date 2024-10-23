@@ -3,7 +3,7 @@
 std::vector<glm::vec3> ExpMath::makeGlobalCoordsFromVertex(const std::vector<Vertex>& local_coords, const glm::mat4& model_matrix)
 {
 	std::vector<glm::vec3> return_verts;
-	for (auto item : local_coords)
+	for (auto& item : local_coords)
 	{
 		return_verts.push_back(model_matrix * glm::vec4(item.Position, 1.0f));
 	}
@@ -13,7 +13,7 @@ std::vector<glm::vec3> ExpMath::makeGlobalCoordsFromVertex(const std::vector<Ver
 std::vector<glm::vec3> ExpMath::makeGlobalCoordsFromLocal(const std::vector<glm::vec3>& local_coords, const glm::mat4& model_matrix)
 {
 	std::vector<glm::vec3> return_verts;
-	for (auto item : local_coords)
+	for (auto& item : local_coords)
 	{
 		return_verts.push_back(model_matrix * glm::vec4(item, 1.0f));
 	}
@@ -37,40 +37,17 @@ glm::vec3 ExpMath::getGlobalCoordsFromScreen(GLfloat screen_x, GLfloat screen_y,
 	return ray_wor;
 }
 
-std::pair<glm::vec3, glm::vec3> ExpMath::makeAABB(const std::vector<Vertex>& coords)
+std::pair<glm::vec3, glm::vec3> ExpMath::makeAABB(const std::vector<Vertex>& vector)
 {
-	if (coords.size() == 0)
-		std::cerr << "ERROR::EXP_MATH makeAABB HAS TAKEN COORDS WITH ZERO SIZE" << std::endl;
-
-	glm::vec3 min_corner, max_corner;
-
-	bool first_iter = true;
-	for (auto item : coords) 
-	{
-		if (first_iter)
-		{
-			min_corner = item.Position;
-			max_corner = item.Position;
-
-			first_iter = false;
-		}
-		else
-		{
-			if (min_corner.x > item.Position.x)
-				min_corner.x = item.Position.x;
-			if (max_corner.x < item.Position.x)
-				max_corner.x = item.Position.x;
-			if (min_corner.y > item.Position.y)
-				min_corner.y = item.Position.y;
-			if (max_corner.y < item.Position.y)
-				max_corner.y = item.Position.y;
-			if (min_corner.z > item.Position.z)
-				min_corner.z = item.Position.z;
-			if (max_corner.z < item.Position.z)
-				max_corner.z = item.Position.z;
-		}
+	if (vector.size() == 0) {
+		std::cerr << "ERROR::vector had zero size\n";
+		__debugbreak();
 	}
-	return std::make_pair(min_corner, max_corner);
+
+	const auto min_corner = std::min_element(vector.begin(), vector.end(), [](Vertex first, Vertex min) {if (first.Position.x <= min.Position.x && first.Position.y <= min.Position.y && first.Position.z <= min.Position.z) return true; return false; });
+	const auto max_corner = std::max_element(vector.begin(), vector.end(), [](Vertex max, Vertex first) {if (max.Position.x <= first.Position.x && max.Position.y <= first.Position.y && max.Position.z <= first.Position.z) return true; return false; });
+
+	return std::make_pair(min_corner->Position, max_corner->Position);
 }
 
 glm::mat4 ExpMath::makeSummarizeMat4(const glm::mat4 model_matrix, const glm::mat4 view_matrix, const glm::mat4 proj_matrix)
