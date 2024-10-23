@@ -44,10 +44,14 @@ std::pair<glm::vec3, glm::vec3> ExpMath::makeAABB(const std::vector<Vertex>& vec
 		__debugbreak();
 	}
 
-	const auto min_corner = std::min_element(vector.begin(), vector.end(), [](Vertex first, Vertex min) {if (first.Position.x <= min.Position.x && first.Position.y <= min.Position.y && first.Position.z <= min.Position.z) return true; return false; });
-	const auto max_corner = std::max_element(vector.begin(), vector.end(), [](Vertex max, Vertex first) {if (max.Position.x <= first.Position.x && max.Position.y <= first.Position.y && max.Position.z <= first.Position.z) return true; return false; });
+	const auto min_corner_x = std::min_element(vector.begin(), vector.end(), [](Vertex first, Vertex min) {if (first.Position.x <= min.Position.x) return true; return false; })->Position.x;
+	const auto min_corner_y = std::min_element(vector.begin(), vector.end(), [](Vertex first, Vertex min) {if (first.Position.y <= min.Position.y) return true; return false; })->Position.y;
+	const auto min_corner_z = std::min_element(vector.begin(), vector.end(), [](Vertex first, Vertex min) {if (first.Position.z <= min.Position.z) return true; return false; })->Position.z;
+	const auto max_corner_x = std::max_element(vector.begin(), vector.end(), [](Vertex max, Vertex first) {if (max.Position.x <= first.Position.x) return true; return false; })->Position.x;
+	const auto max_corner_y = std::max_element(vector.begin(), vector.end(), [](Vertex max, Vertex first) {if (max.Position.y <= first.Position.y) return true; return false; })->Position.y;
+	const auto max_corner_z = std::max_element(vector.begin(), vector.end(), [](Vertex max, Vertex first) {if (max.Position.z <= first.Position.z) return true; return false; })->Position.z;
 
-	return std::make_pair(min_corner->Position, max_corner->Position);
+	return std::make_pair(glm::vec3(min_corner_x, min_corner_x, min_corner_z), glm::vec3(max_corner_x, max_corner_y, max_corner_z));
 }
 
 glm::mat4 ExpMath::makeSummarizeMat4(const glm::mat4 model_matrix, const glm::mat4 view_matrix, const glm::mat4 proj_matrix)
