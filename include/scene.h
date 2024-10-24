@@ -40,7 +40,7 @@ public:
     glm::mat4 m_ProjectionMatrix;
 
     // Constructor
-    Scene(Camera& camera);
+    Scene(Camera&& camera);
 
     // Destructor
     ~Scene();
@@ -75,9 +75,9 @@ public:
     void   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
 
     // Add lights to the scene
-    void addDirLight(DirLight& dir_light);
-    void addPointLight(PointLight& point_light, std::vector<Vertex> verts);
-    void addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts);
+    void addDirLight(DirLight dir_light);
+    void addPointLight(PointLight point_light, std::vector<Vertex> verts);
+    void addSpotLight(SpotLight spot_light, std::vector<Vertex> verts);
 
     // Print objects in maps
     void printObjectsInMaps(ObjectType objectType);

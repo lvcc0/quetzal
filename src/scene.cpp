@@ -1,6 +1,6 @@
 #include "scene.h"
 
-Scene::Scene(Camera& camera)
+Scene::Scene(Camera&& camera)
     : m_Camera(std::make_shared<Camera>(camera)),
       m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders(), camera.m_width, camera.m_height))
 { /* empty */ }
@@ -208,13 +208,13 @@ void Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, con
     m_RenderableVec.push_back(sph_billboard);
 }
 
-void Scene::addDirLight(DirLight& dir_light)
+void Scene::addDirLight(DirLight dir_light)
 {
     std::shared_ptr<DirLight> light = std::make_shared<DirLight>(dir_light);
     this->m_DirLights.push_back(light);
 }
 
-void Scene::addPointLight(PointLight& point_light, std::vector<Vertex> verts)
+void Scene::addPointLight(PointLight point_light, std::vector<Vertex> verts)
 {
     std::shared_ptr<PointLight> light = std::make_shared<PointLight>(point_light);
     this->m_PointLights.push_back(light);
@@ -222,7 +222,7 @@ void Scene::addPointLight(PointLight& point_light, std::vector<Vertex> verts)
     this->addSphBillboard(point_light.m_name, point_light.m_pos, glm::vec2(1.0f), "lightbulb", verts);
 }
 
-void Scene::addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts)
+void Scene::addSpotLight(SpotLight spot_light, std::vector<Vertex> verts)
 {
     std::shared_ptr<SpotLight> light = std::make_shared<SpotLight>(spot_light);
     this->m_SpotLights.push_back(light);

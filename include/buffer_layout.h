@@ -35,7 +35,7 @@ public:
 	template<typename T>
 	void push(GLuint count, size_t vertex_offset)
 	{
-		static_assert(false);
+		__debugbreak();
 	}
 
 	template<>

@@ -20,7 +20,7 @@ class Renderable: public Node {
 public:
 
 	// Constructors
-	Renderable(std::string name, std::vector<Vertex>& vertices, std::vector<unsigned int>& indices = std::vector<unsigned int>{});
+	Renderable(std::string name, std::vector<Vertex>& vertices, std::vector<unsigned int> indices = std::vector<unsigned int>{});
 	Renderable(const Renderable& obj);
 
 	// Destructor

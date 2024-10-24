@@ -18,7 +18,7 @@ public:
     std::vector<std::shared_ptr<Shader>> m_ActiveShaders;
 
     // Constructor
-    PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>& shaderMap, GLfloat width, GLfloat height);
+    PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>&& shaderMap, GLfloat width, GLfloat height);
 
     // Destructor
     ~PostProcessing();

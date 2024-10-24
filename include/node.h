@@ -14,4 +14,6 @@ private:
 public:
 	inline const std::string getName() const { return this->m_Name; }
 	inline void setName(std::string name) { this->m_Name = name; }
+	inline void setParent(const std::shared_ptr<Node>& parent) { this->m_Parent_node = parent; };
+	inline const std::shared_ptr<Node> getParent() const { return this->m_Parent_node.lock(); };
 };

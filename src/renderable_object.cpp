@@ -1,6 +1,6 @@
 #include "renderable_object.h"
 
-Renderable::Renderable(std::string name, std::vector<Vertex>& vertices, std::vector<unsigned int>& indices) 
+Renderable::Renderable(std::string name, std::vector<Vertex>& vertices, std::vector<unsigned int> indices) 
 	: Node(name), m_Vertices(vertices), m_Indices(indices)
 {
 	

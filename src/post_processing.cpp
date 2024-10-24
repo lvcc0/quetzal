@@ -1,6 +1,6 @@
 #include "post_processing.h"
 
-PostProcessing::PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>& shaderMap, GLfloat width, GLfloat height)
+PostProcessing::PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>&& shaderMap, GLfloat width, GLfloat height)
     : m_ShaderMap(shaderMap)
 {
     this->setupBuffers(VAO, VBO);
@@ -110,7 +110,7 @@ void PostProcessing::recreate(GLuint width, GLuint height) const
 
 void PostProcessing::setScreenShader(const std::string& name, bool enabled)
 {
-    std::vector<std::string>& currentScreenShaderNames = getScreenShaders();
+    std::vector<std::string> currentScreenShaderNames = getScreenShaders();
 
     if (enabled)
         this->m_ActiveShaders.push_back(this->m_ShaderMap.at(name));
