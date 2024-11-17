@@ -4,14 +4,14 @@ Model::Model(std::vector<Vertex>& vertices,
              std::vector<unsigned int>& indices,
              std::vector<std::shared_ptr<Texture>>& textures,
              bool is_preload, std::string name)
-    :Renderable(name, vertices, indices), m_Textures(textures)
+    :Renderable(vertices, indices), Scene_Node(name), Scene_Object(), m_Textures(textures)
 {
     if (!is_preload)
         setupRender(); // setup VAO, VBO, EBO
 }
 
 Model::Model(const Model& obj)
-    : Renderable(obj),
+    : Renderable(obj), Scene_Node(obj), Scene_Object(obj),
     m_Textures(obj.m_Textures)
 {
     setupRender();
@@ -23,11 +23,11 @@ void Model::draw(const Shaders_pack& shaders)
     std::shared_ptr<Shader> stencil_shader = shaders.STENCIL_SHADER;
     
     // Inheritor methods can be called
-    this->translate(m_Position);
-    this->scale(m_Scale);
-    this->rotate(m_RotationDegrees.x, glm::vec3(1.0, 0.0, 0.0));
-    this->rotate(m_RotationDegrees.y, glm::vec3(0.0, 1.0, 0.0));
-    this->rotate(m_RotationDegrees.z, glm::vec3(0.0, 0.0, 1.0));
+    this->setPosition(m_Position);
+    this->setScale(m_Scale);
+    this->setRotationDegrees(glm::vec3(1.0, 0.0, 0.0), m_RotationDegrees.x);
+    this->setRotationDegrees(glm::vec3(0.0, 1.0, 0.0), m_RotationDegrees.y);
+    this->setRotationDegrees(glm::vec3(0.0, 0.0, 1.0), m_RotationDegrees.z);
 
     unsigned int diffuseNum = 1;
     unsigned int specularNum = 1;
@@ -102,19 +102,22 @@ void Model::draw(const Shaders_pack& shaders)
     m_ModelMatrix = glm::mat4(1.0f);
 }
 
-void Model::translate(glm::vec3 vector)
+inline void Model::setPosition(const glm::vec3 pos)
 {
-    m_ModelMatrix = glm::translate(m_ModelMatrix, vector);
+    m_ModelMatrix = glm::translate(m_ModelMatrix, pos);
+    m_Position = pos;
 }
 
-void Model::scale(glm::vec3 vector)
+inline void Model::setScale(const glm::vec3 scale)
 {
-    m_ModelMatrix = glm::scale(m_ModelMatrix, vector);
+    m_ModelMatrix = glm::scale(m_ModelMatrix, scale);
+    m_Scale = scale;
 }
 
-void Model::rotate(float degrees, glm::vec3 vector)
+inline void Model::setRotationDegrees(const glm::vec3 rotation, float degrees)
 {
-    m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees), vector);
+    m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees), rotation);
+    m_RotationDegrees = rotation * degrees;
 }
 
 glm::mat4 Model::getModelMatrix() const

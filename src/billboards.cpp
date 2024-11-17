@@ -24,7 +24,7 @@ void CylindricalBillboard::draw(const Shaders_pack& shaders)
 
     m_ModelMatrix = glm::translate(m_ModelMatrix, m_Position);
     m_ModelMatrix = glm::rotate(m_ModelMatrix, angle_in_rad, up);
-    m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(m_Scale, 1.0f));
+    m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(m_Scale.x, m_Scale.y, 1.0f));
 
     main_shader->activateShader();
 
@@ -48,7 +48,7 @@ glm::mat4 CylindricalBillboard::getModelMatrix() const
     glm::mat4 return_matrix = glm::mat4(1.0f);
     return_matrix = glm::translate(return_matrix, m_Position);
     return_matrix = glm::rotate(return_matrix, angle_in_rad, up);
-    return_matrix = glm::scale(return_matrix, glm::vec3(m_Scale, 1.0f));
+    return_matrix = glm::scale(return_matrix, glm::vec3(m_Scale.x, m_Scale.y, 1.0f));
 
     return return_matrix;
 }
@@ -88,7 +88,7 @@ void SphericalBillboard::draw(const Shaders_pack& shaders)
     m_ModelMatrix = glm::translate(m_ModelMatrix, m_Position);
     m_ModelMatrix = glm::rotate(m_ModelMatrix, vert_angle_in_rad, up);
     m_ModelMatrix = glm::rotate(m_ModelMatrix, hor_angle_in_rad, right);
-    m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(m_Scale, 1.0f));
+    m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(m_Scale.x, m_Scale.y, 1.0f));
 
     main_shader->activateShader();
 
@@ -114,7 +114,7 @@ glm::mat4 SphericalBillboard::getModelMatrix() const
     return_matrix = glm::translate(return_matrix, m_Position);
     return_matrix = glm::rotate(return_matrix, vert_angle_in_rad, up);
     return_matrix = glm::rotate(return_matrix, hor_angle_in_rad, right);
-    return_matrix = glm::scale(return_matrix, glm::vec3(m_Scale, 1.0f));
+    return_matrix = glm::scale(return_matrix, glm::vec3(m_Scale.x, m_Scale.y, 1.0f));
 
     return return_matrix;
 }
@@ -122,26 +122,26 @@ glm::mat4 SphericalBillboard::getModelMatrix() const
 
 // --- Billboard --- //
 Billboard::Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload, std::string name)
-    : m_Position(pos), m_Scale(scale), m_Texture(texture), Renderable(name, verts)
+    : m_Texture(texture), Renderable(verts), Scene_Node(name), Scene_Object(glm::vec3(0, 0, 0), glm::vec3(1.0, 1.0, 0))
 {
     if (!is_preload)
         setupRender();
 }
 
 Billboard::Billboard(const Billboard& obj):
-    Renderable(obj), m_Texture(obj.m_Texture)
+    Renderable(obj), Scene_Node(obj), m_Texture(obj.m_Texture)
 {
     setupRender();
 }
 
-void Billboard::translate(glm::vec3 vector)
+inline void Billboard::setPosition(glm::vec3 pos)
 {
-    m_Position = vector;
+    m_Position = pos;
 }
 
-void Billboard::scale(glm::vec2 vector)
+inline void Billboard::setScale(glm::vec3 scale)
 {
-    m_Scale = vector;
+    m_Scale = glm::vec3(scale.x, scale.y, 0);
 }
 
 void Billboard::setupRender()

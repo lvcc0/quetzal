@@ -25,6 +25,8 @@
 #include "billboards.h"
 #include "physics.h"
 
+
+
 enum class ObjectType { SHADER, TEXTURE, RENDERABLE };
 
 class Scene
@@ -61,10 +63,12 @@ public:
     void enablePhysics();
     
     //void setShader(const std::string& name, ShaderType type);                     // set shader to draw stuff with (only one for now (ig it'll always be only one)) //IMHO: There could be more than one shader
-    
+    // REDO IT
     inline Shaders_pack                                                       getActiveShaders() const { return shaders_active; };
     inline std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap() const { return m_TextureMap; };
     inline std::vector<std::shared_ptr<Renderable>>                           getRenderableVec() const { return m_RenderableVec; };
+    inline std::vector<std::shared_ptr<Scene_Node>>                           getSceneNodeVec() const { return m_NodeVec; };
+    inline std::vector<std::shared_ptr<Scene_Object>>                         getSceneObjectVec() const { return m_SceneObjectVec; };
 
     // Some stuff to add to the scene
     void   addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type);
@@ -79,11 +83,7 @@ public:
     void addPointLight(PointLight point_light, std::vector<Vertex> verts);
     void addSpotLight(SpotLight spot_light, std::vector<Vertex> verts);
 
-    // Print objects in maps
-    void printObjectsInMaps(ObjectType objectType);
-
 private:
-
     // Vectors with scene lights
     std::vector<std::shared_ptr<DirLight>>   m_DirLights;
     std::vector<std::shared_ptr<PointLight>> m_PointLights;
@@ -98,5 +98,6 @@ private:
 
     // Vectors
     std::vector<std::shared_ptr<Renderable>> m_RenderableVec;
-
+    std::vector<std::shared_ptr<Scene_Node>> m_NodeVec;
+    std::vector<std::shared_ptr<Scene_Object>> m_SceneObjectVec;
 };

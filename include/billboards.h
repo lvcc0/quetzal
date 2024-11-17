@@ -19,12 +19,12 @@
 #include "shader.h"
 #include "texture.h"
 #include "vertex.h"
-#include "renderable_object.h"
+#include "base_classes.h"
 
 // TODO: technically they're almost the same, so we can do something like inheritance here
 
 // Abstract class (draw functuion which is pure virtual isnt declared here)
-class Billboard : public Renderable
+class Billboard : public Renderable, public Scene_Node, public Scene_Object
 {
 public:
     // Constructors
@@ -33,16 +33,13 @@ public:
 
     std::shared_ptr<Texture> m_Texture;
 
-    glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec2 m_Scale = glm::vec2(1.0f, 1.0f);
     glm::vec3 m_Target = glm::vec3(0.0f, 0.0f, 0.0f);
 
     // Moving in the world space
-    virtual void translate(glm::vec3 vector);
-    virtual void scale(glm::vec2 vector);
+    inline virtual void setPosition(glm::vec3 pos) override;
+    inline virtual void setScale(glm::vec3 scale) override;
 
 protected:
-
     virtual void setupRender() override;
 };
 

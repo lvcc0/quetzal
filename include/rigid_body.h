@@ -14,8 +14,8 @@ public:
     RigidBody(const Model& model, Collision& collision, std::string name = "");
 
     // Moving in world space
-    virtual void translate(glm::vec3 vector) override;
-    virtual void scale(glm::vec3 vector) override;
-    virtual void rotate(float degrees, glm::vec3 vector) override;
+    virtual void translate(glm::vec3 vector);
+    virtual void scale(glm::vec3 vector);
+    virtual void rotate(float degrees, glm::vec3 vector);
 
 };

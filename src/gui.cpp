@@ -73,12 +73,12 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
 
     ImGui::SeparatorText("Objects");
 
-    // Renderable UI
-    if (!current_scene.second->getRenderableVec().empty())
+    // SceneNode UI
+    if (!current_scene.second->getSceneNodeVec().empty())
     {
-        ImGui::SeparatorText("Renderables");
+        ImGui::SeparatorText("Objects");
 
-        for (const auto& entry : current_scene.second->getRenderableVec())
+        for (const auto& entry : current_scene.second->getSceneNodeVec())
         {
             ImGui::Separator();
             if (ImGui::Selectable(entry->getName().c_str()))
@@ -98,36 +98,94 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     ImGui::End();
 }
 
-void GUI::clickWindow(const std::shared_ptr<Renderable> obj_in)
+// Making window using scene node
+void GUI::clickWindow(const std::shared_ptr<Scene_Node> obj_in)
 {
-    auto window_it = std::find_if(m_WindowsVec.begin(), m_WindowsVec.end(), [&obj_in](std::shared_ptr<GUI_Window_object_properties>obj) {if (obj->getRenderable() == obj_in) return true; return false; });
+    // Selecting and deselecting
+    auto window_it = std::find_if(m_WindowsVec.begin(), m_WindowsVec.end(), [&obj_in](std::shared_ptr<GUI_Window_object_properties>obj) {if (obj->getNode() == obj_in) return true; return false; });
+    
     if (window_it == m_WindowsVec.end())
         m_WindowsVec.push_back(std::make_shared<GUI_Window_object_properties>(obj_in));
     else
         m_WindowsVec.erase(window_it);
 }
 
-GUI_Window_object_properties::GUI_Window_object_properties(const std::shared_ptr<Renderable> obj):
-    m_Renderable(obj)
+// Making window using renderable and convert renderable to scene_node
+void GUI::clickWindow(const std::shared_ptr<Renderable> obj_in) 
+{
+    std::shared_ptr<Scene_Node> aux{ nullptr };
+    if (typeid(*obj_in) == typeid(RigidBody))
+    {
+        auto temp = std::dynamic_pointer_cast<RigidBody>(obj_in);
+        aux = std::dynamic_pointer_cast<Scene_Node>(temp);
+    }
+    else if (typeid(*obj_in) == typeid(CylindricalBillboard))
+    {
+        auto temp = std::dynamic_pointer_cast<CylindricalBillboard>(obj_in);
+        aux = std::dynamic_pointer_cast<Scene_Node>(temp);
+    }
+    else if (typeid(*obj_in) == typeid(SphericalBillboard))
+    {
+        auto temp = std::dynamic_pointer_cast<SphericalBillboard>(obj_in);
+        aux = std::dynamic_pointer_cast<Scene_Node>(temp);
+    }
+    else if (typeid(*obj_in) == typeid(Model))
+    {
+        auto temp = std::dynamic_pointer_cast<Model>(obj_in);
+        aux = std::dynamic_pointer_cast<Scene_Node>(temp);
+    }
+    else
+    {
+        std::cout << "ERROR::GUI:CLICK_WINDOW HAVEN`T RECOGNISED INPUT OBJECT\n";
+        __debugbreak();
+    }
+    // Selecting and deselecting
+    auto window_it = std::find_if(m_WindowsVec.begin(), m_WindowsVec.end(), [&aux](std::shared_ptr<GUI_Window_object_properties>obj) {if (obj->getNode() == aux) return true; return false; });
+
+    if (window_it == m_WindowsVec.end())
+        m_WindowsVec.push_back(std::make_shared<GUI_Window_object_properties>(aux));
+    else
+        m_WindowsVec.erase(window_it);
+}
+
+GUI_Window_object_properties::GUI_Window_object_properties(const std::shared_ptr<Scene_Node> obj):
+    m_SceneNode(obj)
 {
 
-}
+};
 
 GUI_Window_object_properties::~GUI_Window_object_properties()
 {
-    m_Renderable->is_selected = false;
+    if (typeid(*m_SceneNode) == typeid(RigidBody))
+    {
+        auto temp = std::dynamic_pointer_cast<RigidBody>(m_SceneNode);
+        temp->is_selected = false;
+    }
+    else if (typeid(*m_SceneNode) == typeid(CylindricalBillboard))
+    {
+        auto temp = std::dynamic_pointer_cast<CylindricalBillboard>(m_SceneNode);
+        temp->is_selected = false;
+    }
+    else if (typeid(*m_SceneNode) == typeid(SphericalBillboard))
+    {
+        auto temp = std::dynamic_pointer_cast<SphericalBillboard>(m_SceneNode);
+        temp->is_selected = false;
+    }
+    else if (typeid(*m_SceneNode) == typeid(Model))
+    {
+        auto temp = std::dynamic_pointer_cast <Model>(m_SceneNode);
+        temp->is_selected = false;
+    }
 }
 
 void GUI_Window_object_properties::windowLoop()
 {
-    m_Renderable->is_selected = true;
-
-    if (typeid(*m_Renderable) == typeid(RigidBody))
-        showCurrentObjectGUI<RigidBody>(m_Renderable);
-    else if (typeid(*m_Renderable) == typeid(CylindricalBillboard))
-        showCurrentObjectGUI<CylindricalBillboard>(m_Renderable);
-    else if (typeid(*m_Renderable) == typeid(SphericalBillboard))
-        showCurrentObjectGUI<SphericalBillboard>(m_Renderable);
-    else if (typeid(*m_Renderable) == typeid(Model))
-        showCurrentObjectGUI<Model>(m_Renderable);
+    if (typeid(*m_SceneNode) == typeid(RigidBody))
+        showCurrentObjectGUI<RigidBody>();
+    else if (typeid(*m_SceneNode) == typeid(CylindricalBillboard))
+        showCurrentObjectGUI<CylindricalBillboard>();
+    else if (typeid(*m_SceneNode) == typeid(SphericalBillboard))
+        showCurrentObjectGUI<SphericalBillboard>();
+    else if (typeid(*m_SceneNode) == typeid(Model))
+        showCurrentObjectGUI<Model>();
 }

@@ -94,6 +94,7 @@ void Engine::processInput()
         this->scenes.at(this->currentScene)->m_Camera->Inputs(this->window, deltaTime);
 }
 
+// Badly working with zero scaled objects
 void Engine::pickObject()
 {
     GLdouble mouse_x, mouse_y;
@@ -101,28 +102,28 @@ void Engine::pickObject()
 
     glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Camera->m_pos;
     glm::vec3 direction = ExpMath::getGlobalCoordsFromScreen(mouse_x, mouse_y, this->scenes.at(currentScene)->m_Camera->m_width, this->scenes.at(currentScene)->m_Camera->m_height, this->scenes.at(currentScene)->m_ProjectionMatrix, this->scenes.at(currentScene)->m_Camera->getViewMatrix());
-    
+
     Ray ray(cam_coords, direction);
     
     // At this section checking models of rigid bodies (two corners of model make square)
-    std::vector <std::pair<std::pair<std::string, std::shared_ptr<Renderable>>, GLfloat >> inter_render_body_vector; // pair (pair (string, RigidBody), float)
+    std::vector <std::pair<std::shared_ptr<Renderable>, GLfloat >> inter_render_body_vector;
 
     for (auto item : this->scenes.at(currentScene)->getRenderableVec()) 
     {
         GLfloat intersection_distance;
         if (ray.TestRayOBBIntersection(ExpMath::makeAABB(item->m_Vertices).first, ExpMath::makeAABB(item->m_Vertices).second, item->getModelMatrix(), intersection_distance))
         {
-            inter_render_body_vector.push_back(std::pair(std::pair(item->getName(), item), intersection_distance));
+            inter_render_body_vector.push_back(std::pair(item, intersection_distance));
         }
     }
     
     // Picking object with lesser intersection_distance
     if (inter_render_body_vector.size() != 0) {
-        std::pair<std::string, std::shared_ptr<Renderable>> curr_renderable_ptr = ExpMath::getItemWithMinimumFloat<std::pair<std::string, std::shared_ptr<Renderable>>>(inter_render_body_vector).first;
+        std::shared_ptr<Renderable> curr_renderable_ptr = ExpMath::getItemWithMinimumFloat(inter_render_body_vector).first;
 
-        if (curr_renderable_ptr.second != nullptr)
+        if (curr_renderable_ptr != nullptr)
         {
-            gui->clickWindow(curr_renderable_ptr.second);
+            gui->clickWindow(curr_renderable_ptr);
         }
     }
 }

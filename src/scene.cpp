@@ -49,9 +49,9 @@ void Scene::update()
         {
             this->m_PointLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
             std::string name = m_PointLights[i]->m_name;
-            std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(*std::find_if(m_RenderableVec.begin(), m_RenderableVec.end(), [name](std::shared_ptr<Renderable> item) {if (item->getName() == name) return true; return false; }));
+            std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
 
-            sph_bill->translate(this->m_PointLights[i]->m_pos);
+            sph_bill->setPosition(m_PointLights[i]->m_pos);
             sph_bill->m_Target = m_Camera->m_pos;
             sph_bill->draw(shaders_active);
         }
@@ -63,9 +63,9 @@ void Scene::update()
             this->m_SpotLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
             
             std::string name = m_SpotLights[i]->m_name;
-            std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(*std::find_if(m_RenderableVec.begin(), m_RenderableVec.end(), [name](std::shared_ptr<Renderable> item) {if (item->getName() == name) return true; return false; }));
+            std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
 
-            sph_bill->translate(this->m_SpotLights[i]->m_pos);
+            sph_bill->setPosition(m_PointLights[i]->m_pos);
             sph_bill->m_Target = m_Camera->m_pos;
             sph_bill->draw(shaders_active);
         }
@@ -78,13 +78,13 @@ void Scene::update()
             auto object = it;
             if (typeid(*object) == typeid(SphericalBillboard))
             {
-                std::shared_ptr<SphericalBillboard> sph_bill = std::static_pointer_cast<SphericalBillboard>(it);
+                std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(it);
                 sph_bill->m_Target = m_Camera->m_pos;
                 sph_bill->draw(shaders_active);
             }
             else if (typeid(*object) == typeid(CylindricalBillboard))
             {
-                std::shared_ptr<CylindricalBillboard> cyl_bill = std::static_pointer_cast<CylindricalBillboard>(it);
+                std::shared_ptr<CylindricalBillboard> cyl_bill = std::dynamic_pointer_cast<CylindricalBillboard>(it);
                 cyl_bill->m_Target = m_Camera->m_pos;
                 cyl_bill->draw(shaders_active);
             }
@@ -157,7 +157,7 @@ void Scene::addModel(std::string name)
 
     unsigned int i{ 0 };
 
-    for (auto item: m_RenderableVec)
+    for (auto item: m_NodeVec)
     {
         if (item->getName() == name) {
             i++;
@@ -169,7 +169,10 @@ void Scene::addModel(std::string name)
         }
     }
     model->setName(name);
+
     m_RenderableVec.push_back(model);
+    m_NodeVec.push_back(model);
+    m_SceneObjectVec.push_back(model);
 }
 
 void Scene::addRigidBody(std::string name, Collision &collision)
@@ -178,7 +181,7 @@ void Scene::addRigidBody(std::string name, Collision &collision)
     
     unsigned int i{ 0 };
 
-    for (auto item : m_RenderableVec)
+    for (auto item : m_NodeVec)
     {
         if (item->getName() == name) {
             i++;
@@ -192,6 +195,8 @@ void Scene::addRigidBody(std::string name, Collision &collision)
     
     rigid_body->setName(name);
     m_RenderableVec.push_back(rigid_body);
+    m_NodeVec.push_back(rigid_body);
+    m_SceneObjectVec.push_back(rigid_body);
 }
 
 void Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
@@ -199,6 +204,8 @@ void Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, con
     auto cyl_billboard = std::make_shared<CylindricalBillboard>(ResourceManager::makeCylBillboard(pos, size, texture_name, verts));
     cyl_billboard->setName(name);
     m_RenderableVec.push_back(cyl_billboard);
+    m_NodeVec.push_back(cyl_billboard);
+    m_SceneObjectVec.push_back(cyl_billboard);
 }
 
 void Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
@@ -206,6 +213,8 @@ void Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, con
     auto sph_billboard = std::make_shared<SphericalBillboard>(ResourceManager::makeSphBillboard(pos, size, texture_name, verts));
     sph_billboard->setName(name);
     m_RenderableVec.push_back(sph_billboard);
+    m_NodeVec.push_back(sph_billboard);
+    m_SceneObjectVec.push_back(sph_billboard);
 }
 
 void Scene::addDirLight(DirLight dir_light)
@@ -228,31 +237,4 @@ void Scene::addSpotLight(SpotLight spot_light, std::vector<Vertex> verts)
     this->m_SpotLights.push_back(light);
 
     this->addSphBillboard(spot_light.m_name, spot_light.m_pos, glm::vec2(1.0f), "highlight", verts);
-}
-
-void Scene::printObjectsInMaps(ObjectType objectType)
-{
-    switch (objectType)
-    {
-    case ObjectType::TEXTURE:
-    {
-        std::map<std::string, std::shared_ptr<Texture>>::iterator it = m_TextureMap.begin();
-        while (it != m_TextureMap.end())
-        {
-            std::cout << "texture \"" << it->first << "\" with id " << it->second->ID << std::endl;
-            it++;
-        }
-        break;
-    }
-    case ObjectType::RENDERABLE:
-    {
-        for (auto item: m_RenderableVec)
-        {
-            std::cout << "renderable \"" << item->getName() << "\" with vao " << item->getVAO() << std::endl;
-        }
-        break;
-    }
-    default:
-        std::cout << "the default output of the switch statement in the getObjectsInMaps() function" << std::endl;
-    }
 }

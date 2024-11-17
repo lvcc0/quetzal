@@ -8,9 +8,9 @@
 #include <algorithm>
 
 #include "texture.h"
-#include "renderable_object.h"
+#include "base_classes.h"
 
-class Model : public Renderable
+class Model : public Renderable, public Scene_Node, public Scene_Object
 {
 public:
     float m_StencilScaling = 1.4f;
@@ -28,15 +28,10 @@ public:
     // Draw model
     virtual void draw(const Shaders_pack& shaders) override;
 
-    // Abstract variables for using in world space
-    glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);        // position in the world space
-    glm::vec3 m_Scale = glm::vec3(1.0f, 1.0f, 1.0f);           // scaling in the world space
-    glm::vec3 m_RotationDegrees = glm::vec3(0.0f, 0.0f, 0.0f); // rotation in all 3 axes respectively in the world space
-
     // Moving in world space
-    virtual void translate(glm::vec3 vector);
-    virtual void scale(glm::vec3 vector);
-    virtual void rotate(float degrees, glm::vec3 vector);
+    inline virtual void setPosition(const glm::vec3 pos) override;
+    inline virtual void setScale(const glm::vec3 scale) override;
+    inline virtual void setRotationDegrees(const glm::vec3 rotation, float degrees) override;
 
     virtual glm::mat4 getModelMatrix() const override;
 protected:
