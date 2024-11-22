@@ -33,6 +33,8 @@ public:
 
     // Constructor
     Shader(std::string& vertexCode, std::string& fragmentCode);
+    Shader(const Shader& obj) = delete;
+    Shader(Shader&& obj) = delete;
 
     // Destructor
     ~Shader();
@@ -51,7 +53,7 @@ public:
     void activateShader() const;
     void deleteShader() const;
 
-private:
+protected:
     void compileErrors(unsigned int shader, const char* type);
     bool is_active() const;
 };

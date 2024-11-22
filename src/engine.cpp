@@ -100,6 +100,19 @@ void Engine::pickObject()
     GLdouble mouse_x, mouse_y;
     glfwGetCursorPos(window, &mouse_x, &mouse_y);
 
+    // Blocking that part of screen which is already occupied
+    for (auto item : gui->getWindowsObjProps())
+    {
+        if (item->getGUIWindowPos().x + item->getGUIWindowSize().x > mouse_x && mouse_x > item->getGUIWindowPos().x
+            && item->getGUIWindowPos().y + item->getGUIWindowSize().y > mouse_y && mouse_y > item->getGUIWindowPos().y)
+            return;
+    }
+
+    if (gui->getGUIWindowPos().x + gui->getGUIWindowSize().x > mouse_x && mouse_x > gui->getGUIWindowPos().x 
+        && gui->getGUIWindowPos().y + gui->getGUIWindowSize().y > mouse_y && mouse_y > gui->getGUIWindowPos().y)
+        return;
+    // ----------------------------- //
+
     glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Camera->m_pos;
     glm::vec3 direction = ExpMath::getGlobalCoordsFromScreen(mouse_x, mouse_y, this->scenes.at(currentScene)->m_Camera->m_width, this->scenes.at(currentScene)->m_Camera->m_height, this->scenes.at(currentScene)->m_ProjectionMatrix, this->scenes.at(currentScene)->m_Camera->getViewMatrix());
 

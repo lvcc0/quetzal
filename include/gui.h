@@ -8,6 +8,8 @@
 #include <vector>
 #include <algorithm>
 #include <typeinfo>
+#include <concepts>
+#include <type_traits>
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -15,10 +17,28 @@
 
 #include "scene.h"
 
+
+// TIP: USE IMGUI WINDOW STATE FUNCS BETWEEN CALLING IMGUI::RENDER AND IMGUI::END 
+
 class GUI_Window_object_properties;
 
+// You must prepare your inheritor for recieving info about this params
+struct WindowProperties{
+    // params //
+    // These particular params must be taken between ImGui::Render and ImGui::End
+    // So we somehow get them and keep here
+protected:
+    glm::vec2 GUIWindowSize{ 0.0f ,0.0f };
+    glm::vec2 GUIWindowPos{ 0.0f, 0.0f };
+public:
+    // sup funcs //
+    inline glm::vec2 getGUIWindowSize() const noexcept { return GUIWindowSize; };
+    inline glm::vec2 getGUIWindowPos() const noexcept { return GUIWindowPos; };
+    // -------------------//
+};
+
 // Singleton (should be)
-class GUI {
+class GUI: public WindowProperties {
 public:
     GUI(GLFWwindow* window);
     GUI(const GUI& obj) = delete;
@@ -34,6 +54,7 @@ public:
     void clickWindow(const std::shared_ptr<Scene_Node> obj);
     void clickWindow(const std::shared_ptr<Renderable> obj);
     // ------------------ //
+    inline std::vector<std::shared_ptr<GUI_Window_object_properties>> getWindowsObjProps()const { return m_WindowsVec; }
 
 private:
     std::vector<std::shared_ptr<GUI_Window_object_properties>> m_WindowsVec;
@@ -52,7 +73,7 @@ private:
 
 // This class of windows operating with Scene_Node objects
 // But constructors get their object via Scene_Node
-class GUI_Window_object_properties {
+class GUI_Window_object_properties: public WindowProperties {
 public:
     // Constructors
     GUI_Window_object_properties(const std::shared_ptr<Scene_Node> obj);
@@ -92,6 +113,11 @@ private:
         ImGui::Separator();
         ImGui::DragFloat3("Rotation", (float*)&m_CurrentModel->m_RotationDegrees, 1.0f);
 
+        // This must be between render and end funcs
+        GUIWindowPos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
+        GUIWindowSize = glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+        // ------------------------- //
+
         ImGui::End();
     }
     template<>
@@ -114,6 +140,11 @@ private:
         ImGui::Separator();
         ImGui::DragFloat3("Rotation", (float*)&m_CurrentRigidBody->m_RotationDegrees, 1.0f);
 
+        // This must be between render and end funcs
+        GUIWindowPos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
+        GUIWindowSize = glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+        // ------------------------- //
+
         ImGui::End();
     }
     template<>
@@ -127,6 +158,11 @@ private:
         ImGui::Separator();
         ImGui::DragFloat3("Position", (float*)&m_CurrentCylBill->m_Position, 0.5f);
 
+        // This must be between render and end funcs
+        GUIWindowPos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
+        GUIWindowSize = glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+        // ------------------------- //
+
         ImGui::End();
     }
     template<>
@@ -139,6 +175,11 @@ private:
 
         ImGui::Separator();
         ImGui::DragFloat3("Position", (float*)&m_CurrentSphBill->m_Position, 0.5f);
+
+        // This must be between render and end funcs
+        GUIWindowPos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
+        GUIWindowSize = glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+        // ------------------------- //
 
         ImGui::End();
     }

@@ -22,7 +22,7 @@ GUI::~GUI()
 void GUI::guiLoop(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene)
 {
     showCurrentSceneGUI(delta_time, current_scene);
-    
+
     for (auto item : m_WindowsVec)
         item->windowLoop();
 }
@@ -30,7 +30,7 @@ void GUI::guiLoop(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Sce
 void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene)
 {
     ImGui::Begin((current_scene.first + " config").c_str());
-    
+
     ImGui::Checkbox("Physics Enabled", &current_scene.second->m_IsPhysics);
 
     ImGui::Separator();
@@ -94,6 +94,12 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", current_scene.second->m_Camera->m_pos.x, current_scene.second->m_Camera->m_pos.y, current_scene.second->m_Camera->m_pos.z);
     ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", current_scene.second->m_Camera->m_orientation.x, current_scene.second->m_Camera->m_orientation.y, current_scene.second->m_Camera->m_orientation.z);
     ImGui::Text("%.3f ms (%.1f FPS)", delta_time * 1000.0f, 1.0f / delta_time);
+    ImGui::Text("Pos X%.2f Y%.2f Size X%.2f Y%.2f", ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+
+    // This must be between render and end funcs
+    GUIWindowPos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
+    GUIWindowSize = glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+    // ------------------------- //
 
     ImGui::End();
 }
