@@ -2,7 +2,7 @@
 
 std::string ResourceManager::getFileString(const std::string& file_path)
 {
-    
+    std::cout << file_path << std::endl;
     std::string temp_file_path = file_path;
 
     // catch if file_path is relative
@@ -24,7 +24,8 @@ std::string ResourceManager::getFileString(const std::string& file_path)
 
 void ResourceManager::loadModel(const std::string model_path)
 {
-    std::string name = model_path.substr(model_path.find_last_of("/") + 1, model_path.substr(model_path.find_last_of("/") + 1).size() - MODELS_MAIN_FILE_EXTENSION.size() - 1);
+    std::filesystem::path path(model_path);
+    std::string name = path.filename().string();
 
     if (m_LoadedModels.find(name) != m_LoadedModels.end())
         std::cout << "MODEL WITH NAME:: " << name << " ALREADY LOADED" << std::endl;
@@ -135,28 +136,26 @@ void ResourceManager::loadModel(const std::string model_path)
             if (linetype == "mtllib") // corresponding material file
             {
                 std::istringstream file_name(line.substr(line.find(" ") + 1));
-                textures = pullTexturesFromMtl(model_path.substr(0, model_path.find_last_of('/') + 1) + file_name.str());
+                textures = pullTexturesFromMtl(path.parent_path().string() + "/" + file_name.str());
 
                 continue;
             }
         }
-
         m_LoadedModels.emplace(name, Model(vertices, indices, textures, true));
     }
 }
 
 void ResourceManager::loadTexture(const std::string texture_path)
 {
-    std::string ext = texture_path.substr(texture_path.find_last_of(".") + 1);
-    std::string name = texture_path.substr(texture_path.find_last_of("/") + 1, texture_path.substr(texture_path.find_last_of("/") + 1).size() - ext.size() - 1);
-    std::cout << name << std::endl;
+    std::filesystem::path path(texture_path);
+    std::string name = path.filename().string();
+
     // If the same texture was loaded - return it (copying isnt necessary)
     if (m_LoadedTextures.find(name) != m_LoadedTextures.end())
         std::cout << "TEXTURE WITH NAME:: " << name << " ALREADY LOADED" << std::endl;
 
     else
     {
-
         int width, height, numComponents;
         unsigned char* image = stbi_load(texture_path.c_str(), &width, &height, &numComponents, 0);
 
@@ -173,16 +172,16 @@ void ResourceManager::loadTexture(const std::string texture_path)
 
 void ResourceManager::loadScreenShaders(const std::string path_to_folder)
 {
-    std::string vert_path;
-    std::vector<std::string> frag_paths;
+    // AT NOW THERE ONLY ONE VERTEX FILE CAN BE IN THIS FOLDER 
+    std::filesystem::path vert_path;
+    std::vector<std::filesystem::path> frag_paths;
 
     for (const auto& entry : std::filesystem::directory_iterator(path_to_folder))
     {
-        std::string file_path = entry.path().string();
-        std::replace(file_path.begin(), file_path.end(), '\\', '/');
+        std::filesystem::path path(entry.path());
 
-        std::string file_name_with_extension = file_path.substr(file_path.find_last_of("/") + 1, file_path.size());
-        std::string extension = file_name_with_extension.substr(file_name_with_extension.find(".") + 1, file_name_with_extension.size());
+        std::string file_name_with_extension = path.filename().string();
+        std::string extension = path.extension().string();
 
         if (extension == VERTEX_FILE_EXTENSION)
             vert_path = path_to_folder + "/" + file_name_with_extension;
@@ -192,18 +191,18 @@ void ResourceManager::loadScreenShaders(const std::string path_to_folder)
 
     for (const auto& frag_path : frag_paths)
     {
-        std::string file_name = frag_path.substr(frag_path.find_last_of("/") + 1, frag_path.size() - frag_path.find_last_of("/") - (frag_path.size() - frag_path.find(".") + 1));
-        m_LoadedScreenShaders.emplace(file_name, makeShaderProgram(vert_path, frag_path));
+        std::filesystem::path path(frag_path);
+        m_LoadedScreenShaders.emplace(path.filename().string(), makeShaderProgram(vert_path.string(), frag_path.string()));
     }
 }
 
 std::vector<std::shared_ptr<Texture>> ResourceManager::pullTexturesFromMtl(const std::string& full_path)
 {
     std::ifstream file(full_path);
+    std::filesystem::path path(full_path);
     std::string line;
 
     std::vector<std::shared_ptr<Texture>> textures;
-
     while (std::getline(file, line))
     {
         std::string linetype = line.substr(0, line.find(" "));
@@ -211,11 +210,10 @@ std::vector<std::shared_ptr<Texture>> ResourceManager::pullTexturesFromMtl(const
         if (linetype == "map_Kd")
         {
             std::string str = line.substr(line.find(" ") + 1);
-            std::string file_path = full_path.substr(0, full_path.find_last_of('/') + 1) + str;
-            std::string ext = file_path.substr(file_path.find_last_of(".") + 1);
-            std::string name = file_path.substr(file_path.find_last_of("/") + 1, file_path.substr(file_path.find_last_of("/") + 1).size() - ext.size() - 1);
+            std::filesystem::path file_path = path.parent_path().string() + "/" + str;
+            std::string name = file_path.filename().string();
 
-            loadTexture(file_path);
+            loadTexture(file_path.string());
             std::shared_ptr<Texture> texture = makeTexture(name);
             texture->m_type = "texture_diffuse";
             textures.push_back(texture);
@@ -290,29 +288,26 @@ void ResourceManager::preLoadResources()
     // Loading models
     for (const auto& entry : std::filesystem::directory_iterator(model_folder_path))
     {
-        std::string folder_path = entry.path().string();
-        std::replace(folder_path.begin(), folder_path.end(), '\\', '/');
+        std::filesystem::path folder_path = entry.path();
 
         for (const auto& file : std::filesystem::directory_iterator(folder_path))
         {
-            std::string file_path = file.path().string();
-            std::replace(file_path.begin(), file_path.end(), '\\', '/');
+            std::filesystem::path file_path = file.path();
 
-            std::string extension = file_path.substr(file_path.find(".") + 1, file_path.size());
+            std::string extension = file_path.extension().string();
             if (extension == MODELS_MAIN_FILE_EXTENSION)
-                loadModel(file_path);
+                loadModel(file_path.string());
         }
     }
 
     // Loading textures
     for (const auto& entry : std::filesystem::directory_iterator(textures_folder_path))
     {
-        std::string file_path = entry.path().string();
-        std::replace(file_path.begin(), file_path.end(), '\\', '/');
+        std::filesystem::path file_path = entry.path();
 
-        std::string extension = file_path.substr(file_path.find(".") + 1, file_path.size());
+        std::string extension = file_path.extension().string();
         if (std::find(TEXTURES_FILE_EXTENSIONS.begin(), TEXTURES_FILE_EXTENSIONS.end(), extension) != TEXTURES_FILE_EXTENSIONS.end())
-            loadTexture(file_path);
+            loadTexture(file_path.string());
     }
 
     // Loading screen shaders

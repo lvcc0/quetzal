@@ -37,6 +37,7 @@ public:
 
     // Make shared_ptrs
     static std::shared_ptr<Shader>               makeShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
+    // In my opinion it should return a copy of an object
     static std::shared_ptr<Texture>              makeTexture(const std::string& name);
 
     // Make objects
@@ -54,11 +55,11 @@ private:
     inline static const std::string TEXTURES_FOLDER = "textures";
     inline static const std::string SCREEN_SHADERS_FOLDER = "postprocess";
 
-    inline static const std::string MODELS_MAIN_FILE_EXTENSION = "obj";
-    inline static const std::string VERTEX_FILE_EXTENSION = "vert";
-    inline static const std::string FRAGMENT_FILE_EXTENSION = "frag";
+    inline static const std::string MODELS_MAIN_FILE_EXTENSION = ".obj";
+    inline static const std::string VERTEX_FILE_EXTENSION = ".vert";
+    inline static const std::string FRAGMENT_FILE_EXTENSION = ".frag";
 
-    inline static const std::vector<std::string> TEXTURES_FILE_EXTENSIONS{ "jpg", "png" };
+    inline static const std::vector<std::string> TEXTURES_FILE_EXTENSIONS{ ".jpg", ".png" };
 
     // Map of loaded resources (First - name of file, second - ptrs of objects)
     inline static std::map<std::string, std::shared_ptr<void>> m_LoadedObjects;

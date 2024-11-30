@@ -228,7 +228,7 @@ void Scene::addPointLight(PointLight point_light, std::vector<Vertex> verts)
     std::shared_ptr<PointLight> light = std::make_shared<PointLight>(point_light);
     this->m_PointLights.push_back(light);
 
-    this->addSphBillboard(point_light.m_name, point_light.m_pos, glm::vec2(1.0f), "lightbulb", verts);
+    this->addSphBillboard(point_light.m_name, point_light.m_pos, glm::vec2(1.0f), "lightbulb.png", verts);
 }
 
 void Scene::addSpotLight(SpotLight spot_light, std::vector<Vertex> verts)
@@ -236,5 +236,5 @@ void Scene::addSpotLight(SpotLight spot_light, std::vector<Vertex> verts)
     std::shared_ptr<SpotLight> light = std::make_shared<SpotLight>(spot_light);
     this->m_SpotLights.push_back(light);
 
-    this->addSphBillboard(spot_light.m_name, spot_light.m_pos, glm::vec2(1.0f), "highlight", verts);
+    this->addSphBillboard(spot_light.m_name, spot_light.m_pos, glm::vec2(1.0f), "highlight.png", verts);
 }
