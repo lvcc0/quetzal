@@ -28,13 +28,12 @@ public:
     // Draw model
     virtual void draw(const Shaders_pack& shaders) override;
 
+    virtual glm::mat4 getModelMatrix() const noexcept override;
+protected:
     // Moving in world space
     inline virtual void setPosition(const glm::vec3 pos) override;
     inline virtual void setScale(const glm::vec3 scale) override;
     inline virtual void setRotationDegrees(const glm::vec3 rotation, float degrees) override;
-
-    virtual glm::mat4 getModelMatrix() const override;
-protected:
 
     // Setup VAO, VBO, EBO
     void setupRender() override;

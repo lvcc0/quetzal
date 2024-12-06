@@ -20,25 +20,34 @@
 
 // TIP: USE IMGUI WINDOW STATE FUNCS BETWEEN CALLING IMGUI::RENDER AND IMGUI::END 
 
-class GUI_Window_object_properties;
+class GUI_Window_object_properties; // GUI must be able to know about this class
 
-// You must prepare your inheritor for recieving info about this params
-struct WindowProperties{
-    // params //
+template <class T>
+concept constraint_window_properties = std::is_same_v<T, glm::vec2> || std::is_same_v <T, std::vector<glm::vec2>>;
+
+// You must prepare your inheritor for recieving info about some parameters
+template<class Type> requires constraint_window_properties<Type>
+struct WindowProperties
+{
+protected:
+    unsigned int pos_x, pos_y, width, height;
     // These particular params must be taken between ImGui::Render and ImGui::End
     // So we somehow get them and keep here
-protected:
-    glm::vec2 GUIWindowSize{ 0.0f ,0.0f };
-    glm::vec2 GUIWindowPos{ 0.0f, 0.0f };
+    Type GUIWindowSize;
+    Type GUIWindowPos;
+    // ----------------- //
+    void positioningWindow(GLFWwindow* window, float part_of_width, float part_of_height, float pos_x, float pos_y);
 public:
-    // sup funcs //
-    inline glm::vec2 getGUIWindowSize() const noexcept { return GUIWindowSize; };
-    inline glm::vec2 getGUIWindowPos() const noexcept { return GUIWindowPos; };
+    // getters //
+    inline Type getGUIWindowSize() const noexcept { return GUIWindowSize; };
+    inline Type getGUIWindowPos() const noexcept { return GUIWindowPos; };
     // -------------------//
 };
 
 // Singleton (should be)
-class GUI: public WindowProperties {
+// This is the main part of GUI of scenes. It contains more than one window
+class GUI: public WindowProperties<std::vector<glm::vec2>>
+{
 public:
     GUI(GLFWwindow* window);
     GUI(const GUI& obj) = delete;
@@ -48,9 +57,9 @@ public:
     ~GUI();
 
     // main funcs //
-    void guiLoop(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene);
+    void guiLoop(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene, GLFWwindow* window);
 
-    void showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene);
+    void showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene, GLFWwindow* window);
     void clickWindow(const std::shared_ptr<Scene_Node> obj);
     void clickWindow(const std::shared_ptr<Renderable> obj);
     // ------------------ //
@@ -58,6 +67,7 @@ public:
 
 private:
     std::vector<std::shared_ptr<GUI_Window_object_properties>> m_WindowsVec;
+    std::vector<std::shared_ptr<Scene_Node>> m_AllSceneNodes;
 
     template<typename T>
     void addObject(std::string name, std::shared_ptr<Scene> scene)
@@ -73,10 +83,11 @@ private:
 
 // This class of windows operating with Scene_Node objects
 // But constructors get their object via Scene_Node
-class GUI_Window_object_properties: public WindowProperties {
+class GUI_Window_object_properties : public WindowProperties <std::vector<glm::vec2>>
+{
 public:
     // Constructors
-    GUI_Window_object_properties(const std::shared_ptr<Scene_Node> obj);
+    GUI_Window_object_properties(const std::shared_ptr<Scene_Node> obj, const std::vector<std::shared_ptr<Scene_Node>> scene_nodes);
     GUI_Window_object_properties(const GUI_Window_object_properties& window) = delete;
     GUI_Window_object_properties(GUI_Window_object_properties&& window) = delete;
 
@@ -90,98 +101,18 @@ public:
     inline const std::shared_ptr<Scene_Node> getNode() const { return m_SceneNode; }
 private:
     std::shared_ptr<Scene_Node> m_SceneNode;
+    std::vector<std::shared_ptr<Scene_Node>> m_AllSceneNodes;
+    bool attaching{false};
 
     template <typename T>
-    void showCurrentObjectGUI()
-    {
-        ASSERT(false);
-    }
+    void showCurrentObjectGUI();
     template<>
-    void showCurrentObjectGUI<Model>()
-    {
-        std::shared_ptr<Model> m_CurrentModel = std::dynamic_pointer_cast<Model>(m_SceneNode);
-        m_CurrentModel->is_selected = true;
-
-        ImGui::Begin((m_CurrentModel->getName() + " config").c_str());
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Position", (float*)&m_CurrentModel->m_Position, 0.5f);
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Scale", (float*)&m_CurrentModel->m_Scale, 0.2f);
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Rotation", (float*)&m_CurrentModel->m_RotationDegrees, 1.0f);
-
-        // This must be between render and end funcs
-        GUIWindowPos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
-        GUIWindowSize = glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
-        // ------------------------- //
-
-        ImGui::End();
-    }
+    void showCurrentObjectGUI<Model>();
     template<>
-    void showCurrentObjectGUI<RigidBody>()
-    {
-        std::shared_ptr<RigidBody> m_CurrentRigidBody = std::dynamic_pointer_cast<RigidBody>(m_SceneNode);
-        m_CurrentRigidBody->is_selected = true;
-
-        ImGui::Begin((m_CurrentRigidBody->getName() + " config").c_str());
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Position", (float*)&m_CurrentRigidBody->m_Position, 0.5f);
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Move speed", (float*)&m_CurrentRigidBody->m_MoveVector, 0.001f);
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Scale", (float*)&m_CurrentRigidBody->m_Scale, 0.2f);
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Rotation", (float*)&m_CurrentRigidBody->m_RotationDegrees, 1.0f);
-
-        // This must be between render and end funcs
-        GUIWindowPos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
-        GUIWindowSize = glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
-        // ------------------------- //
-
-        ImGui::End();
-    }
+    void showCurrentObjectGUI<RigidBody>();
     template<>
-    void showCurrentObjectGUI<CylindricalBillboard>()
-    {
-        std::shared_ptr<CylindricalBillboard> m_CurrentCylBill = std::dynamic_pointer_cast<CylindricalBillboard>(m_SceneNode);
-        m_CurrentCylBill->is_selected = true;
-
-        ImGui::Begin((m_CurrentCylBill->getName() + " config").c_str());
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Position", (float*)&m_CurrentCylBill->m_Position, 0.5f);
-
-        // This must be between render and end funcs
-        GUIWindowPos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
-        GUIWindowSize = glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
-        // ------------------------- //
-
-        ImGui::End();
-    }
+    void showCurrentObjectGUI<CylindricalBillboard>();
     template<>
-    void showCurrentObjectGUI<SphericalBillboard>()
-    {
-        std::shared_ptr<SphericalBillboard> m_CurrentSphBill = std::dynamic_pointer_cast<SphericalBillboard>(m_SceneNode);
-        m_CurrentSphBill->is_selected = true;
-
-        ImGui::Begin((m_CurrentSphBill->getName() + " config").c_str());
-
-        ImGui::Separator();
-        ImGui::DragFloat3("Position", (float*)&m_CurrentSphBill->m_Position, 0.5f);
-
-        // This must be between render and end funcs
-        GUIWindowPos = glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
-        GUIWindowSize = glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
-        // ------------------------- //
-
-        ImGui::End();
-    }
-
+    void showCurrentObjectGUI<SphericalBillboard>();
 };
+

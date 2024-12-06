@@ -35,11 +35,10 @@ public:
 
     glm::vec3 m_Target = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    // Moving in the world space
+protected:
     inline virtual void setPosition(glm::vec3 pos) override;
     inline virtual void setScale(glm::vec3 scale) override;
 
-protected:
     virtual void setupRender() override;
 };
 
@@ -57,7 +56,7 @@ public:
     // Draw billboard and change it's model matrix
     void draw(const Shaders_pack& shaders) override;
 
-    virtual glm::mat4 getModelMatrix() const override;
+    virtual glm::mat4 getModelMatrix() const noexcept override;
 };
 
 class SphericalBillboard : public Billboard
@@ -76,5 +75,5 @@ public:
     // Draw billboard and change it's model matrix
     void draw(const Shaders_pack& shaders) override;
 
-    virtual glm::mat4 getModelMatrix() const override;
+    virtual glm::mat4 getModelMatrix() const noexcept override;
 };

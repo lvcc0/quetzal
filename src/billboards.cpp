@@ -43,7 +43,7 @@ void CylindricalBillboard::draw(const Shaders_pack& shaders)
 
     vao_ptr->unbind();
 }
-glm::mat4 CylindricalBillboard::getModelMatrix() const
+glm::mat4 CylindricalBillboard::getModelMatrix() const noexcept
 {
     glm::mat4 return_matrix = glm::mat4(1.0f);
     return_matrix = glm::translate(return_matrix, m_Position);
@@ -108,7 +108,7 @@ void SphericalBillboard::draw(const Shaders_pack& shaders)
 
     vao_ptr->unbind();
 }
-glm::mat4 SphericalBillboard::getModelMatrix() const
+glm::mat4 SphericalBillboard::getModelMatrix() const noexcept
 {
     glm::mat4 return_matrix = glm::mat4(1.0f);
     return_matrix = glm::translate(return_matrix, m_Position);

@@ -100,17 +100,26 @@ void Engine::pickObject()
     GLdouble mouse_x, mouse_y;
     glfwGetCursorPos(window, &mouse_x, &mouse_y);
 
-    // Blocking that part of screen which is already occupied
-    for (auto item : gui->getWindowsObjProps())
+    // Blocking that part of screen which is already occupied by:
+    // Main GUI of scene
+    // Main GUI contains more than one window
+    for (int i{ 0 }; i < gui->getGUIWindowPos().size(); i++)
     {
-        if (item->getGUIWindowPos().x + item->getGUIWindowSize().x > mouse_x && mouse_x > item->getGUIWindowPos().x
-            && item->getGUIWindowPos().y + item->getGUIWindowSize().y > mouse_y && mouse_y > item->getGUIWindowPos().y)
+        if (gui->getGUIWindowPos()[i].x + gui->getGUIWindowSize()[i].x > mouse_x && mouse_x > gui->getGUIWindowPos()[i].x
+            && gui->getGUIWindowPos()[i].y + gui->getGUIWindowSize()[i].y > mouse_y && mouse_y > gui->getGUIWindowPos()[i].y)
             return;
     }
 
-    if (gui->getGUIWindowPos().x + gui->getGUIWindowSize().x > mouse_x && mouse_x > gui->getGUIWindowPos().x 
-        && gui->getGUIWindowPos().y + gui->getGUIWindowSize().y > mouse_y && mouse_y > gui->getGUIWindowPos().y)
-        return;
+    // Window_obj_props
+    for (auto item : gui->getWindowsObjProps())
+    {
+        for (int i{ 0 }; i < item->getGUIWindowPos().size(); i++)
+        {
+            if (item->getGUIWindowPos()[i].x + item->getGUIWindowSize()[i].x > mouse_x && mouse_x > item->getGUIWindowPos()[i].x
+                && item->getGUIWindowPos()[i].y + item->getGUIWindowSize()[i].y > mouse_y && mouse_y > item->getGUIWindowPos()[i].y)
+                return;
+        }
+    }
     // ----------------------------- //
 
     glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Camera->m_pos;
@@ -156,7 +165,7 @@ void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 // Gets called upon key press
 void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_0 && action == GLFW_PRESS)
+    if (key == GLFW_KEY_M && action == GLFW_PRESS)
         this->shouldDrawGui = !this->shouldDrawGui;
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -177,7 +186,7 @@ void Engine::process()
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
-        gui->guiLoop(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)));
+        gui->guiLoop(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)), window);
 
 
     // --------- //

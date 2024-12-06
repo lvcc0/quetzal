@@ -51,7 +51,7 @@ void Scene::update()
             std::string name = m_PointLights[i]->m_name;
             std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
 
-            sph_bill->setPosition(m_PointLights[i]->m_pos);
+            sph_bill->m_Position = m_PointLights[i]->m_pos;
             sph_bill->m_Target = m_Camera->m_pos;
             sph_bill->draw(shaders_active);
         }
@@ -65,7 +65,7 @@ void Scene::update()
             std::string name = m_SpotLights[i]->m_name;
             std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
 
-            sph_bill->setPosition(m_PointLights[i]->m_pos);
+            sph_bill->m_Position = m_PointLights[i]->m_pos;
             sph_bill->m_Target = m_Camera->m_pos;
             sph_bill->draw(shaders_active);
         }

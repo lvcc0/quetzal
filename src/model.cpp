@@ -104,23 +104,45 @@ void Model::draw(const Shaders_pack& shaders)
 
 inline void Model::setPosition(const glm::vec3 pos)
 {
-    m_ModelMatrix = glm::translate(m_ModelMatrix, pos);
-    m_Position = pos;
+    // Parent pos
+    glm::vec3 parent_pos(0.0, 0.0, 0.0);
+    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
+    if (parent_ptr != nullptr)
+        parent_pos = parent_ptr->getPosition();
+
+    m_ModelMatrix = glm::translate(m_ModelMatrix, m_Position + parent_pos);
 }
 
 inline void Model::setScale(const glm::vec3 scale)
 {
-    m_ModelMatrix = glm::scale(m_ModelMatrix, scale);
-    m_Scale = scale;
+    // Parent scale
+    glm::vec3 parent_scale(1.0, 1.0, 1.0);
+    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
+    if (parent_ptr != nullptr)
+        parent_scale = parent_ptr->getScale();
+
+    m_ModelMatrix = glm::scale(m_ModelMatrix, m_Scale * parent_scale);
 }
 
 inline void Model::setRotationDegrees(const glm::vec3 rotation, float degrees)
 {
-    m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees), rotation);
-    m_RotationDegrees = rotation * degrees;
+    // Parent rotation
+    glm::vec3 parent_rotation_degrees(0.0, 0.0, 0.0);
+    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
+    if (parent_ptr != nullptr)
+        parent_rotation_degrees = parent_ptr->getRotationDegrees();
+
+    if (rotation == glm::vec3(1.0, 0.0, 0.0))
+        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees + parent_rotation_degrees.x), rotation);
+    else if (rotation == glm::vec3(0.0, 1.0, 0.0))
+        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees + parent_rotation_degrees.y), rotation);
+    else if (rotation == glm::vec3(0.0, 0.0, 1.0))
+        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees + parent_rotation_degrees.z), rotation);
+    else
+        __debugbreak();
 }
 
-glm::mat4 Model::getModelMatrix() const
+glm::mat4 Model::getModelMatrix() const noexcept
 {
     glm::mat4 return_matrix = glm::mat4(1.0f);
     return_matrix = glm::translate(return_matrix, m_Position);
