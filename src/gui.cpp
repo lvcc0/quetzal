@@ -30,6 +30,10 @@ void GUI::guiLoop(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Sce
 
 void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene, GLFWwindow* window)
 {
+    // Delete vecs
+    GUIWindowPos.clear();
+    GUIWindowSize.clear();
+
     // First window //
     ImGui::Begin((current_scene.first + " config").c_str(), 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
@@ -89,8 +93,8 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     ImGui::Text("Pos X%.2f Y%.2f Size X%.2f Y%.2f", ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
     // This must be between render and end funcs
-    GUIWindowPos.emplace(GUIWindowPos.cbegin(), glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
-    GUIWindowSize.emplace(GUIWindowSize.cbegin(), glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
+    GUIWindowPos.push_back(glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
+    GUIWindowSize.push_back(glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
     // ------------- //
 
     ImGui::End();
@@ -113,8 +117,8 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     }
 
     // This must be between render and end funcs
-    GUIWindowPos.emplace(GUIWindowPos.cbegin() + 1, glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
-    GUIWindowSize.emplace(GUIWindowSize.cbegin() + 1, glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
+    GUIWindowPos.push_back(glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
+    GUIWindowSize.push_back(glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
     // ------------- //
 
     ImGui::End();
@@ -164,6 +168,8 @@ GUI_Window_object_properties::~GUI_Window_object_properties()
 
 void GUI_Window_object_properties::windowLoop()
 {
+    GUIWindowPos.clear();
+    GUIWindowSize.clear();
     if (typeid(*m_SceneNode) == typeid(RigidBody))
         showCurrentObjectGUI<RigidBody>();
     else if (typeid(*m_SceneNode) == typeid(CylindricalBillboard))
@@ -224,8 +230,8 @@ void GUI_Window_object_properties::showCurrentObjectGUI<Model>()
             m_CurrentModel->setParent(nullptr);
         }
         // This must be between render and end funcs
-        GUIWindowPos.emplace(GUIWindowPos.cbegin() + 1, glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
-        GUIWindowSize.emplace(GUIWindowSize.cbegin() + 1, glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
+        GUIWindowPos.push_back(glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
+        GUIWindowSize.push_back(glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
         // ------------------------- //
 
         ImGui::End();
@@ -233,8 +239,8 @@ void GUI_Window_object_properties::showCurrentObjectGUI<Model>()
     // --------------------------------- //
     
     // This must be between render and end funcs
-    GUIWindowPos.emplace(GUIWindowPos.cbegin(), glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
-    GUIWindowSize.emplace(GUIWindowSize.cbegin(), glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
+    GUIWindowPos.push_back(glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
+    GUIWindowSize.push_back(glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
     // ------------------------- //
 
     ImGui::End();
@@ -260,8 +266,8 @@ void GUI_Window_object_properties::showCurrentObjectGUI<RigidBody>()
     ImGui::DragFloat3("Rotation", (float*)&m_CurrentRigidBody->m_RotationDegrees, 1.0f, 0.0, 360);
 
     // This must be between render and end funcs
-    GUIWindowPos.emplace(GUIWindowPos.cbegin(), glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
-    GUIWindowSize.emplace(GUIWindowSize.cbegin(), glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
+    GUIWindowPos.push_back(glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
+    GUIWindowSize.push_back(glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
     // ------------------------- //
 
     ImGui::End();
@@ -278,8 +284,8 @@ void GUI_Window_object_properties::showCurrentObjectGUI<CylindricalBillboard>()
     ImGui::DragFloat3("Position", (float*)&m_CurrentCylBill->m_Position, 0.5f);
 
     // This must be between render and end funcs
-    GUIWindowPos.emplace(GUIWindowPos.cbegin(), glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
-    GUIWindowSize.emplace(GUIWindowSize.cbegin(), glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
+    GUIWindowPos.push_back(glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
+    GUIWindowSize.push_back(glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
     // ------------------------- //
 
     ImGui::End();
@@ -296,8 +302,8 @@ void GUI_Window_object_properties::showCurrentObjectGUI<SphericalBillboard>()
     ImGui::DragFloat3("Position", (float*)&m_CurrentSphBill->m_Position, 0.5f);
 
     // This must be between render and end funcs
-    GUIWindowPos.emplace(GUIWindowPos.cbegin(), glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
-    GUIWindowSize.emplace(GUIWindowSize.cbegin(), glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
+    GUIWindowPos.push_back(glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
+    GUIWindowSize.push_back(glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
     // ------------------------- //
 
     ImGui::End();

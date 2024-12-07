@@ -36,8 +36,6 @@ public:
     glm::vec3 m_Target = glm::vec3(0.0f, 0.0f, 0.0f);
 
 protected:
-    inline virtual void setPosition(glm::vec3 pos) override;
-    inline virtual void setScale(glm::vec3 scale) override;
 
     virtual void setupRender() override;
 };

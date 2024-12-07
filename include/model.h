@@ -31,9 +31,9 @@ public:
     virtual glm::mat4 getModelMatrix() const noexcept override;
 protected:
     // Moving in world space
-    inline virtual void setPosition(const glm::vec3 pos) override;
-    inline virtual void setScale(const glm::vec3 scale) override;
-    inline virtual void setRotationDegrees(const glm::vec3 rotation, float degrees) override;
+    inline virtual void setPosition() override;
+    inline virtual void setScale() override;
+    inline virtual void setRotationDegrees(const glm::vec3 rotation) override;
 
     // Setup VAO, VBO, EBO
     void setupRender() override;

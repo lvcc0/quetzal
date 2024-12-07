@@ -49,18 +49,23 @@ public:
 
 	// Abstract variables for using in world space
 	glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);        // position in the world space
+	glm::vec3 m_AbsolutePosition = glm::vec3(0.0f, 0.0f, 0.0f);  
+
 	glm::vec3 m_Scale = glm::vec3(1.0f, 1.0f, 1.0f);           // scaling in the world space
+	glm::vec3 m_AbsoluteScale = glm::vec3(1.0f, 1.0f, 1.0f);
+
 	glm::vec3 m_RotationDegrees = glm::vec3(0.0f, 0.0f, 0.0f); // rotation in all 3 axis respectively in the world space
+	glm::vec3 m_AbsoluteRotationDegrees = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	// ----------------- //
-	inline virtual const glm::vec3 getPosition() const noexcept { return m_Position; }
-	inline virtual const glm::vec3 getScale() const noexcept { return m_Scale; }
-	inline virtual const glm::vec3 getRotationDegrees() const noexcept { return m_RotationDegrees; }
+	inline virtual const glm::vec3 getPosition() const noexcept { return m_AbsolutePosition; }
+	inline virtual const glm::vec3 getScale() const noexcept { return m_AbsoluteScale; }
+	inline virtual const glm::vec3 getRotationDegrees() const noexcept { return m_AbsoluteRotationDegrees; }
 protected:
 	// Use while drawing
-	inline virtual void setPosition(const glm::vec3 pos) { m_Position = pos; }
-	inline virtual void setScale(const glm::vec3 scale) { m_Scale = scale; }
-	inline virtual void setRotationDegrees(const glm::vec3 rotation, float degrees) { m_RotationDegrees = rotation; }
+	inline virtual void setPosition() {  }
+	inline virtual void setScale() {  }
+	inline virtual void setRotationDegrees(const glm::vec3 rotation) {  }
 };
 
 // Parent for classes which objects are used as something renderable

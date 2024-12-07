@@ -134,16 +134,6 @@ Billboard::Billboard(const Billboard& obj):
     setupRender();
 }
 
-inline void Billboard::setPosition(glm::vec3 pos)
-{
-    m_Position = pos;
-}
-
-inline void Billboard::setScale(glm::vec3 scale)
-{
-    m_Scale = glm::vec3(scale.x, scale.y, 0);
-}
-
 void Billboard::setupRender()
 {
     // Vertex Array Object

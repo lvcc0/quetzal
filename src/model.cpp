@@ -23,11 +23,11 @@ void Model::draw(const Shaders_pack& shaders)
     std::shared_ptr<Shader> stencil_shader = shaders.STENCIL_SHADER;
     
     // Inheritor methods can be called
-    this->setPosition(m_Position);
-    this->setScale(m_Scale);
-    this->setRotationDegrees(glm::vec3(1.0, 0.0, 0.0), m_RotationDegrees.x);
-    this->setRotationDegrees(glm::vec3(0.0, 1.0, 0.0), m_RotationDegrees.y);
-    this->setRotationDegrees(glm::vec3(0.0, 0.0, 1.0), m_RotationDegrees.z);
+    this->setPosition();
+    this->setScale();
+    this->setRotationDegrees(glm::vec3(1.0, 0.0, 0.0));
+    this->setRotationDegrees(glm::vec3(0.0, 1.0, 0.0));
+    this->setRotationDegrees(glm::vec3(0.0, 0.0, 1.0));
 
     unsigned int diffuseNum = 1;
     unsigned int specularNum = 1;
@@ -102,42 +102,42 @@ void Model::draw(const Shaders_pack& shaders)
     m_ModelMatrix = glm::mat4(1.0f);
 }
 
-inline void Model::setPosition(const glm::vec3 pos)
+inline void Model::setPosition()
 {
+    m_AbsolutePosition = m_Position;
     // Parent pos
-    glm::vec3 parent_pos(0.0, 0.0, 0.0);
     auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
     if (parent_ptr != nullptr)
-        parent_pos = parent_ptr->getPosition();
+        m_AbsolutePosition += parent_ptr->getPosition();
 
-    m_ModelMatrix = glm::translate(m_ModelMatrix, m_Position + parent_pos);
+    m_ModelMatrix = glm::translate(m_ModelMatrix, m_AbsolutePosition);
 }
 
-inline void Model::setScale(const glm::vec3 scale)
+inline void Model::setScale()
 {
+    m_AbsoluteScale = m_Scale;
     // Parent scale
-    glm::vec3 parent_scale(1.0, 1.0, 1.0);
     auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
     if (parent_ptr != nullptr)
-        parent_scale = parent_ptr->getScale();
+        m_AbsoluteScale *= parent_ptr->getScale();
 
-    m_ModelMatrix = glm::scale(m_ModelMatrix, m_Scale * parent_scale);
+    m_ModelMatrix = glm::scale(m_ModelMatrix, m_AbsoluteScale);
 }
 
-inline void Model::setRotationDegrees(const glm::vec3 rotation, float degrees)
+inline void Model::setRotationDegrees(const glm::vec3 rotation)
 {
+    m_AbsoluteRotationDegrees = m_RotationDegrees;
     // Parent rotation
-    glm::vec3 parent_rotation_degrees(0.0, 0.0, 0.0);
     auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
     if (parent_ptr != nullptr)
-        parent_rotation_degrees = parent_ptr->getRotationDegrees();
+        m_AbsoluteRotationDegrees += parent_ptr->getRotationDegrees();
 
     if (rotation == glm::vec3(1.0, 0.0, 0.0))
-        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees + parent_rotation_degrees.x), rotation);
+        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.x), rotation);
     else if (rotation == glm::vec3(0.0, 1.0, 0.0))
-        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees + parent_rotation_degrees.y), rotation);
+        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.y), rotation);
     else if (rotation == glm::vec3(0.0, 0.0, 1.0))
-        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(degrees + parent_rotation_degrees.z), rotation);
+        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.z), rotation);
     else
         __debugbreak();
 }
@@ -145,11 +145,11 @@ inline void Model::setRotationDegrees(const glm::vec3 rotation, float degrees)
 glm::mat4 Model::getModelMatrix() const noexcept
 {
     glm::mat4 return_matrix = glm::mat4(1.0f);
-    return_matrix = glm::translate(return_matrix, m_Position);
-    return_matrix = glm::scale(return_matrix, m_Scale);
-    return_matrix = glm::rotate(return_matrix, glm::radians(m_RotationDegrees.x), glm::vec3(1.0, 0.0, 0.0));
-    return_matrix = glm::rotate(return_matrix, glm::radians(m_RotationDegrees.y), glm::vec3(0.0, 1.0, 0.0));
-    return_matrix = glm::rotate(return_matrix, glm::radians(m_RotationDegrees.z), glm::vec3(0.0, 0.0, 1.0));
+    return_matrix = glm::translate(return_matrix, m_AbsolutePosition);
+    return_matrix = glm::scale(return_matrix, m_AbsoluteScale);
+    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.x), glm::vec3(1.0, 0.0, 0.0));
+    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.y), glm::vec3(0.0, 1.0, 0.0));
+    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.z), glm::vec3(0.0, 0.0, 1.0));
 
     return return_matrix;
 }
