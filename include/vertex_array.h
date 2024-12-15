@@ -5,15 +5,17 @@
 #include "buffers_objects.h"
 #include "buffer_layout.h"
 
-class VAO {
-	GLuint m_ID;
+class VAO
+{
 public:
-	VAO();
-	~VAO();
+    VAO();
+    ~VAO();
 
-	void addBuffer(const VBO& vbo, const VB_Vertex_Layout& layout);
+    void addBuffer(const VBO& vbo, const VB_Vertex_Layout& layout);
 
-	void bind() const;
-	void unbind() const;
-	inline GLuint getID() const { return m_ID; }
+    void bind() const;
+    void unbind() const;
+    inline GLuint getID() const { return m_ID; }
+private:
+    GLuint m_ID;
 };

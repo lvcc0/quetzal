@@ -7,7 +7,8 @@
 
 enum class VERTEX_VARIABLE{ NONE ,POS, TEX, NOR };
 
-struct Vertex {
+struct Vertex
+{
     glm::vec3 Position;
     glm::vec2 TexCoord;
     glm::vec3 Normal;

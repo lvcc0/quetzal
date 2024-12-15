@@ -23,9 +23,9 @@ public:
     // Destructor
     ~PostProcessing();
 
-    void deactivate() const;                                                        // deactivating postprocessing (must be used BEFORE any postprocessing funcs and objects drawing)
-    void activate() const; // postprocessing funcs
-    void recreate(GLuint width, GLuint height) const;                               // recreate framebuffer's attachments
+    void deactivate() const;                          // deactivating postprocessing (must be used BEFORE any postprocessing funcs and objects drawing)
+    void activate() const;                            // postprocessing funcs
+    void recreate(GLuint width, GLuint height) const; // recreate framebuffer's attachments
 
     void setScreenShader(const std::string& name, bool enabled); // set postprocessing shader on or off
 

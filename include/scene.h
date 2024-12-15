@@ -25,15 +25,13 @@
 #include "billboards.h"
 #include "physics.h"
 
-
-
 enum class ObjectType { SHADER, TEXTURE, RENDERABLE };
 
 class Scene
 {
 public:
-    std::shared_ptr<Camera>                 m_Camera;         // TODO: make it just a camera object, not a pointer perhaps)
-    std::shared_ptr<PostProcessing>         m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
+    std::shared_ptr<Camera>         m_Camera;         // TODO: make it just a camera object, not a pointer perhaps)
+    std::shared_ptr<PostProcessing> m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
 
     bool m_IsPostProcessing = false; // postprocessing bool
     bool m_IsPhysics = true; // physics bool
@@ -63,7 +61,7 @@ public:
     void enablePhysics();
     
     //void setShader(const std::string& name, ShaderType type);                     // set shader to draw stuff with (only one for now (ig it'll always be only one)) //IMHO: There could be more than one shader
-    // REDO IT
+    // TODO: REDO IT
     inline Shaders_pack                                                       getActiveShaders() const { return shaders_active; };
     inline std::map<const std::string, std::shared_ptr<Texture>>              getTextureMap() const { return m_TextureMap; };
     inline std::vector<std::shared_ptr<Renderable>>                           getRenderableVec() const { return m_RenderableVec; };

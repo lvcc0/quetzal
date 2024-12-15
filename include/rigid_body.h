@@ -17,5 +17,4 @@ public:
     virtual void translate(glm::vec3 vector);
     virtual void scale(glm::vec3 vector);
     virtual void rotate(float degrees, glm::vec3 vector);
-
 };

@@ -3,25 +3,31 @@
 #include <vector>
 #include "renderer.h"
 
-class VBO {
-	GLuint m_ID;
+class VBO
+{
 public:
-	VBO(const void* data, GLuint size);
-	~VBO();
+    VBO(const void* data, GLuint size);
+    ~VBO();
 
-	void bind() const;
-	void unbind() const;
+    void bind() const;
+    void unbind() const;
+
+private:
+    GLuint m_ID;
 };
 
-class IBO {
-	GLuint m_ID;
-	GLuint m_Count;
+class IBO
+{
 public:
-	IBO(const GLuint* data, GLuint count);
-	~IBO();
+    IBO(const GLuint* data, GLuint count);
+    ~IBO();
 
-	void bind() const;
-	void unbind() const;
+    void bind() const;
+    void unbind() const;
 
-	inline GLuint getCount() const { return m_Count; }
+    inline GLuint getCount() const { return m_Count; }
+
+private:
+    GLuint m_ID;
+    GLuint m_Count;
 };

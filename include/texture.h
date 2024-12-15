@@ -15,6 +15,5 @@ public:
     std::string m_type;
 
     // Constructor
-    Texture(unsigned char* image, int width, int height, int numComponents, std::string type = "");
-    
+    Texture(unsigned char* image, int width, int height, int numComponents, std::string type = "");  
 };

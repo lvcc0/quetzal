@@ -1,14 +1,44 @@
 #include "billboards.h"
 
-// --- Cylindrical Billboard --- //
+// --- Billboard --- //
+Billboard::Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload, std::string name)
+    : m_Texture(texture), Renderable(verts), Scene_Node(name), Scene_Object(glm::vec3(0, 0, 0), glm::vec3(1.0, 1.0, 0))
+{
+    if (!is_preload)
+        setupRender();
+}
 
+Billboard::Billboard(const Billboard& obj)
+    : Renderable(obj), Scene_Node(obj), m_Texture(obj.m_Texture)
+{
+    setupRender();
+}
+
+void Billboard::setupRender()
+{
+    // Vertex Array Object
+    vao_ptr = std::make_unique<VAO>();
+
+    // Vertex Buffer Object
+    vbo_ptr = std::make_unique<VBO>(&m_Vertices[0], m_Vertices.size() * sizeof(Vertex));
+
+    VB_Vertex_Layout layout;
+    layout.push<GLfloat>(3, offsetof(Vertex, Position));
+    layout.push<GLfloat>(2, offsetof(Vertex, TexCoord));
+    layout.push<GLfloat>(3, offsetof(Vertex, Normal));
+
+    vao_ptr->addBuffer(*vbo_ptr, layout);
+}
+// --- //
+
+// --- Cylindrical Billboard --- //
 CylindricalBillboard::CylindricalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload, std::string name)
     : Billboard(pos, scale, texture, verts, is_preload)
 {
 }
 
-CylindricalBillboard::CylindricalBillboard(const CylindricalBillboard& obj):
-    Billboard(obj)
+CylindricalBillboard::CylindricalBillboard(const CylindricalBillboard& obj)
+    : Billboard(obj)
 {
 }
 
@@ -55,15 +85,13 @@ glm::mat4 CylindricalBillboard::getModelMatrix() const noexcept
 // --- //
 
 // --- Spherical Billboard --- //
-
 SphericalBillboard::SphericalBillboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload, std::string name)
     : Billboard(pos, scale, texture, verts, is_preload, name)
 {
-
 }
 
-SphericalBillboard::SphericalBillboard(const SphericalBillboard& obj):
-    Billboard(obj)
+SphericalBillboard::SphericalBillboard(const SphericalBillboard& obj)
+    : Billboard(obj)
 {
 }
 
@@ -117,36 +145,5 @@ glm::mat4 SphericalBillboard::getModelMatrix() const noexcept
     return_matrix = glm::scale(return_matrix, glm::vec3(m_Scale.x, m_Scale.y, 1.0f));
 
     return return_matrix;
-}
-// --- //
-
-// --- Billboard --- //
-Billboard::Billboard(glm::vec3 pos, glm::vec2 scale, std::shared_ptr<Texture>& texture, std::vector<Vertex> verts, bool is_preload, std::string name)
-    : m_Texture(texture), Renderable(verts), Scene_Node(name), Scene_Object(glm::vec3(0, 0, 0), glm::vec3(1.0, 1.0, 0))
-{
-    if (!is_preload)
-        setupRender();
-}
-
-Billboard::Billboard(const Billboard& obj):
-    Renderable(obj), Scene_Node(obj), m_Texture(obj.m_Texture)
-{
-    setupRender();
-}
-
-void Billboard::setupRender()
-{
-    // Vertex Array Object
-    vao_ptr = std::make_unique<VAO>();
-
-    // Vertex Buffer Object
-    vbo_ptr = std::make_unique<VBO>(&m_Vertices[0], m_Vertices.size() * sizeof(Vertex));
-
-    VB_Vertex_Layout layout;
-    layout.push<GLfloat>(3, offsetof(Vertex, Position));
-    layout.push<GLfloat>(2, offsetof(Vertex, TexCoord));
-    layout.push<GLfloat>(3, offsetof(Vertex, Normal));
-
-    vao_ptr->addBuffer(*vbo_ptr, layout);
 }
 // --- //

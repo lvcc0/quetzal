@@ -21,8 +21,6 @@
 #include "vertex.h"
 #include "base_classes.h"
 
-// TODO: technically they're almost the same, so we can do something like inheritance here
-
 // Abstract class (draw functuion which is pure virtual isnt declared here)
 class Billboard : public Renderable, public Scene_Node, public Scene_Object
 {
@@ -36,7 +34,6 @@ public:
     glm::vec3 m_Target = glm::vec3(0.0f, 0.0f, 0.0f);
 
 protected:
-
     virtual void setupRender() override;
 };
 
