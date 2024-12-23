@@ -1,174 +1,247 @@
 #include "model.h"
 
-Model::Model(std::vector<Vertex>& vertices,
-             std::vector<unsigned int>& indices,
-             std::vector<std::shared_ptr<Texture>>& textures,
-             bool is_preload, std::string name)
-    :Renderable(vertices, indices), Scene_Node(name), Scene_Object(), m_Textures(textures)
+Model::Model(const std::string& path, bool is_preload, std::string name)
 {
-    if (!is_preload)
-        setupRender(); // setup VAO, VBO, EBO
+    this->loadModel(path);
 }
 
 Model::Model(const Model& obj)
-    : Renderable(obj), Scene_Node(obj), Scene_Object(obj),
-    m_Textures(obj.m_Textures)
 {
-    setupRender();
 }
 
 void Model::draw(const Shaders_pack& shaders) 
 {
-    std::shared_ptr<Shader> main_shader = shaders.MAIN_SHADER;
-    std::shared_ptr<Shader> stencil_shader = shaders.STENCIL_SHADER;
-    
-    // Inheritor methods can be called
-    this->setPosition();
-    this->setScale();
-    this->setRotationDegrees(glm::vec3(1.0, 0.0, 0.0));
-    this->setRotationDegrees(glm::vec3(0.0, 1.0, 0.0));
-    this->setRotationDegrees(glm::vec3(0.0, 0.0, 1.0));
+    for (unsigned int i = 0; i < m_Meshes.size(); i++)
+        m_Meshes[i].draw(*shaders.MAIN_SHADER);
 
-    unsigned int diffuseNum = 1;
-    unsigned int specularNum = 1;
+    // TODO: drawing with outline
+}
 
-    main_shader->activateShader(); // Using default shader
+//inline void Model::setPosition()
+//{
+//    m_AbsolutePosition = m_Position;
+//    // Parent pos
+//    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
+//    if (parent_ptr != nullptr)
+//        m_AbsolutePosition += parent_ptr->getPosition();
+//
+//    m_ModelMatrix = glm::translate(m_ModelMatrix, m_AbsolutePosition);
+//}
 
-    // Assign all texture fragment shader uniforms
-    for (auto i = 0; i < m_Textures.size(); i++)
+//inline void Model::setScale()
+//{
+//    m_AbsoluteScale = m_Scale;
+//    // Parent scale
+//    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
+//    if (parent_ptr != nullptr)
+//        m_AbsoluteScale *= parent_ptr->getScale();
+//
+//    m_ModelMatrix = glm::scale(m_ModelMatrix, m_AbsoluteScale);
+//}
+
+//inline void Model::setRotationDegrees(const glm::vec3 rotation)
+//{
+//    m_AbsoluteRotationDegrees = m_RotationDegrees;
+//    // Parent rotation
+//    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
+//    if (parent_ptr != nullptr)
+//        m_AbsoluteRotationDegrees += parent_ptr->getRotationDegrees();
+//
+//    if (rotation == glm::vec3(1.0, 0.0, 0.0))
+//        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.x), rotation);
+//    else if (rotation == glm::vec3(0.0, 1.0, 0.0))
+//        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.y), rotation);
+//    else if (rotation == glm::vec3(0.0, 0.0, 1.0))
+//        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.z), rotation);
+//    else
+//        __debugbreak();
+//}
+
+//glm::mat4 Model::getModelMatrix() const noexcept
+//{
+//    glm::mat4 return_matrix = glm::mat4(1.0f);
+//    return_matrix = glm::translate(return_matrix, m_AbsolutePosition);
+//    return_matrix = glm::scale(return_matrix, m_AbsoluteScale);
+//    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.x), glm::vec3(1.0, 0.0, 0.0));
+//    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.y), glm::vec3(0.0, 1.0, 0.0));
+//    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.z), glm::vec3(0.0, 0.0, 1.0));
+//
+//    return return_matrix;
+//}
+
+//void Model::setupRender()
+//{
+//    // Vertex Array Object
+//    vao_ptr = std::make_unique<VAO>();
+//
+//    // Vertex Buffer Object
+//    vbo_ptr = std::make_unique<VBO>(&m_Vertices[0], m_Vertices.size() * sizeof(Vertex));
+//
+//    // Element Array Buffer
+//    ibo_ptr = std::make_unique<IBO>(&m_Indices[0], m_Indices.size());
+//
+//    VB_Vertex_Layout layout;
+//    layout.push<GLfloat>(3, offsetof(Vertex, Position));
+//    layout.push<GLfloat>(2, offsetof(Vertex, TexCoord));
+//    layout.push<GLfloat>(3, offsetof(Vertex, Normal));
+//
+//    vao_ptr->addBuffer(*vbo_ptr, layout);
+//}
+
+unsigned int TextureFromFile(const char* path, const std::string& directory)
+{
+    std::string filename = directory + '/' + std::string(path);
+
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, componentsNum;
+    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &componentsNum, 0);
+
+    if (data)
     {
-        GLCall(glActiveTexture(GL_TEXTURE0 + i));
+        GLenum format;
+        if (componentsNum == 1)
+            format = GL_RED;
+        else if (componentsNum == 3)
+            format = GL_RGB;
+        else if (componentsNum == 4)
+            format = GL_RGBA;
 
-        std::string number;
-        std::string name = m_Textures[i]->m_type;
-        
-        if (name == "texture_diffuse")
-            number = std::to_string(diffuseNum++);
-        else if (name == "texture_specular")
-            number = std::to_string(specularNum++);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
-        main_shader->setInt(("material." + name + number).c_str(), i);
-        GLCall(glBindTexture(GL_TEXTURE_2D, m_Textures[i]->ID));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+    else
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+
+    stbi_image_free(data);
+    return textureID;
+}
+
+void Model::loadModel(const std::string& path)
+{
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+    
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
+        return;
     }
 
-    GLCall(glActiveTexture(GL_TEXTURE0));
+    m_Directory = path.substr(0, path.find_last_of('/'));
+    this->processNode(scene->mRootNode, scene);
+}
 
-    // Convert local coordinates to world coordinates
-    main_shader->setMat4("model", m_ModelMatrix);
-    main_shader->setMat4("inversed", glm::inverse(m_ModelMatrix));
+std::vector<Texture> Model::loadTextures(aiMaterial* material, aiTextureType type, std::string typeName)
+{
+    std::vector<Texture> textures;
 
-    // Draw via indices
-    // Part working if model selected
-    if (is_selected && stencil_shader != nullptr)
+    for (unsigned int i = 0; i < material->GetTextureCount(type); i++)
     {
-        // 1st. render pass, draw objects as normal, writing to the stencil buffer
-        GLCall(glStencilFunc(GL_ALWAYS, 1, 0xFF));
-        GLCall(glStencilMask(0xFF));
+        aiString string;
+        material->GetTexture(type, i, &string);
 
-        vao_ptr->bind();
-        GLCall(glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0));
-
-        // 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
-        GLCall(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
-        GLCall(glStencilMask(0x00));
-        GLCall(glDisable(GL_DEPTH_TEST));
-
-        stencil_shader->activateShader(); // Using special stencil shader
-        for (auto i = 0; i < m_Textures.size(); i++)
+        bool skip = false;
+        
+        for (unsigned int j = 0; j < m_Textures.size(); j++)
         {
-            GLCall(glActiveTexture(GL_TEXTURE0 + i));
-            GLCall(glBindTexture(GL_TEXTURE_2D, m_Textures[i]->ID));
+            if (std::strcmp(m_Textures[j]->m_path.data(), string.C_Str()) == 0)
+            {
+                textures.push_back(*m_Textures[j]);
+                skip = true;
+                break;
+            }
         }
 
-        // Convert local coordinates to world coordinates
-        stencil_shader->setMat4("model", glm::scale(m_ModelMatrix, glm::vec3(m_StencilScaling, m_StencilScaling, m_StencilScaling)));
-        GLCall(glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0));
-        vao_ptr->unbind();
+        if (!skip)
+        {
+            Texture texture;
+            texture.ID = TextureFromFile(string.C_Str(), m_Directory);
+            texture.m_type = typeName;
+            texture.m_path = string.C_Str();
 
-        GLCall(glStencilFunc(GL_ALWAYS, 0, 0xFF));
-        GLCall(glStencilMask(0xFF));
-        GLCall(glEnable(GL_DEPTH_TEST));
-
-        main_shader->activateShader(); // Return default shader
+            textures.push_back(texture);
+            m_Textures.push_back(std::make_shared<Texture>(texture));
+        }
     }
-    // Part working if model not selected
-    else 
+
+    return textures;
+}
+
+void Model::processNode(aiNode* node, const aiScene* scene)
+{
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
-        vao_ptr->bind();
-        GLCall(glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0));
-        vao_ptr->unbind();
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        m_Meshes.push_back(this->processMesh(mesh, scene));
     }
 
-    m_ModelMatrix = glm::mat4(1.0f);
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+        this->processNode(node->mChildren[i], scene);
 }
 
-inline void Model::setPosition()
+Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 {
-    m_AbsolutePosition = m_Position;
-    // Parent pos
-    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
-    if (parent_ptr != nullptr)
-        m_AbsolutePosition += parent_ptr->getPosition();
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+    std::vector<Texture> textures;
 
-    m_ModelMatrix = glm::translate(m_ModelMatrix, m_AbsolutePosition);
-}
+    glm::vec3 vec3; // placeholder
+    glm::vec2 vec2; // stuff
+    
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+        Vertex vertex;
 
-inline void Model::setScale()
-{
-    m_AbsoluteScale = m_Scale;
-    // Parent scale
-    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
-    if (parent_ptr != nullptr)
-        m_AbsoluteScale *= parent_ptr->getScale();
+        // position
+        vec3.x = mesh->mVertices[i].x;
+        vec3.y = mesh->mVertices[i].y;
+        vec3.z = mesh->mVertices[i].z;
+        vertex.Position = vec3;
 
-    m_ModelMatrix = glm::scale(m_ModelMatrix, m_AbsoluteScale);
-}
+        // normals
+        if (mesh->HasNormals())
+        {
+            vec3.x = mesh->mNormals[i].x;
+            vec3.y = mesh->mNormals[i].y;
+            vec3.z = mesh->mNormals[i].z;
+            vertex.Normal = vec3;
+        }
 
-inline void Model::setRotationDegrees(const glm::vec3 rotation)
-{
-    m_AbsoluteRotationDegrees = m_RotationDegrees;
-    // Parent rotation
-    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
-    if (parent_ptr != nullptr)
-        m_AbsoluteRotationDegrees += parent_ptr->getRotationDegrees();
+        // texture coordinates
+        if (mesh->mTextureCoords[0])
+        {
+            vec2.x = mesh->mTextureCoords[0][i].x;
+            vec2.y = mesh->mTextureCoords[0][i].y;
+            vertex.TexCoord = vec2;
+        }
+        else
+            vertex.TexCoord = glm::vec2(0.0f);
 
-    if (rotation == glm::vec3(1.0, 0.0, 0.0))
-        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.x), rotation);
-    else if (rotation == glm::vec3(0.0, 1.0, 0.0))
-        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.y), rotation);
-    else if (rotation == glm::vec3(0.0, 0.0, 1.0))
-        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.z), rotation);
-    else
-        __debugbreak();
-}
+        vertices.push_back(vertex);
+    }
 
-glm::mat4 Model::getModelMatrix() const noexcept
-{
-    glm::mat4 return_matrix = glm::mat4(1.0f);
-    return_matrix = glm::translate(return_matrix, m_AbsolutePosition);
-    return_matrix = glm::scale(return_matrix, m_AbsoluteScale);
-    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.x), glm::vec3(1.0, 0.0, 0.0));
-    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.y), glm::vec3(0.0, 1.0, 0.0));
-    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.z), glm::vec3(0.0, 0.0, 1.0));
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+        aiFace face = mesh->mFaces[i];
+        for (unsigned int j = 0; j < face.mNumIndices; j++)
+            indices.push_back(face.mIndices[j]);
+    }
 
-    return return_matrix;
-}
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-void Model::setupRender()
-{
-    // Vertex Array Object
-    vao_ptr = std::make_unique<VAO>();
+    std::vector<Texture> diffuseMaps = this->loadTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-    // Vertex Buffer Object
-    vbo_ptr = std::make_unique<VBO>(&m_Vertices[0], m_Vertices.size() * sizeof(Vertex));
+    std::vector<Texture> specularMaps = this->loadTextures(material, aiTextureType_SPECULAR, "texture_specular");
+    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-    // Element Array Buffer
-    ibo_ptr = std::make_unique<IBO>(&m_Indices[0], m_Indices.size());
-
-    VB_Vertex_Layout layout;
-    layout.push<GLfloat>(3, offsetof(Vertex, Position));
-    layout.push<GLfloat>(2, offsetof(Vertex, TexCoord));
-    layout.push<GLfloat>(3, offsetof(Vertex, Normal));
-
-    vao_ptr->addBuffer(*vbo_ptr, layout);
+    return Mesh(vertices, indices, textures);
 }

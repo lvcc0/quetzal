@@ -170,9 +170,9 @@ void Scene::addModel(std::string name)
     }
     model->setName(name);
 
-    m_RenderableVec.push_back(model);
-    m_NodeVec.push_back(model);
-    m_SceneObjectVec.push_back(model);
+    //m_RenderableVec.push_back(model);
+    //m_NodeVec.push_back(model);
+    //m_SceneObjectVec.push_back(model);
 }
 
 void Scene::addRigidBody(std::string name, Collision &collision)
@@ -192,11 +192,11 @@ void Scene::addRigidBody(std::string name, Collision &collision)
                 name = name.substr(0, name.size() - std::to_string(i - 1).length()) + std::to_string(i);
         }
     }
-    
     rigid_body->setName(name);
-    m_RenderableVec.push_back(rigid_body);
-    m_NodeVec.push_back(rigid_body);
-    m_SceneObjectVec.push_back(rigid_body);
+    
+    //m_RenderableVec.push_back(rigid_body);
+    //m_NodeVec.push_back(rigid_body);
+    //m_SceneObjectVec.push_back(rigid_body);
 }
 
 void Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)
