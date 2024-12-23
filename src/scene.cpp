@@ -101,7 +101,7 @@ void Scene::update()
 void Scene::doPhysicsProcessing()
 {
     // TODO::Change this
-    Physics::processPhysics(m_CollisionMap);
+    //Physics::processPhysics(m_CollisionMap);
 }
 
 void Scene::doProcessing()
@@ -173,30 +173,6 @@ void Scene::addModel(std::string name)
     //m_RenderableVec.push_back(model);
     //m_NodeVec.push_back(model);
     //m_SceneObjectVec.push_back(model);
-}
-
-void Scene::addRigidBody(std::string name, Collision &collision)
-{
-    auto rigid_body = std::make_shared<RigidBody>(ResourceManager::makeModel(name), collision);
-    
-    unsigned int i{ 0 };
-
-    for (auto item : m_NodeVec)
-    {
-        if (item->getName() == name) {
-            i++;
-
-            if (i == 1)
-                name += std::to_string(i);
-            else
-                name = name.substr(0, name.size() - std::to_string(i - 1).length()) + std::to_string(i);
-        }
-    }
-    rigid_body->setName(name);
-    
-    //m_RenderableVec.push_back(rigid_body);
-    //m_NodeVec.push_back(rigid_body);
-    //m_SceneObjectVec.push_back(rigid_body);
 }
 
 void Scene::addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts)

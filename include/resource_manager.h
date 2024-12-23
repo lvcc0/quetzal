@@ -14,7 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "billboards.h"
-#include "rigid_body.h"
+#include "model.h"
 
 class ResourceManager
 {

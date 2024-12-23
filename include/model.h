@@ -14,6 +14,7 @@
 #include "texture.h"
 #include "mesh.h"
 #include "base_classes.h"
+#include "collision.h"
 
 class Model // : public Renderable, public Scene_Node, public Scene_Object
 {

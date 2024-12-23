@@ -7,6 +7,7 @@ Model::Model(const std::string& path, bool is_preload, std::string name)
 
 Model::Model(const Model& obj)
 {
+
 }
 
 void Model::draw(const Shaders_pack& shaders) 

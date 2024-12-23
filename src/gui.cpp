@@ -170,9 +170,7 @@ void GUI_Window_object_properties::windowLoop()
 {
     GUIWindowPos.clear();
     GUIWindowSize.clear();
-    if (typeid(*m_SceneNode) == typeid(RigidBody))
-        showCurrentObjectGUI<RigidBody>();
-    else if (typeid(*m_SceneNode) == typeid(CylindricalBillboard))
+    if (typeid(*m_SceneNode) == typeid(CylindricalBillboard))
         showCurrentObjectGUI<CylindricalBillboard>();
     else if (typeid(*m_SceneNode) == typeid(SphericalBillboard))
         showCurrentObjectGUI<SphericalBillboard>();
@@ -238,33 +236,6 @@ void GUI_Window_object_properties::showCurrentObjectGUI<Model>()
     }
     // --------------------------------- //
     
-    // This must be between render and end funcs
-    GUIWindowPos.push_back(glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
-    GUIWindowSize.push_back(glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));
-    // ------------------------- //
-
-    ImGui::End();
-}
-template<>
-void GUI_Window_object_properties::showCurrentObjectGUI<RigidBody>()
-{
-    std::shared_ptr<RigidBody> m_CurrentRigidBody = std::dynamic_pointer_cast<RigidBody>(m_SceneNode);
-    m_CurrentRigidBody->is_selected = true;
-
-    ImGui::Begin((m_CurrentRigidBody->getName() + " config").c_str(), 0, ImGuiWindowFlags_NoCollapse);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Position", (float*)&m_CurrentRigidBody->m_Position, 0.5f);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Move speed", (float*)&m_CurrentRigidBody->m_MoveVector, 0.001f);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Scale", (float*)&m_CurrentRigidBody->m_Scale, 0.2f, 0.01, 1000);
-
-    ImGui::Separator();
-    ImGui::DragFloat3("Rotation", (float*)&m_CurrentRigidBody->m_RotationDegrees, 1.0f, 0.0, 360);
-
     // This must be between render and end funcs
     GUIWindowPos.push_back(glm::vec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y));
     GUIWindowSize.push_back(glm::vec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight()));

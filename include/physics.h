@@ -15,15 +15,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "rigid_body.h"
+#include "model.h"
 #include "colliding_ray.h"
 
 // TODO: Make clearing impact if objects no longer collide
 
-class Physics
-{
-public:
-    static bool checkCollision(std::shared_ptr<Collision> one, std::shared_ptr<Collision> two);
-
-    static void processPhysics(std::map<const std::string, std::shared_ptr<Collision>>& body_map); // Called every tick
-};
+//class Physics
+//{
+//public:
+//    static bool checkCollision(std::shared_ptr<Collision> one, std::shared_ptr<Collision> two);
+//
+//    static void processPhysics(std::map<const std::string, std::shared_ptr<Collision>>& body_map); // Called every tick
+//};

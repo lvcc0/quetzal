@@ -72,7 +72,6 @@ public:
     void   addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type);
     void   addTexture(std::string name, std::string type);
     void   addModel(std::string name);
-    void   addRigidBody(std::string name, Collision& collision);
     void   addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
     void   addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
 

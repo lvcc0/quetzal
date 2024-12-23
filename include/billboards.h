@@ -16,10 +16,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "shader.h"
 #include "texture.h"
-#include "vertex.h"
 #include "base_classes.h"
+#include "collision.h"
 
 // Abstract class (draw functuion which is pure virtual isnt declared here)
 class Billboard : public Renderable, public Scene_Node, public Scene_Object

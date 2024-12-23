@@ -109,8 +109,6 @@ private:
     template<>
     void showCurrentObjectGUI<Model>();
     template<>
-    void showCurrentObjectGUI<RigidBody>();
-    template<>
     void showCurrentObjectGUI<CylindricalBillboard>();
     template<>
     void showCurrentObjectGUI<SphericalBillboard>();
