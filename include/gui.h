@@ -63,7 +63,7 @@ public:
     void clickWindow(const std::shared_ptr<Scene_Node> obj);
     void clickWindow(const std::shared_ptr<Renderable> obj);
     // ------------------ //
-    inline std::vector<std::shared_ptr<GUI_Window_object_properties>> getWindowsObjProps()const { return m_WindowsVec; }
+    inline std::vector<std::shared_ptr<GUI_Window_object_properties>> getWindowsObjProps() const { return m_WindowsVec; }
 
 private:
     std::vector<std::shared_ptr<GUI_Window_object_properties>> m_WindowsVec;

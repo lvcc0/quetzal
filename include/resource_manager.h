@@ -36,9 +36,9 @@ public:
     inline static std::map<const std::string, Model> takeModels() { return m_LoadedModels; }
 
     // Make shared_ptrs
-    static std::shared_ptr<Shader>               makeShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
+    static std::shared_ptr<Shader> makeShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
     // In my opinion it should return a copy of an object
-    static std::shared_ptr<Texture>              makeTexture(const std::string& name);
+    static std::shared_ptr<Texture> makeTexture(const std::string& name);
 
     // Make objects
     static Model                makeModel(const std::string& name);

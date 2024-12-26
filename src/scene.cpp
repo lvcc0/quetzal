@@ -3,11 +3,11 @@
 Scene::Scene(Camera&& camera)
     : m_Camera(std::make_shared<Camera>(camera)),
       m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders(), camera.m_width, camera.m_height))
-{ /* empty */ }
+{
+}
 
 Scene::~Scene()
-{
-    
+{    
 }
 
 void Scene::update()
@@ -70,6 +70,14 @@ void Scene::update()
             sph_bill->draw(shaders_active);
         }
     }
+
+    // TODO: until i make meshes renderable
+    for (auto& entry : ResourceManager::takeModels())
+    {
+        std::cout << entry.second.getName() << std::endl;
+        entry.second.draw(shaders_active);
+    }
+
     // Draw all renderable
     if (!this->m_RenderableVec.empty())
     {

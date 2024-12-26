@@ -187,7 +187,7 @@ template<>
 void GUI_Window_object_properties::showCurrentObjectGUI<Model>()
 {
     std::shared_ptr<Model> m_CurrentModel = std::dynamic_pointer_cast<Model>(m_SceneNode);
-    m_CurrentModel->is_selected = true;
+    //m_CurrentModel->is_selected = true;
 
     ImGui::Begin((m_CurrentModel->getName() + " config").c_str(), 0, ImGuiWindowFlags_NoCollapse);
 

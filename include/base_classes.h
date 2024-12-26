@@ -19,6 +19,8 @@
 #include "buffers_objects.h"
 #include "vertex_array.h"
 
+// TODO: rename some stuff in here
+
 // Group of base, abstract classes
 // WARNING!!! ALL CLASSES HERE MUST HAVE UNIQUE NAMES OF THEIR VARIABLES AND METHODS
 
@@ -35,6 +37,7 @@ public:
 
     inline const std::string getName() const noexcept { return m_Name; }
     inline const std::shared_ptr<Scene_Node> getParent() const noexcept { return m_Parent_node.lock(); }
+
     inline void setName(std::string name) { m_Name = name; }
     inline void setParent(const std::shared_ptr<Scene_Node>& parent) { m_Parent_node = parent; }
 
@@ -54,6 +57,7 @@ public:
     // Destructor
     virtual ~Scene_Object();
 
+    // TODO: make this stuff protected
     // Abstract variables for using in world space
     glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 0.0f);        // position in the world space
     glm::vec3 m_AbsolutePosition = glm::vec3(0.0f, 0.0f, 0.0f);  
@@ -69,6 +73,7 @@ public:
     inline virtual const glm::vec3 getRotationDegrees() const noexcept { return m_AbsoluteRotationDegrees; }
 
 protected:
+    // TODO: make this stuff public
     // Use while drawing
     inline virtual void setPosition() {  }
     inline virtual void setScale() {  }
@@ -79,6 +84,8 @@ protected:
 class Renderable
 {
 public:
+    bool is_selected = false;
+
     // Constructors
     Renderable(std::vector<Vertex>& vertices, std::vector<unsigned int> indices = std::vector<unsigned int>{});
     Renderable(const Renderable& obj);
@@ -86,10 +93,9 @@ public:
     // Destructor
     virtual ~Renderable();
 
+    // TODO: do all renderable object really need vertices and indices?
     std::vector<Vertex> m_Vertices;
     std::vector<unsigned int> m_Indices;
-
-    bool is_selected = false;
 
     virtual void draw(const Shaders_pack& shaders) = 0;
 

@@ -16,12 +16,11 @@
 #include "base_classes.h"
 #include "collision.h"
 
-class Model // : public Renderable, public Scene_Node, public Scene_Object
+// model is a collection of meshes, so by itself it's not renderable, its meshes are
+class Model : public Scene_Node, public Scene_Object
 {
 public:
     float m_StencilScaling = 1.4f;
-
-    bool is_selected = false;
 
     std::vector<std::shared_ptr<Texture>> m_Textures;
     std::vector<Mesh> m_Meshes;
@@ -34,16 +33,6 @@ public:
     // Draw model
     void draw(const Shaders_pack& shaders);
 
-    std::string getName() { return "cool name"; }
-    
-    glm::vec3 m_Position = glm::vec3(0.0f);
-    glm::vec3 m_Scale = glm::vec3(0.0f);
-    glm::vec3 m_RotationDegrees = glm::vec3(0.0f);
-
-    void setParent(const std::shared_ptr<Scene_Node>& parent) { std::cout << "parent" << std::endl; }
-    void setName(std::string name) { std::cout << "name" << std::endl; }
-
-    //glm::mat4 getModelMatrix() const noexcept;
 protected:
     void loadModel(const std::string& path);
     std::vector<Texture> loadTextures(aiMaterial* material, aiTextureType type, std::string typeName);
@@ -51,6 +40,7 @@ protected:
     void processNode(aiNode* node, const aiScene* scene);
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
+    // TODO: moving, scaling, rotating models
     //// Moving in world space
     //inline virtual void setPosition() override;
     //inline virtual void setScale() override;

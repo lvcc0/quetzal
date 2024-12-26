@@ -1,74 +1,23 @@
 #include "model.h"
 
 Model::Model(const std::string& path, bool is_preload, std::string name)
+    : Scene_Node(name), Scene_Object()
 {
     this->loadModel(path);
 }
 
 Model::Model(const Model& obj)
+    : Scene_Node(obj), Scene_Object(obj)
 {
-
 }
 
 void Model::draw(const Shaders_pack& shaders) 
 {
-    for (unsigned int i = 0; i < m_Meshes.size(); i++)
-        m_Meshes[i].draw(*shaders.MAIN_SHADER);
+    for (unsigned int i = 0; i < this->m_Meshes.size(); i++)
+        this->m_Meshes[i].draw(*shaders.MAIN_SHADER);
 
     // TODO: drawing with outline
 }
-
-//inline void Model::setPosition()
-//{
-//    m_AbsolutePosition = m_Position;
-//    // Parent pos
-//    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
-//    if (parent_ptr != nullptr)
-//        m_AbsolutePosition += parent_ptr->getPosition();
-//
-//    m_ModelMatrix = glm::translate(m_ModelMatrix, m_AbsolutePosition);
-//}
-
-//inline void Model::setScale()
-//{
-//    m_AbsoluteScale = m_Scale;
-//    // Parent scale
-//    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
-//    if (parent_ptr != nullptr)
-//        m_AbsoluteScale *= parent_ptr->getScale();
-//
-//    m_ModelMatrix = glm::scale(m_ModelMatrix, m_AbsoluteScale);
-//}
-
-//inline void Model::setRotationDegrees(const glm::vec3 rotation)
-//{
-//    m_AbsoluteRotationDegrees = m_RotationDegrees;
-//    // Parent rotation
-//    auto parent_ptr = std::dynamic_pointer_cast<Scene_Object>(m_Parent_node.lock());
-//    if (parent_ptr != nullptr)
-//        m_AbsoluteRotationDegrees += parent_ptr->getRotationDegrees();
-//
-//    if (rotation == glm::vec3(1.0, 0.0, 0.0))
-//        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.x), rotation);
-//    else if (rotation == glm::vec3(0.0, 1.0, 0.0))
-//        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.y), rotation);
-//    else if (rotation == glm::vec3(0.0, 0.0, 1.0))
-//        m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(m_AbsoluteRotationDegrees.z), rotation);
-//    else
-//        __debugbreak();
-//}
-
-//glm::mat4 Model::getModelMatrix() const noexcept
-//{
-//    glm::mat4 return_matrix = glm::mat4(1.0f);
-//    return_matrix = glm::translate(return_matrix, m_AbsolutePosition);
-//    return_matrix = glm::scale(return_matrix, m_AbsoluteScale);
-//    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.x), glm::vec3(1.0, 0.0, 0.0));
-//    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.y), glm::vec3(0.0, 1.0, 0.0));
-//    return_matrix = glm::rotate(return_matrix, glm::radians(m_AbsoluteRotationDegrees.z), glm::vec3(0.0, 0.0, 1.0));
-//
-//    return return_matrix;
-//}
 
 //void Model::setupRender()
 //{
@@ -136,7 +85,7 @@ void Model::loadModel(const std::string& path)
         return;
     }
 
-    m_Directory = path.substr(0, path.find_last_of('/'));
+    this->m_Directory = path.substr(0, path.find_last_of('\\'));
     this->processNode(scene->mRootNode, scene);
 }
 
@@ -150,12 +99,12 @@ std::vector<Texture> Model::loadTextures(aiMaterial* material, aiTextureType typ
         material->GetTexture(type, i, &string);
 
         bool skip = false;
-        
-        for (unsigned int j = 0; j < m_Textures.size(); j++)
+
+        for (unsigned int j = 0; j < this->m_Textures.size(); j++)
         {
-            if (std::strcmp(m_Textures[j]->m_path.data(), string.C_Str()) == 0)
+            if (std::strcmp(this->m_Textures[j]->m_path.data(), string.C_Str()) == 0)
             {
-                textures.push_back(*m_Textures[j]);
+                textures.push_back(*this->m_Textures[j]);
                 skip = true;
                 break;
             }
@@ -164,12 +113,12 @@ std::vector<Texture> Model::loadTextures(aiMaterial* material, aiTextureType typ
         if (!skip)
         {
             Texture texture;
-            texture.ID = TextureFromFile(string.C_Str(), m_Directory);
+            texture.ID = TextureFromFile(string.C_Str(), this->m_Directory);
             texture.m_type = typeName;
             texture.m_path = string.C_Str();
 
             textures.push_back(texture);
-            m_Textures.push_back(std::make_shared<Texture>(texture));
+            this->m_Textures.push_back(std::make_shared<Texture>(texture));
         }
     }
 
@@ -181,7 +130,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        m_Meshes.push_back(this->processMesh(mesh, scene));
+        this->m_Meshes.push_back(this->processMesh(mesh, scene));
     }
 
     for (unsigned int i = 0; i < node->mNumChildren; i++)

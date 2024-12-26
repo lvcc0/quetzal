@@ -165,6 +165,8 @@ void ResourceManager::displayLoadedObjects()
 
 void ResourceManager::preLoadResources()
 {
+    // TODO: redo this stuff
+
     std::string model_folder_path = relResPath + MODELS_FOLDER;
     std::string shaders_folder_path = relResPath + SHADERS_FOLDER;
     std::string textures_folder_path = relResPath + TEXTURES_FOLDER;
