@@ -5,16 +5,16 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb_image/stb_image.h>
 
 #include "renderer.h"
 
 class Texture
 {
 public:
-    GLuint ID;
-    std::string m_type;
-    std::string m_path;
+    GLuint m_ID;
+    std::string m_Type;
+    std::string m_Path;
 
-    Texture(unsigned char* image, int width, int height, int numComponents, std::string type = "");  
-    Texture() { /* empty */ };
+    Texture(const std::string& path, std::string type = "");
 };

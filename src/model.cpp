@@ -102,7 +102,7 @@ std::vector<Texture> Model::loadTextures(aiMaterial* material, aiTextureType typ
 
         for (unsigned int j = 0; j < this->m_Textures.size(); j++)
         {
-            if (std::strcmp(this->m_Textures[j]->m_path.data(), string.C_Str()) == 0)
+            if (std::strcmp(this->m_Textures[j]->m_Path.data(), string.C_Str()) == 0)
             {
                 textures.push_back(*this->m_Textures[j]);
                 skip = true;
@@ -112,10 +112,7 @@ std::vector<Texture> Model::loadTextures(aiMaterial* material, aiTextureType typ
 
         if (!skip)
         {
-            Texture texture;
-            texture.ID = TextureFromFile(string.C_Str(), this->m_Directory);
-            texture.m_type = typeName;
-            texture.m_path = string.C_Str();
+            Texture texture = Texture(string.C_Str(), typeName);
 
             textures.push_back(texture);
             this->m_Textures.push_back(std::make_shared<Texture>(texture));

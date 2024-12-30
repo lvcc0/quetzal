@@ -24,26 +24,32 @@ public:
     ResourceManager(const ResourceManager& obj) = delete;
     ResourceManager(ResourceManager&& obj) = delete;
 
-    // Load objects
-    static void loadModel(const std::string model_path);
-    static void loadTexture(const std::string texture_path);
-    static void loadScreenShaders(const std::string path_to_folder);
-
-    // Return processing shaders
-    inline static std::map<const std::string, std::shared_ptr<Shader>> makePostProcessingShaders() { return m_LoadedScreenShaders; }
-
-    // Return maps
-    inline static std::map<const std::string, Model> takeModels() { return m_LoadedModels; }
+    // Load single object
+    static void loadModel(const std::string& file_path);
+    static void loadTexture(const std::string& file_path);
+    static void loadShader(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
+    
+    // Load multiple objects
+    static void loadModels(const std::string& dir_path);
+    static void loadTextures(const std::string& dir_path);
+    static void loadShaders(const std::string& dir_path);
 
     // Make shared_ptrs
     static std::shared_ptr<Shader> makeShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
-    // In my opinion it should return a copy of an object
-    static std::shared_ptr<Texture> makeTexture(const std::string& name);
 
     // Make objects
-    static Model                makeModel(const std::string& name);
     static CylindricalBillboard makeCylBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
     static SphericalBillboard   makeSphBillboard(glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
+    
+    // Return shared_ptrs
+    static std::shared_ptr<Texture> getTexture(const std::string& name); // TODO: return a copy of an object rather than a shared_ptr?
+
+    // Return objects
+    static Model getModel(const std::string& name);
+
+    // Return maps
+    inline static std::map<const std::string, std::shared_ptr<Shader>> getScreenShaders() { return m_LoadedScreenShaders; }
+    inline static std::map<const std::string, Model> getModels() { return m_LoadedModels; }
     
     static void displayLoadedObjects();
     static void preLoadResources();
@@ -61,18 +67,17 @@ private:
 
     inline static const std::vector<std::string> TEXTURES_FILE_EXTENSIONS{ ".jpg", ".png" };
 
-    // Map of loaded resources (First - name of file, second - ptrs of objects)
+    // Map of loaded objects (first - filename, second - object ptrs)
     inline static std::map<std::string, std::shared_ptr<void>> m_LoadedObjects;
 
-    // Maps of loaded resources in ptrs (First - name, second - ptrs)
+    // Maps of loaded resources in ptrs (first - name, second - ptrs)
     inline static std::map<const std::string, std::shared_ptr<Shader>> m_LoadedShaders;
     inline static std::map<const std::string, std::shared_ptr<Shader>> m_LoadedScreenShaders;
 
-    // Maps of loaded resources (First - name, second - objects)
-    inline static std::map<const std::string, Model> m_LoadedModels;
+    // Maps of loaded resources (first - name, second - objects)
+    inline static std::map<const std::string, Model>   m_LoadedModels;
     inline static std::map<const std::string, Texture> m_LoadedTextures;
 
-    static std::string getFileString(const std::string& file_path); // gets file contents as a string
-
-    static std::vector<std::shared_ptr<Texture>> pullTexturesFromMtl(const std::string& fullfilepath);
+    // Returns file contents as a string
+    static std::string getFileString(const std::string& file_path); 
 };

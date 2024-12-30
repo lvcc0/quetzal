@@ -18,7 +18,7 @@ void Mesh::draw(Shader& shader)
         glActiveTexture(GL_TEXTURE0 + i);
 
         std::string number;
-        std::string name = m_Textures[i].m_type;
+        std::string name = m_Textures[i].m_Type;
 
         if (name == "texture_diffuse")
             number = std::to_string(diffuseNr++);
@@ -26,7 +26,7 @@ void Mesh::draw(Shader& shader)
             number = std::to_string(specularNr++);
 
         glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-        glBindTexture(GL_TEXTURE_2D, m_Textures[i].ID);
+        glBindTexture(GL_TEXTURE_2D, m_Textures[i].m_ID);
     }
 
     // draw mesh

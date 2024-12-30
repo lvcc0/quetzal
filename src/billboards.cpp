@@ -59,7 +59,7 @@ void CylindricalBillboard::draw(const Shaders_pack& shaders)
     main_shader->activateShader();
 
     main_shader->setInt("material.texture_diffuse1", 0);
-    GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture->ID));
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture->m_ID));
     GLCall(glActiveTexture(GL_TEXTURE0));
     
     // Convert local coordinates to world coordinates
@@ -122,7 +122,7 @@ void SphericalBillboard::draw(const Shaders_pack& shaders)
 
     main_shader->setInt("material.texture_diffuse1", 0);
 
-    GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture->ID));
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_Texture->m_ID));
     GLCall(glActiveTexture(GL_TEXTURE0));
 
     // Convert local coordinates to world coordinates

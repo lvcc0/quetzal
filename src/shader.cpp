@@ -1,6 +1,5 @@
 #include "shader.h"
 
-
 Shader::Shader(std::string& vertexCode, std::string& fragmentCode)
 {
     const char* vShaderSrc = vertexCode.c_str();

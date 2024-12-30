@@ -2,7 +2,7 @@
 
 Scene::Scene(Camera&& camera)
     : m_Camera(std::make_shared<Camera>(camera)),
-      m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::makePostProcessingShaders(), camera.m_width, camera.m_height))
+      m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::getScreenShaders(), camera.m_width, camera.m_height))
 {
 }
 
@@ -72,9 +72,9 @@ void Scene::update()
     }
 
     // TODO: until i make meshes renderable
-    for (auto& entry : ResourceManager::takeModels())
+    for (auto& entry : ResourceManager::getModels())
     {
-        std::cout << entry.second.getName() << std::endl;
+        //std::cout << entry.second.getName() << std::endl;
         entry.second.draw(shaders_active);
     }
 
@@ -141,8 +141,8 @@ void Scene::addShader(std::string name, const std::string& vertex_shader_rel_pat
 
 void Scene::addTexture(std::string name, std::string type)
 {
-    auto texture = ResourceManager::makeTexture(name);
-    texture->m_type = type;
+    auto texture = ResourceManager::getTexture(name);
+    texture->m_Type = type;
 
     unsigned int i{ 0 };
 
@@ -161,7 +161,7 @@ void Scene::addTexture(std::string name, std::string type)
 
 void Scene::addModel(std::string name)
 {
-    auto model = std::make_shared<Model>(ResourceManager::makeModel(name));
+    auto model = std::make_shared<Model>(ResourceManager::getModel(name));
 
     unsigned int i{ 0 };
 

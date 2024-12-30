@@ -106,7 +106,7 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
 
     ImGui::SeparatorText("Create models");
 
-    for (const auto& entry : ResourceManager::takeModels())
+    for (const auto& entry : ResourceManager::getModels())
     {
         ImGui::Separator();
         std::string name = "make " + entry.first;
