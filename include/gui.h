@@ -44,16 +44,15 @@ public:
     // -------------------//
 };
 
-// Singleton (should be)
+// Singleton (should be) TODO
 // This is the main part of GUI of scenes. It contains more than one window
 class GUI: public WindowProperties<std::vector<glm::vec2>>
 {
 public:
     GUI(GLFWwindow* window);
-    GUI(const GUI& obj) = delete;
-    GUI(GUI&& obj) = delete;
+    GUI(const GUI&) = delete;
+    GUI(GUI&&) = delete;
 
-    // Destructor
     ~GUI();
 
     // main funcs //

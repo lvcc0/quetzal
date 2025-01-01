@@ -15,3 +15,25 @@ bool GLLogCall(const char* function, const char* file, int line)
     }
     return true;
 }
+
+Renderer::Renderer()
+{
+}
+
+Renderer::~Renderer()
+{
+}
+
+Renderer& Renderer::instance()
+{
+    static Renderer instance;
+
+    // TODO: do stuff here
+
+    return instance;
+}
+
+void Renderer::draw(std::shared_ptr<Scene> scene, bool swap_buffers = true)
+{
+    // TODO: draw
+}

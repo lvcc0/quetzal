@@ -33,7 +33,7 @@ public:
     std::shared_ptr<Camera>         m_Camera;         // TODO: make it just a camera object, not a pointer perhaps
     std::shared_ptr<PostProcessing> m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
 
-    bool m_IsPostProcessing = false; // postprocessing bool
+    bool m_IsPostProcessing = false; // postprocessing bool TODO: move it to renderer
     bool m_IsPhysics = true; // physics bool
 
     // Matricies

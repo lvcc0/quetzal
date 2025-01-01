@@ -1,30 +1,25 @@
 #pragma once
 
-#include "scene.h"
-#include "gui.h"
-
 #include "deque"
+
+#include "scene.h"
+#include "renderer.h"
+#include "gui.h"
 
 // Singleton
 class Engine
 {
 private:
-    // Private to prohibit their using outside the class
-    // Constructor
     Engine();
-    // Destructor
     ~Engine();
 
-    // Delete move and copy constructors
-    Engine(const Engine& obj) = delete;
-    Engine(const Engine&& obj) = delete;
-
-    // Delete operator for copying
-    Engine& operator= (Engine const&) = delete;
-
 public:
-    // Initiating
-    static Engine& Instance(unsigned int width, unsigned int height);
+    Engine(const Engine& obj) = delete;  // no copying
+    Engine(Engine&& obj) = delete; // no moving
+    Engine& operator= (const Engine&) = delete; // delete copy operator
+    Engine& operator= (Engine&&) = delete; // delete move operator
+    
+    static Engine& Instance(unsigned int width, unsigned int height); // TODO: rename lol (lowerCamelCase)
 
     GLFWwindow* window;
 
@@ -55,6 +50,8 @@ public:
 
 private:
     std::unique_ptr<GUI> gui;
+    std::unique_ptr<Renderer> renderer;
+    
     bool shouldDrawGui = true;
 
     unsigned int winWidth;
