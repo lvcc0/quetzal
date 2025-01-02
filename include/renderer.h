@@ -5,7 +5,13 @@
 #include <algorithm>
 #include <vector>
 
-#include "scene.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "resource_manager.h"
+#include "post_processing.h"
+#include "camera.h"
 
 #define ASSERT(x) if (!(x)) __debugbreak();
 #define GLCall(x) GLClearError();\
@@ -15,22 +21,23 @@
 void GLClearError();
 bool GLLogCall(const char* function, const char* file, int line);
 
-// Singleton
 class Renderer
 {
-private:
-    Renderer();
+public:
+    Renderer(int viewport_width, int viewport_height);
     ~Renderer();
 
-public:
-    Renderer(const Renderer&) = delete;  // no copying
-    Renderer(Renderer&&) = delete; // no moving
-    Renderer& operator= (const Renderer&) = delete; // delete copy operator
-    Renderer& operator= (Renderer&&) = delete; // delete move operator
+    std::shared_ptr<Camera> m_Camera;
+    std::shared_ptr<PostProcessing> m_PostProcessing;
 
-    static Renderer& instance();
+    int m_ViewportWidth;
+    int m_ViewportHeight;
 
-    bool isPostProcessing = false;
+    bool m_IsPostProcessing = false;
 
-    void draw(std::shared_ptr<Scene> scene, bool swap_buffers = true);
+    glm::mat4 m_ProjectionMatrix;
+
+    void draw(bool swap_buffers = true);
+
+    void togglePostProcessing();
 };

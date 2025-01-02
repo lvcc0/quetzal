@@ -3,7 +3,6 @@
 #include "deque"
 
 #include "scene.h"
-#include "renderer.h"
 #include "gui.h"
 
 // Singleton
@@ -14,12 +13,12 @@ private:
     ~Engine();
 
 public:
-    Engine(const Engine& obj) = delete;  // no copying
-    Engine(Engine&& obj) = delete; // no moving
+    Engine(const Engine& obj) = delete; // no copying
+    Engine(Engine&& obj) = delete;      // no moving
     Engine& operator= (const Engine&) = delete; // delete copy operator
-    Engine& operator= (Engine&&) = delete; // delete move operator
+    Engine& operator= (Engine&&) = delete;      // delete move operator
     
-    static Engine& Instance(unsigned int width, unsigned int height); // TODO: rename lol (lowerCamelCase)
+    static Engine& instance(unsigned int width, unsigned int height); 
 
     GLFWwindow* window;
 
@@ -46,11 +45,13 @@ public:
     void process();
 
     // Create a scene, add it to the scenes map and set currentScene to it
-    std::shared_ptr<Scene> createScene(std::string name);
+    std::shared_ptr<Scene> createScene(const std::string& name, bool set_current = true); // TODO: setting current scene should be optional
+
+    // Set current scene and send some stuff to its renderer and such
+    void setCurrentScene(const std::string& name); // TODO: yeah
 
 private:
     std::unique_ptr<GUI> gui;
-    std::unique_ptr<Renderer> renderer;
     
     bool shouldDrawGui = true;
 

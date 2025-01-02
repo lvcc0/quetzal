@@ -21,8 +21,8 @@ class ResourceManager
 public:
     // Delete all constructors
     ResourceManager() = delete;
-    ResourceManager(const ResourceManager& obj) = delete;
-    ResourceManager(ResourceManager&& obj) = delete;
+    ResourceManager(const ResourceManager&) = delete;
+    ResourceManager(ResourceManager&&) = delete;
 
     // Load single object
     static void loadModel(const std::string& file_path);

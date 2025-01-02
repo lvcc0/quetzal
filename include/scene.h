@@ -17,8 +17,7 @@
 #include <algorithm>
 
 #include "resource_manager.h"
-#include "post_processing.h"
-#include "camera.h"
+#include "renderer.h"
 #include "lights.h"
 
 #include "texture.h"
@@ -30,20 +29,12 @@ enum class ObjectType { SHADER, TEXTURE, RENDERABLE };
 class Scene
 {
 public:
-    std::shared_ptr<Camera>         m_Camera;         // TODO: make it just a camera object, not a pointer perhaps
-    std::shared_ptr<PostProcessing> m_PostProcessing; // basically creating a quad that fills the whole screen allowing some funky shader shenanigans
-
-    bool m_IsPostProcessing = false; // postprocessing bool TODO: move it to renderer
-    bool m_IsPhysics = true; // physics bool
-
-    // Matricies
-    glm::mat4 m_ProjectionMatrix;
-
-    // Constructor
-    Scene(Camera&& camera);
-
-    // Destructor
+    Scene(int viewport_width, int viewport_height);
     ~Scene();
+
+    std::shared_ptr<Renderer> m_Renderer;
+
+    bool m_IsPhysics = true; // physics bool
 
     // Gets called every frame in the engine class
     void update();
@@ -54,9 +45,6 @@ public:
     // Do processing
     void doProcessing();
 
-    // Enable post processing
-    void enablePostProcessing();
-
     // Enable physics
     void enablePhysics();
     
@@ -64,9 +52,6 @@ public:
     // TODO: REDO IT
     inline Shaders_pack                                          getActiveShaders() const { return shaders_active; };
     inline std::map<const std::string, std::shared_ptr<Texture>> getTextureMap() const { return m_TextureMap; };
-    inline std::vector<std::shared_ptr<Renderable>>              getRenderableVec() const { return m_RenderableVec; };
-    inline std::vector<std::shared_ptr<Scene_Node>>              getSceneNodeVec() const { return m_NodeVec; };
-    inline std::vector<std::shared_ptr<Scene_Object>>            getSceneObjectVec() const { return m_SceneObjectVec; };
 
     // Some stuff to add to the scene
     void addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type);
@@ -92,9 +77,4 @@ private:
     // Maps of loaded objects
     std::map<const std::string, std::shared_ptr<Texture>>   m_TextureMap;
     std::map<const std::string, std::shared_ptr<Collision>> m_CollisionMap;
-
-    // Vectors
-    std::vector<std::shared_ptr<Renderable>>   m_RenderableVec;
-    std::vector<std::shared_ptr<Scene_Node>>   m_NodeVec;
-    std::vector<std::shared_ptr<Scene_Object>> m_SceneObjectVec;
 };

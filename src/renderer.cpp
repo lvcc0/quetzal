@@ -9,14 +9,15 @@ bool GLLogCall(const char* function, const char* file, int line)
 {
     while (GLenum error = glGetError())
     {
-        std::cout << "OPEN_GL::ERROR (" << error << "): " << function
-            << " " << file << " " << line << std::endl;
+        std::cerr << "OPEN_GL::ERROR (" << error << "): " << function << " " << file << " " << line << std::endl;
         return false;
     }
     return true;
 }
 
-Renderer::Renderer()
+Renderer::Renderer(int viewport_width, int viewport_height)
+    : m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::getScreenShaders(), viewport_width, viewport_height)),
+      m_ViewportWidth(viewport_width), m_ViewportHeight(viewport_height)
 {
 }
 
@@ -24,16 +25,101 @@ Renderer::~Renderer()
 {
 }
 
-Renderer& Renderer::instance()
+void Renderer::draw(bool swap_buffers = true)
 {
-    static Renderer instance;
+    if (!m_PostProcessing->m_ActiveShaders.empty() && m_IsPostProcessing)
+        this->m_PostProcessing->deactivate();
 
-    // TODO: do stuff here
+    m_ProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)this->m_Camera->m_width / (float)this->m_Camera->m_height, 0.1f, 100.0f);
+    glm::mat4 view = this->m_Camera->getViewMatrix();
 
-    return instance;
+
+    // TODO: rewrite shader stuff
+    //// Default shader
+    //shaders_active.MAIN_SHADER->activateShader();
+    //
+    //shaders_active.MAIN_SHADER->setVec3("viewPos", this->m_Camera->m_pos);
+    //shaders_active.MAIN_SHADER->setFloat("material.shininess", 32.0f);
+
+    //shaders_active.MAIN_SHADER->setMat4("projection", m_ProjectionMatrix);
+    //shaders_active.MAIN_SHADER->setMat4("view", view);
+
+    //// Stencil shader
+    //shaders_active.STENCIL_SHADER->activateShader();
+
+    //shaders_active.STENCIL_SHADER->setMat4("projection", m_ProjectionMatrix);
+    //shaders_active.STENCIL_SHADER->setMat4("view", view);
+
+    // Rendering
+
+    // TODO: consider moving lights into renderer
+    // Rendering lights' influence
+    //if (!this->m_DirLights.empty())
+    //{
+    //    for (auto i = 0; i < this->m_DirLights.size(); i++)
+    //    {
+    //        this->m_DirLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
+    //    }
+    //}
+    //if (!this->m_PointLights.empty())
+    //{
+    //    for (auto i = 0; i < this->m_PointLights.size(); i++)
+    //    {
+    //        this->m_PointLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
+    //        std::string name = m_PointLights[i]->m_name;
+    //        std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
+
+    //        sph_bill->m_Position = m_PointLights[i]->m_pos;
+    //        sph_bill->m_Target = m_Camera->m_pos;
+    //        sph_bill->draw(shaders_active);
+    //    }
+    //}
+    //if (!this->m_SpotLights.empty())
+    //{
+    //    for (auto i = 0; i < this->m_SpotLights.size(); i++)
+    //    {
+    //        this->m_SpotLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
+    //        
+    //        std::string name = m_SpotLights[i]->m_name;
+    //        std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
+
+    //        sph_bill->m_Position = m_PointLights[i]->m_pos;
+    //        sph_bill->m_Target = m_Camera->m_pos;
+    //        sph_bill->draw(shaders_active);
+    //    }
+    //}
+
+    // TODO: yeah
+    // Draw all renderable
+    //if (!this->m_RenderableVec.empty())
+    //{
+    //    for (auto it: m_RenderableVec)
+    //    {
+    //        auto object = it;
+    //        if (typeid(*object) == typeid(SphericalBillboard))
+    //        {
+    //            std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(it);
+    //            sph_bill->m_Target = m_Camera->m_pos;
+    //            sph_bill->draw(shaders_active);
+    //        }
+    //        else if (typeid(*object) == typeid(CylindricalBillboard))
+    //        {
+    //            std::shared_ptr<CylindricalBillboard> cyl_bill = std::dynamic_pointer_cast<CylindricalBillboard>(it);
+    //            cyl_bill->m_Target = m_Camera->m_pos;
+    //            cyl_bill->draw(shaders_active);
+    //        }
+    //        else 
+    //        {
+    //            it->draw(shaders_active);
+    //        }
+    //    }
+    //}
+
+    if (!m_PostProcessing->m_ActiveShaders.empty() && m_IsPostProcessing)
+        this->m_PostProcessing->activate();
 }
 
-void Renderer::draw(std::shared_ptr<Scene> scene, bool swap_buffers = true)
+void Renderer::togglePostProcessing()
 {
-    // TODO: draw
+    this->m_IsPostProcessing = !this->m_IsPostProcessing;
 }

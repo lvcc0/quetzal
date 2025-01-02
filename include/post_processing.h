@@ -13,15 +13,12 @@
 class PostProcessing
 {
 public:
+    PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>&& shaderMap, GLfloat width, GLfloat height);
+    ~PostProcessing();
+
     // Map of shaders
     std::map<const std::string, std::shared_ptr<Shader>> m_ShaderMap;
     std::vector<std::shared_ptr<Shader>> m_ActiveShaders;
-
-    // Constructor
-    PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>&& shaderMap, GLfloat width, GLfloat height);
-
-    // Destructor
-    ~PostProcessing();
 
     void deactivate() const;                          // deactivating postprocessing (must be used BEFORE any postprocessing funcs and objects drawing)
     void activate() const;                            // postprocessing funcs
