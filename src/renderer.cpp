@@ -25,6 +25,16 @@ Renderer::~Renderer()
 {
 }
 
+void Renderer::setCurrentShader(std::shared_ptr<Shader> shader)
+{
+    this->m_CurrentShader = shader;
+}
+
+void Renderer::setCurrentStencilShader(std::shared_ptr<Shader> shader)
+{
+    this->m_CurrentStencilShader = shader;
+}
+
 void Renderer::draw(bool swap_buffers = true)
 {
     if (!m_PostProcessing->m_ActiveShaders.empty() && m_IsPostProcessing)
@@ -35,59 +45,58 @@ void Renderer::draw(bool swap_buffers = true)
 
 
     // TODO: rewrite shader stuff
-    //// Default shader
-    //shaders_active.MAIN_SHADER->activateShader();
-    //
-    //shaders_active.MAIN_SHADER->setVec3("viewPos", this->m_Camera->m_pos);
-    //shaders_active.MAIN_SHADER->setFloat("material.shininess", 32.0f);
+    // Default shader
+    m_CurrentShader->activateShader();
+    
+    m_CurrentShader->setVec3("viewPos", this->m_Camera->m_pos);
+    m_CurrentShader->setFloat("material.shininess", 32.0f);
 
-    //shaders_active.MAIN_SHADER->setMat4("projection", m_ProjectionMatrix);
-    //shaders_active.MAIN_SHADER->setMat4("view", view);
+    m_CurrentShader->setMat4("projection", m_ProjectionMatrix);
+    m_CurrentShader->setMat4("view", view);
 
-    //// Stencil shader
-    //shaders_active.STENCIL_SHADER->activateShader();
+    // Stencil shader
+    m_CurrentStencilShader->activateShader();
 
-    //shaders_active.STENCIL_SHADER->setMat4("projection", m_ProjectionMatrix);
-    //shaders_active.STENCIL_SHADER->setMat4("view", view);
+    m_CurrentStencilShader->setMat4("projection", m_ProjectionMatrix);
+    m_CurrentStencilShader->setMat4("view", view);
 
     // Rendering
 
     // TODO: consider moving lights into renderer
     // Rendering lights' influence
-    //if (!this->m_DirLights.empty())
-    //{
-    //    for (auto i = 0; i < this->m_DirLights.size(); i++)
-    //    {
-    //        this->m_DirLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
-    //    }
-    //}
-    //if (!this->m_PointLights.empty())
-    //{
-    //    for (auto i = 0; i < this->m_PointLights.size(); i++)
-    //    {
-    //        this->m_PointLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
-    //        std::string name = m_PointLights[i]->m_name;
-    //        std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
+    if (!this->m_DirLights.empty())
+    {
+        for (auto i = 0; i < this->m_DirLights.size(); i++)
+        {
+            this->m_DirLights[i]->updateUni(m_CurrentShader, i);
+        }
+    }
+    if (!this->m_PointLights.empty())
+    {
+        for (auto i = 0; i < this->m_PointLights.size(); i++)
+        {
+            this->m_PointLights[i]->updateUni(m_CurrentShader, i);
 
-    //        sph_bill->m_Position = m_PointLights[i]->m_pos;
-    //        sph_bill->m_Target = m_Camera->m_pos;
-    //        sph_bill->draw(shaders_active);
-    //    }
-    //}
-    //if (!this->m_SpotLights.empty())
-    //{
-    //    for (auto i = 0; i < this->m_SpotLights.size(); i++)
-    //    {
-    //        this->m_SpotLights[i]->updateUni(shaders_active.MAIN_SHADER, i);
-    //        
-    //        std::string name = m_SpotLights[i]->m_name;
-    //        std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
-
-    //        sph_bill->m_Position = m_PointLights[i]->m_pos;
-    //        sph_bill->m_Target = m_Camera->m_pos;
-    //        sph_bill->draw(shaders_active);
-    //    }
-    //}
+            //std::string name = m_PointLights[i]->m_Name;
+            //std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
+            //sph_bill->m_Position = m_PointLights[i]->m_pos;
+            //sph_bill->m_Target = m_Camera->m_pos;
+            //sph_bill->draw(shaders_active);
+        }
+    }
+    if (!this->m_SpotLights.empty())
+    {
+        for (auto i = 0; i < this->m_SpotLights.size(); i++)
+        {
+            this->m_SpotLights[i]->updateUni(m_CurrentShader, i);
+            
+            //std::string name = m_SpotLights[i]->m_name;
+            //std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
+            //sph_bill->m_Position = m_PointLights[i]->m_pos;
+            //sph_bill->m_Target = m_Camera->m_pos;
+            //sph_bill->draw(shaders_active);
+        }
+    }
 
     // TODO: yeah
     // Draw all renderable

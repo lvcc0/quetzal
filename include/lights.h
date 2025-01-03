@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sstream>
+#include <string>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -10,118 +11,79 @@
 
 #include "billboards.h"
 
-class DirLight
+// TODO: rename some stuff here
+
+class Light
 {
 public:
-    bool m_enabled;
-    const char* m_name;
-    
-    glm::vec3 m_dir;
+    Light(bool enabled, const std::string& name, glm::vec3 color,
+          glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 
-    glm::vec3 m_ambient;
-    glm::vec3 m_diffuse;
-    glm::vec3 m_specular;
+    bool m_Enabled;
+    std::string m_Name;
+    glm::vec3 m_Color;
 
-    glm::vec3 m_color;
-
-    // Constructor
-    DirLight( bool enabled, const char* name, glm::vec3 dir,
-              glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
-              glm::vec3 color ) :
-        m_enabled(enabled), m_name(name), m_dir(dir),
-        m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
-        m_color(color) { /* empty */ }
+    glm::vec3 m_Ambient;
+    glm::vec3 m_Diffuse;
+    glm::vec3 m_Specular;
 
     // Updates all corresponging fragment shader uniforms
-    void updateUni(std::shared_ptr<Shader>& shader, int index) const;
-
-    // (const char*) cast operator
-    operator const char* () { return m_name; }
+    virtual void updateUni(std::shared_ptr<Shader>& shader, int index) const = 0;
 };
 
-class PointLight
+class DirLight : public Light
 {
 public:
-    bool m_enabled;
-    bool m_draw_billboard;
+    DirLight(bool enabled, const std::string& name, glm::vec3 color, glm::vec3 dir,
+             glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 
-    const char* m_name;
+    glm::vec3 m_Direction;
 
-    glm::vec3 m_pos;
+    void updateUni(std::shared_ptr<Shader>& shader, int index) const override;
+};
 
-    glm::vec3 m_ambient;
-    glm::vec3 m_diffuse;
-    glm::vec3 m_specular;
+class PointLight : public Light
+{
+public:
+    PointLight(bool enabled, const std::string& name, glm::vec3 color, glm::vec3 pos,
+               glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+               float constant, float linear, float quad);
 
-    float m_constant;
-    float m_linear;
-    float m_quad;
+    bool m_DrawBillboard;
 
-    glm::vec3 m_color;
+    glm::vec3 m_Position;
 
-    // Constructor
-    PointLight( bool enabled, const char* name, glm::vec3 pos, 
-                glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
-                float constant, float linear, float quad,
-                glm::vec3 color ) :
-        m_enabled(enabled), m_draw_billboard(true),
-        m_name(name), m_pos(pos),
-        m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
-        m_constant(constant), m_linear(linear), m_quad(quad),
-        m_color(color) { /* empty */ }
-
-    // Updates all corresponging fragment shader uniforms
-    void updateUni(std::shared_ptr<Shader>& shader, int index) const;
-
-    // (const char*) cast operator
-    operator const char* () { return m_name; }
+    float m_Constant;
+    float m_Linear;
+    float m_Quad;
+    
+    void updateUni(std::shared_ptr<Shader>& shader, int index) const override;
 
 private:
     void enableBillboard();
 };
 
-class SpotLight
+class SpotLight : public Light
 {
 public:
-    bool m_enabled;
-    bool m_draw_billboard;
+    bool m_DrawBillboard;
 
-    const char* m_name;
+    glm::vec3 m_Position;
+    glm::vec3 m_Direction;
 
-    glm::vec3 m_pos;
-    glm::vec3 m_dir;
+    float m_Constant;
+    float m_Linear;
+    float m_Quad;
 
-    glm::vec3 m_ambient;
-    glm::vec3 m_diffuse;
-    glm::vec3 m_specular;
+    float m_InnerCutoff;
+    float m_OuterCutoff;
 
-    float m_constant;
-    float m_linear;
-    float m_quad;
+    SpotLight(bool enabled, const std::string& name, glm::vec3 color, glm::vec3 pos, glm::vec3 dir,
+              glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
+              float constant, float linear, float quad,
+              float inner_cutoff, float outer_cutoff);
 
-    float m_innerCutoff;
-    float m_outerCutoff;
-
-    glm::vec3 m_color;
-
-    // Constructor
-    SpotLight( bool enabled, const char* name, glm::vec3 pos, glm::vec3 dir,
-               glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
-               float constant, float linear, float quad,
-               float innerCutoff, float outerCutoff,
-               glm::vec3 color ) :
-        m_enabled(enabled), m_draw_billboard(true),
-        m_name(name), m_pos(pos), m_dir(dir),
-        m_ambient(ambient), m_diffuse(diffuse), m_specular(specular),
-        m_constant(constant), m_linear(linear), m_quad(quad),
-        m_innerCutoff(innerCutoff), m_outerCutoff(outerCutoff),
-        m_color(color) { /* empty */ }
-
-    // Updates all corresponging fragment shader uniforms
-    void updateUni(std::shared_ptr<Shader>& shader, int index) const;
-
-    // (const char*) cast operator
-    operator const char* () { return m_name; }
+    void updateUni(std::shared_ptr<Shader>& shader, int index) const override;
 
 private:
     void enableBillboard();

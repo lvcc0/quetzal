@@ -40,9 +40,9 @@ Shader::~Shader()
 
 void Shader::activateShader() const
 {
-    #ifdef DEBUG
+#ifdef DEBUG
     std::cout << "DEBUG::SHADER::ACTIVATE " << ID << std::endl;
-    #endif // DEBUG
+#endif
     GLCall(glUseProgram(ID));
 }
 
@@ -76,14 +76,12 @@ void Shader::compileErrors(unsigned int shader, const char* type)
     }
 }
 
-bool Shader::is_active() const
+bool Shader::isActive() const
 {
-    GLint shader_id;
-    glGetIntegerv(GL_ACTIVE_PROGRAM, &shader_id);
-    if (shader_id == this->ID)
-        return true;
-
-    return false;
+    GLint activeShaderID;
+    glGetIntegerv(GL_ACTIVE_PROGRAM, &activeShaderID);
+    
+    return activeShaderID == this->ID;
 }
 
 void Shader::setBool(const std::string& name, bool value) const
@@ -129,24 +127,4 @@ void Shader::setMat3(const std::string& name, const glm::mat3& value) const
 void Shader::setMat4(const std::string& name, const glm::mat4& value) const
 {
     ACTIVATE_SHADER(GLCall(glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0])));
-}
-
-std::shared_ptr<Shader> Shaders_pack::push(std::shared_ptr<Shader> shader, ShaderType type)
-{
-    std::shared_ptr<Shader> p_shader{ nullptr };
-    
-    if (type == ShaderType::MAIN)
-    {
-        p_shader = MAIN_SHADER;
-        MAIN_SHADER = shader;
-    }
-    else if (type == ShaderType::STENCIL)
-    {
-        p_shader = STENCIL_SHADER;
-        STENCIL_SHADER = shader;
-    }
-    else
-        ASSERT(false);
-
-    return p_shader;
 }

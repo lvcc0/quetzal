@@ -12,6 +12,8 @@
 #include "resource_manager.h"
 #include "post_processing.h"
 #include "camera.h"
+#include "shader.h"
+#include "lights.h"
 
 #define ASSERT(x) if (!(x)) __debugbreak();
 #define GLCall(x) GLClearError();\
@@ -37,7 +39,18 @@ public:
 
     glm::mat4 m_ProjectionMatrix;
 
+    void setCurrentShader(std::shared_ptr<Shader> shader);
+    void setCurrentStencilShader(std::shared_ptr<Shader> shader);
+
     void draw(bool swap_buffers = true);
 
     void togglePostProcessing();
+
+private:
+    std::shared_ptr<Shader> m_CurrentShader;
+    std::shared_ptr<Shader> m_CurrentStencilShader;
+
+    std::vector<std::shared_ptr<DirLight>>   m_DirLights;
+    std::vector<std::shared_ptr<PointLight>> m_PointLights;
+    std::vector<std::shared_ptr<SpotLight>>  m_SpotLights;
 };

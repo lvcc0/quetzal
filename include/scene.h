@@ -48,9 +48,6 @@ public:
     // Enable physics
     void enablePhysics();
     
-    //void setShader(const std::string& name, ShaderType type);                     // set shader to draw stuff with (only one for now (ig it'll always be only one)) //IMHO: There could be more than one shader
-    // TODO: REDO IT
-    inline Shaders_pack                                          getActiveShaders() const { return shaders_active; };
     inline std::map<const std::string, std::shared_ptr<Texture>> getTextureMap() const { return m_TextureMap; };
 
     // Some stuff to add to the scene
@@ -66,13 +63,9 @@ public:
     void addSpotLight(SpotLight spot_light, std::vector<Vertex> verts);
 
 private:
-    // Vectors with scene lights
-    std::vector<std::shared_ptr<DirLight>>   m_DirLights;
-    std::vector<std::shared_ptr<PointLight>> m_PointLights;
-    std::vector<std::shared_ptr<SpotLight>>  m_SpotLights;
-
-    // TODO: redo it to better array
-    Shaders_pack shaders_active;
+    // Vectors of loaded objects
+    std::vector<std::shared_ptr<Light>>  m_Lights;
+    std::vector<std::shared_ptr<Shader>> m_Shaders;
 
     // Maps of loaded objects
     std::map<const std::string, std::shared_ptr<Texture>>   m_TextureMap;
