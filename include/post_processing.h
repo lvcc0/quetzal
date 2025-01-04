@@ -5,10 +5,10 @@
 #include <vector>
 #include <map>
 
-#include <shader.h>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include "shader.h"
 
 class PostProcessing
 {

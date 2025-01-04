@@ -30,7 +30,6 @@ class Scene
 {
 public:
     Scene(int viewport_width, int viewport_height);
-    ~Scene();
 
     std::shared_ptr<Renderer> m_Renderer;
 
@@ -47,13 +46,9 @@ public:
 
     // Enable physics
     void enablePhysics();
-    
-    inline std::map<const std::string, std::shared_ptr<Texture>> getTextureMap() const { return m_TextureMap; };
 
     // Some stuff to add to the scene
-    void addShader(std::string name, const std::string& vertex_shader_rel_path, const std::string& fragment_shader_rel_path, ShaderType type);
-    void addTexture(std::string name, std::string type);
-    void addModel(std::string name);
+    //void addModel(std::string name); // TODO: not a model, but a node that contains that model
     void addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
     void addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
 
@@ -64,10 +59,8 @@ public:
 
 private:
     // Vectors of loaded objects
-    std::vector<std::shared_ptr<Light>>  m_Lights;
-    std::vector<std::shared_ptr<Shader>> m_Shaders;
+    std::vector<std::shared_ptr<Light>> m_Lights;
 
     // Maps of loaded objects
-    std::map<const std::string, std::shared_ptr<Texture>>   m_TextureMap;
     std::map<const std::string, std::shared_ptr<Collision>> m_CollisionMap;
 };

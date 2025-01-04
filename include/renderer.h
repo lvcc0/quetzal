@@ -23,6 +23,7 @@
 void GLClearError();
 bool GLLogCall(const char* function, const char* file, int line);
 
+// TODO: make it a singleton after all?
 class Renderer
 {
 public:

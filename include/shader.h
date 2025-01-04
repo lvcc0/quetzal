@@ -24,8 +24,8 @@ public:
     GLuint ID;
 
     Shader(std::string& vertexCode, std::string& fragmentCode);
-    Shader(const Shader& obj) = delete;
-    Shader(Shader&& obj) = delete;
+    Shader(const Shader&) = delete;
+    Shader(Shader&&) = delete;
 
     ~Shader();
 
