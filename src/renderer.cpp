@@ -15,86 +15,51 @@ bool GLLogCall(const char* function, const char* file, int line)
     return true;
 }
 
-Renderer::Renderer(int viewport_width, int viewport_height)
-    : m_PostProcessing(std::make_shared<PostProcessing>(ResourceManager::getScreenShaders(), viewport_width, viewport_height)),
-      m_ViewportWidth(viewport_width), m_ViewportHeight(viewport_height)
+void Renderer::draw(Scene& scene, bool swap_buffers)
 {
-}
+    if (!scene.m_PostProcessing.m_ActiveShaders.empty() && scene.m_IsPostProcessing)
+        scene.m_PostProcessing.deactivate();
 
-Renderer::~Renderer()
-{
-}
+    currentProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)scene.m_Camera.m_width / (float)scene.m_Camera.m_height, 0.1f, 100.0f);
+    glm::mat4 view = scene.m_Camera.getViewMatrix();
 
-void Renderer::setCurrentShader(std::shared_ptr<Shader> shader)
-{
-    this->m_CurrentShader = shader;
-}
-
-void Renderer::setCurrentStencilShader(std::shared_ptr<Shader> shader)
-{
-    this->m_CurrentStencilShader = shader;
-}
-
-void Renderer::draw(bool swap_buffers = true)
-{
-    if (!m_PostProcessing->m_ActiveShaders.empty() && m_IsPostProcessing)
-        this->m_PostProcessing->deactivate();
-
-    m_ProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)this->m_Camera->m_width / (float)this->m_Camera->m_height, 0.1f, 100.0f);
-    glm::mat4 view = this->m_Camera->getViewMatrix();
-
-
-    // TODO: rewrite shader stuff
     // Default shader
-    m_CurrentShader->activateShader();
+    currentShader->activateShader();
     
-    m_CurrentShader->setVec3("viewPos", this->m_Camera->m_pos);
-    m_CurrentShader->setFloat("material.shininess", 32.0f);
+    currentShader->setVec3("viewPos", scene.m_Camera.m_pos);
+    currentShader->setFloat("material.shininess", 32.0f);
 
-    m_CurrentShader->setMat4("projection", m_ProjectionMatrix);
-    m_CurrentShader->setMat4("view", view);
+    currentShader->setMat4("projection", currentProjectionMatrix);
+    currentShader->setMat4("view", view);
 
     // Stencil shader
-    m_CurrentStencilShader->activateShader();
+    currentStencilShader->activateShader();
 
-    m_CurrentStencilShader->setMat4("projection", m_ProjectionMatrix);
-    m_CurrentStencilShader->setMat4("view", view);
+    currentStencilShader->setMat4("projection", currentProjectionMatrix);
+    currentStencilShader->setMat4("view", view);
 
-    // Rendering
-
-    // TODO: consider moving lights into renderer
     // Rendering lights' influence
-    if (!this->m_DirLights.empty())
+    if (!scene.m_DirLights.empty())
     {
-        for (auto i = 0; i < this->m_DirLights.size(); i++)
+        for (auto i = 0; i < scene.m_DirLights.size(); i++)
         {
-            this->m_DirLights[i]->updateUni(m_CurrentShader, i);
+            scene.m_DirLights[i]->updateUni(currentShader, i);
         }
     }
-    if (!this->m_PointLights.empty())
+    if (!scene.m_PointLights.empty())
     {
-        for (auto i = 0; i < this->m_PointLights.size(); i++)
+        for (auto i = 0; i < scene.m_PointLights.size(); i++)
         {
-            this->m_PointLights[i]->updateUni(m_CurrentShader, i);
-
-            //std::string name = m_PointLights[i]->m_Name;
-            //std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
-            //sph_bill->m_Position = m_PointLights[i]->m_pos;
-            //sph_bill->m_Target = m_Camera->m_pos;
-            //sph_bill->draw(shaders_active);
+            scene.m_PointLights[i]->updateUni(currentShader, i);
+            // TODO: draw the billboard
         }
     }
-    if (!this->m_SpotLights.empty())
+    if (!scene.m_SpotLights.empty())
     {
-        for (auto i = 0; i < this->m_SpotLights.size(); i++)
+        for (auto i = 0; i < scene.m_SpotLights.size(); i++)
         {
-            this->m_SpotLights[i]->updateUni(m_CurrentShader, i);
-            
-            //std::string name = m_SpotLights[i]->m_name;
-            //std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(*std::find_if(m_NodeVec.begin(), m_NodeVec.end(), [name](std::shared_ptr<Scene_Node> item) {if (item->getName() == name) return true; return false; }));
-            //sph_bill->m_Position = m_PointLights[i]->m_pos;
-            //sph_bill->m_Target = m_Camera->m_pos;
-            //sph_bill->draw(shaders_active);
+            scene.m_SpotLights[i]->updateUni(currentShader, i);
+            // TODO: draw the billboard
         }
     }
 
@@ -124,11 +89,6 @@ void Renderer::draw(bool swap_buffers = true)
     //    }
     //}
 
-    if (!m_PostProcessing->m_ActiveShaders.empty() && m_IsPostProcessing)
-        this->m_PostProcessing->activate();
-}
-
-void Renderer::togglePostProcessing()
-{
-    this->m_IsPostProcessing = !this->m_IsPostProcessing;
+    if (!scene.m_PostProcessing.m_ActiveShaders.empty() && scene.m_IsPostProcessing)
+        scene.m_PostProcessing.activate();
 }

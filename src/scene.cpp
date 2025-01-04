@@ -1,19 +1,19 @@
 #include "scene.h"
 
 Scene::Scene(int viewport_width, int viewport_height)
-    : m_Renderer(std::make_shared<Renderer>(viewport_width, viewport_height))
+    : m_Camera(viewport_width, viewport_height, glm::vec3(0.0f)),
+      m_PostProcessing(ResourceManager::getPPShaders(), viewport_width, viewport_height)
 {
 }
 
 void Scene::update()
 {
     this->doProcessing();
-    this->m_Renderer->draw();
 }
 
 void Scene::doPhysicsProcessing()
 {
-    // TODO::Change this
+    // TODO: Change this
     //Physics::processPhysics(m_CollisionMap);
 }
 
@@ -42,19 +42,19 @@ void Scene::addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, con
     // TODO
 }
 
-void Scene::addDirLight(DirLight dir_light)
+void Scene::addDirLight(DirLight& dir_light)
 {
-    this->m_Lights.push_back(std::make_shared<DirLight>(dir_light));
+    this->m_DirLights.push_back(std::make_unique<DirLight>(dir_light));
 }
 
-void Scene::addPointLight(PointLight point_light, std::vector<Vertex> verts)
+void Scene::addPointLight(PointLight& point_light, std::vector<Vertex> verts)
 {
-    this->m_Lights.push_back(std::make_shared<PointLight>(point_light));
+    this->m_PointLights.push_back(std::make_unique<PointLight>(point_light));
     this->addSphBillboard(point_light.m_Name, point_light.m_Position, glm::vec2(1.0f), "lightbulb.png", verts);
 }
 
-void Scene::addSpotLight(SpotLight spot_light, std::vector<Vertex> verts)
+void Scene::addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts)
 {
-    this->m_Lights.push_back(std::make_shared<SpotLight>(spot_light));
+    this->m_SpotLights.push_back(std::make_unique<SpotLight>(spot_light));
     this->addSphBillboard(spot_light.m_Name, spot_light.m_Position, glm::vec2(1.0f), "highlight.png", verts);
 }

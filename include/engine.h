@@ -13,8 +13,8 @@ private:
     ~Engine();
 
 public:
-    Engine(const Engine& obj) = delete; // no copying
-    Engine(Engine&& obj) = delete;      // no moving
+    Engine(const Engine&) = delete; // no copying
+    Engine(Engine&&) = delete;      // no moving
     Engine& operator= (const Engine&) = delete; // delete copy operator
     Engine& operator= (Engine&&) = delete;      // delete move operator
     
@@ -34,7 +34,7 @@ public:
     void processInput(); // gets called every frame in the process() function below
 
     // Picking an object
-    void pickObject();
+    void pickObject(); // TODO
 
     // Callbacks
     void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -47,8 +47,8 @@ public:
     // Create a scene, add it to the scenes map and set currentScene to it
     std::shared_ptr<Scene> createScene(const std::string& name, bool set_current = true); // TODO: setting current scene should be optional
 
-    // Set current scene and send some stuff to its renderer and such
-    void setCurrentScene(const std::string& name); // TODO: yeah
+    // Set current scene and TODO: send some stuff to the renderer and such
+    void setCurrentScene(const std::string& name);
 
 private:
     std::unique_ptr<GUI> gui;

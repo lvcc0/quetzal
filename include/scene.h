@@ -17,7 +17,8 @@
 #include <algorithm>
 
 #include "resource_manager.h"
-#include "renderer.h"
+#include "camera.h"
+#include "post_processing.h"
 #include "lights.h"
 
 #include "texture.h"
@@ -31,9 +32,15 @@ class Scene
 public:
     Scene(int viewport_width, int viewport_height);
 
-    std::shared_ptr<Renderer> m_Renderer;
+    Camera m_Camera;
+    PostProcessing m_PostProcessing;
 
-    bool m_IsPhysics = true; // physics bool
+    bool m_IsPostProcessing = false;
+    bool m_IsPhysics = true;
+
+    std::vector<std::unique_ptr<DirLight>>   m_DirLights;
+    std::vector<std::unique_ptr<PointLight>> m_PointLights;
+    std::vector<std::unique_ptr<SpotLight>>  m_SpotLights;
 
     // Gets called every frame in the engine class
     void update();
@@ -53,14 +60,12 @@ public:
     void addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
 
     // Add lights to the scene
-    void addDirLight(DirLight dir_light);
-    void addPointLight(PointLight point_light, std::vector<Vertex> verts);
-    void addSpotLight(SpotLight spot_light, std::vector<Vertex> verts);
+    // TODO: remove those verts from the argument list
+    void addDirLight(DirLight& dir_light);
+    void addPointLight(PointLight& point_light, std::vector<Vertex> verts);
+    void addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts);
 
 private:
-    // Vectors of loaded objects
-    std::vector<std::shared_ptr<Light>> m_Lights;
-
     // Maps of loaded objects
     std::map<const std::string, std::shared_ptr<Collision>> m_CollisionMap;
 };

@@ -91,7 +91,7 @@ void Engine::processInput()
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey( window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
-        this->scenes.at(this->currentScene)->m_Renderer->m_Camera->Inputs(this->window, deltaTime);
+        this->scenes.at(this->currentScene)->m_Camera.Inputs(this->window, deltaTime);
 }
 
 // Badly working with zero scaled objects
@@ -122,7 +122,7 @@ void Engine::pickObject()
     }
     // ----------------------------- //
 
-    glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Renderer->m_Camera->m_pos;
+    glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Camera.m_pos;
     glm::vec3 direction = ExpMath::getGlobalCoordsFromScreen(mouse_x, mouse_y, this->scenes.at(currentScene)->m_Camera->m_width, this->scenes.at(currentScene)->m_Camera->m_height, this->scenes.at(currentScene)->m_ProjectionMatrix, this->scenes.at(currentScene)->m_Camera->getViewMatrix());
 
     Ray ray(cam_coords, direction);
@@ -157,8 +157,8 @@ void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
     {
-        this->scenes.at(this->currentScene)->m_Renderer->m_Camera->UpdateSize(width, height);
-        this->scenes.at(this->currentScene)->m_Renderer->m_PostProcessing->recreate(width, height);
+        this->scenes.at(this->currentScene)->m_Camera.UpdateSize(width, height);
+        this->scenes.at(this->currentScene)->m_PostProcessing.recreate(width, height);
     }
 }
 

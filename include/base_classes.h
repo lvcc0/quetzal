@@ -20,54 +20,60 @@
 #include "vertex_array.h"
 
 // TODO: put them in separate files
+// TODO: reorganize the file structure
 
-class Node
+namespace qtzl
 {
-public:
-    Node();
-    virtual ~Node();
 
-    inline std::string getName() const;
-    inline std::shared_ptr<Node> getParent() const;
-    inline std::map<std::string, std::shared_ptr<Node>> getChildren() const;
+    class Node
+    {
+    public:
+        Node();
+        virtual ~Node();
 
-    inline void setName(const std::string& name);
-    inline void setParent(const std::shared_ptr<Node>& parent);
+        inline std::string                                  getName() const;
+        inline std::shared_ptr<Node>                        getParent() const;
+        inline std::map<std::string, std::shared_ptr<Node>> getChildren() const;
 
-    void addChild(std::shared_ptr<Node> child);
-    void removeChild(std::shared_ptr<Node> child);
+        inline void setName(const std::string& name);
+        inline void setParent(const std::shared_ptr<Node>& parent);
 
-protected:
-    std::string m_Name;
-    std::weak_ptr<Node> m_Parent;
+        void addChild(std::shared_ptr<Node> child);
+        void removeChild(std::shared_ptr<Node> child);
 
-    inline static std::map<std::string, std::shared_ptr<Node>> m_Children;
-};
+        void show();
+        void hide();
 
-class Node3D : public Node
-{
-public:
-    Node3D();
-    virtual ~Node3D();
+    protected:
+        std::string m_Name;
+        std::weak_ptr<Node> m_Parent;
 
-    inline glm::vec3 getPosition();
-    inline glm::vec3 getScale();
-    inline glm::vec3 getRotationDegrees();
+        inline static std::map<std::string, std::weak_ptr<Node>> m_Children;
+    };
 
-    inline void setPosition();
-    inline void setScale();
-    inline void setRotationDegrees();
-    
-    void show();
-    void hide();
+    class Node3D : public Node
+    {
+    public:
+        Node3D();
+        virtual ~Node3D();
 
-protected:
-    glm::vec3 m_LocalPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 m_GlobalPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+        inline glm::vec3 getPosition();
+        inline glm::vec3 getScale();
+        inline glm::vec3 getRotationDegrees();
 
-    glm::vec3 m_LocalScale = glm::vec3(1.0f, 1.0f, 1.0f);
-    glm::vec3 m_GlobalScale = glm::vec3(1.0f, 1.0f, 1.0f);
+        inline void setPosition();
+        inline void setScale();
+        inline void setRotationDegrees();
 
-    glm::vec3 m_LocalRotationDegrees = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 m_GlobalRotationDegrees = glm::vec3(0.0f, 0.0f, 0.0f);
-};
+    protected:
+        glm::vec3 m_LocalPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 m_GlobalPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+
+        glm::vec3 m_LocalScale = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 m_GlobalScale = glm::vec3(1.0f, 1.0f, 1.0f);
+
+        glm::vec3 m_LocalRotationDegrees = glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 m_GlobalRotationDegrees = glm::vec3(0.0f, 0.0f, 0.0f);
+    };
+
+} // namespace qtzl
