@@ -17,36 +17,13 @@
 
 #include "scene.h"
 
-// NOTE: USE IMGUI WINDOW STATE FUNCS BETWEEN CALLING IMGUI::RENDER AND IMGUI::END 
+enum class EngineWindowType { SceneCfg, NodeMgr, ResourceMgr };
 
-template <class T>
-concept constraint_window_properties = std::is_same_v<T, glm::vec2> || std::is_same_v<T, std::vector<glm::vec2>>;
-
-// You must prepare your inheritor for recieving info about some parameters
-template<class T> requires constraint_window_properties<T>
-struct WindowProperties
+// Base window class
+class GUIWindow
 {
 public:
-    inline T getGUIWindowSize() const noexcept { return GUIWindowSize; };
-    inline T getGUIWindowPos() const noexcept { return GUIWindowPos; };
-
-protected:
-    unsigned int pos_x, pos_y, width, height;
-
-    // These particular params must be taken between ImGui::Render and ImGui::End
-    // So we somehow get them and keep here
-    inline static T GUIWindowSize;
-    inline static T GUIWindowPos;
-
-    static void positioningWindow(GLFWwindow* window, float part_of_width, float part_of_height, float pos_x, float pos_y);
-};
-
-// This class of windows operating with Scene_Node objects
-// But constructors get their object via Scene_Node
-class GUIWindow : public WindowProperties<std::vector<glm::vec2>>
-{
-public:
-    GUIWindow(const std::shared_ptr<qtzl::Node> obj, const std::vector<std::shared_ptr<qtzl::Node>> scene_nodes);
+    GUIWindow();
     GUIWindow(const GUIWindow&) = delete;
     GUIWindow(GUIWindow&&) = delete;
 
@@ -54,27 +31,51 @@ public:
 
     GUIWindow& operator= (const GUIWindow&) = delete;
 
-    void windowLoop();
+    inline glm::vec2 getPosition() const { return m_Position; }
+    inline glm::vec2 getSize() const { return m_Size; }
 
-    inline const std::shared_ptr<qtzl::Node> getNode() const { return m_SceneNode; }
-
-private:
-    std::shared_ptr<qtzl::Node> m_SceneNode;
-    std::vector<std::shared_ptr<qtzl::Node>> m_AllSceneNodes;
-    bool attaching{ false };
-
-    template <typename T>
-    void showCurrentObjectGUI();
-    template<>
-    void showCurrentObjectGUI<Model>();
-    template<>
-    void showCurrentObjectGUI<CylindricalBillboard>();
-    template<>
-    void showCurrentObjectGUI<SphericalBillboard>();
+protected:
+    glm::vec2 m_Position;
+    glm::vec2 m_Size;
 };
 
-// This is the main part of GUI of scenes. It contains more than one window
-class GUI : public WindowProperties<std::vector<glm::vec2>>
+// NOTE: maybe we'll add some more stuff to this class
+class GUIEngineWindow : public GUIWindow
+{
+public:
+    GUIEngineWindow(EngineWindowType type);
+
+    EngineWindowType m_Type;
+
+    bool isVisible() const;
+    void toggleVisibility();
+
+private:
+    bool m_IsVisible = false;
+};
+
+// Windows created for nodes only
+class GUINodeWindow : public GUIWindow
+{
+public:
+    GUINodeWindow(std::shared_ptr<qtzl::Node3D> node);
+    ~GUINodeWindow();
+
+    void render();
+
+    inline std::shared_ptr<qtzl::Node3D> getNode() const { return m_Node; }
+
+private:
+    std::shared_ptr<qtzl::Node3D> m_Node;
+    
+    // TODO: yeah
+    //template <typename T> void showNodeGUI();
+    //template <typename T> void showNodeGUI</*node*/>();
+    //template <typename T> void showNodeGUI</*node*/>();
+};
+
+// This is the main part of scene GUI. It contains more than one window
+class GUI
 {
 public:
     GUI() = delete;
@@ -84,25 +85,21 @@ public:
     static void init(GLFWwindow* window);
     static void shutdown();
 
-    static void render(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene, GLFWwindow* window);
+    static void render(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time);
 
-    static void showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene, GLFWwindow* window);
-    static void createWindow(const std::shared_ptr<qtzl::Node> obj);
-    static void createWindow(const std::shared_ptr<qtzl::Node3D> obj);
+    static void showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time);
+    static void showNodeManager(std::shared_ptr<Scene> scene);
+    static void showResourceManager();
 
-    inline static std::vector<std::shared_ptr<GUIWindow>> getWindows() { return m_Windows; }
+    // Creating or destroying windows for nodes
+    static void onClick(const std::shared_ptr<qtzl::Node> obj);
+    static void onClick(const std::shared_ptr<qtzl::Node3D> obj);
+    
+    static bool isOccupied(double x, double y);
+
+    inline static std::vector<std::shared_ptr<GUINodeWindow>> getNodeWindows();
 
 private:
-    inline static std::vector<std::shared_ptr<GUIWindow>> m_Windows;
-
-    //template<typename T>
-    //void addObject(std::string name, std::shared_ptr<Scene> scene)
-    //{
-    //    ASSERT(false);
-    //}
-    //template<>
-    //void addObject<Model>(std::string name, std::shared_ptr<Scene> scene)
-    //{
-    //    scene->addModel(name);
-    //}
+    inline static std::vector<std::shared_ptr<GUINodeWindow>> m_NodeWindows;
+    inline static std::vector<std::shared_ptr<GUIEngineWindow>> m_EngineWindows;
 };
