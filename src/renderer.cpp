@@ -15,18 +15,18 @@ bool GLLogCall(const char* function, const char* file, int line)
     return true;
 }
 
-void Renderer::draw(Scene& scene, bool swap_buffers)
+void Renderer::draw(std::shared_ptr<Scene> scene, bool swap_buffers)
 {
-    if (!scene.m_PostProcessing.m_ActiveShaders.empty() && scene.m_IsPostProcessing)
-        scene.m_PostProcessing.deactivate();
+    if (!scene->m_PostProcessing.m_ActiveShaders.empty() && scene->m_IsPostProcessing)
+        scene->m_PostProcessing.deactivate();
 
-    currentProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)scene.m_Camera.m_width / (float)scene.m_Camera.m_height, 0.1f, 100.0f);
-    glm::mat4 view = scene.m_Camera.getViewMatrix();
+    currentProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)scene->m_Camera.m_width / (float)scene->m_Camera.m_height, 0.1f, 100.0f);
+    glm::mat4 view = scene->m_Camera.getViewMatrix();
 
     // Default shader
     currentShader->activateShader();
     
-    currentShader->setVec3("viewPos", scene.m_Camera.m_pos);
+    currentShader->setVec3("viewPos", scene->m_Camera.m_pos);
     currentShader->setFloat("material.shininess", 32.0f);
 
     currentShader->setMat4("projection", currentProjectionMatrix);
@@ -39,26 +39,26 @@ void Renderer::draw(Scene& scene, bool swap_buffers)
     currentStencilShader->setMat4("view", view);
 
     // Rendering lights' influence
-    if (!scene.m_DirLights.empty())
+    if (!scene->m_DirLights.empty())
     {
-        for (auto i = 0; i < scene.m_DirLights.size(); i++)
+        for (auto i = 0; i < scene->m_DirLights.size(); i++)
         {
-            scene.m_DirLights[i]->updateUni(currentShader, i);
+            scene->m_DirLights[i]->updateUni(currentShader, i);
         }
     }
-    if (!scene.m_PointLights.empty())
+    if (!scene->m_PointLights.empty())
     {
-        for (auto i = 0; i < scene.m_PointLights.size(); i++)
+        for (auto i = 0; i < scene->m_PointLights.size(); i++)
         {
-            scene.m_PointLights[i]->updateUni(currentShader, i);
+            scene->m_PointLights[i]->updateUni(currentShader, i);
             // TODO: draw the billboard
         }
     }
-    if (!scene.m_SpotLights.empty())
+    if (!scene->m_SpotLights.empty())
     {
-        for (auto i = 0; i < scene.m_SpotLights.size(); i++)
+        for (auto i = 0; i < scene->m_SpotLights.size(); i++)
         {
-            scene.m_SpotLights[i]->updateUni(currentShader, i);
+            scene->m_SpotLights[i]->updateUni(currentShader, i);
             // TODO: draw the billboard
         }
     }
@@ -89,6 +89,6 @@ void Renderer::draw(Scene& scene, bool swap_buffers)
     //    }
     //}
 
-    if (!scene.m_PostProcessing.m_ActiveShaders.empty() && scene.m_IsPostProcessing)
-        scene.m_PostProcessing.activate();
+    if (!scene->m_PostProcessing.m_ActiveShaders.empty() && scene->m_IsPostProcessing)
+        scene->m_PostProcessing.activate();
 }

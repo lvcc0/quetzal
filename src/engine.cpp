@@ -26,8 +26,8 @@ Engine& Engine::instance(unsigned int width, unsigned int height)
     engine.createWindow();
 
     gladLoadGL();
-
     stbi_set_flip_vertically_on_load(true);
+    GUI::init(engine.window);
 
     // Depth testing
     glEnable(GL_DEPTH_TEST);
@@ -45,8 +45,6 @@ Engine& Engine::instance(unsigned int width, unsigned int height)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
-
-    engine.gui = std::make_unique<GUI>(engine.window);
 
     return engine;
 }
@@ -123,7 +121,7 @@ void Engine::pickObject()
     // ----------------------------- //
 
     glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Camera.m_pos;
-    glm::vec3 direction = ExpMath::getGlobalCoordsFromScreen(mouse_x, mouse_y, this->scenes.at(currentScene)->m_Camera->m_width, this->scenes.at(currentScene)->m_Camera->m_height, this->scenes.at(currentScene)->m_ProjectionMatrix, this->scenes.at(currentScene)->m_Camera->getViewMatrix());
+    glm::vec3 direction = ExpMath::getGlobalCoordsFromScreen(mouse_x, mouse_y, this->scenes.at(currentScene)->m_Camera.m_width, this->scenes.at(currentScene)->m_Camera.m_height, Renderer::currentProjectionMatrix, this->scenes.at(currentScene)->m_Camera.getViewMatrix());
 
     Ray ray(cam_coords, direction);
     
@@ -186,7 +184,7 @@ void Engine::process()
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
-        gui->guiLoop(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)), window);
+        GUI::render(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)), window);
     // --- //
 
     float curFrame = (float)glfwGetTime();
@@ -203,6 +201,7 @@ void Engine::process()
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
     {
         this->scenes.at(this->currentScene)->update();
+        Renderer::draw(this->scenes.at(this->currentScene));
     }
     
     // GUI // 

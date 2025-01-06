@@ -1,6 +1,16 @@
 #include "gui.h"
 
-GUI::GUI(GLFWwindow* window)
+template<class T> requires constraint_window_properties<T>
+void WindowProperties<T>::positioningWindow(GLFWwindow* window, float part_of_width, float part_of_height, float pos_x, float pos_y)
+{
+    int winWidth, winHeight;
+    glfwGetWindowSize(window, &winWidth, &winHeight);
+
+    ImGui::SetWindowSize(ImVec2(winWidth * part_of_width, winHeight * part_of_height));
+    ImGui::SetWindowPos(ImVec2(winWidth * pos_x, winHeight * pos_y));
+}
+
+void GUI::init(GLFWwindow* window)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -11,21 +21,20 @@ GUI::GUI(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init();
 }
 
-GUI::~GUI()
+void GUI::shutdown()
 {
-    // ImGui stuff
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
 
-void GUI::guiLoop(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene, GLFWwindow* window)
+void GUI::render(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene, GLFWwindow* window)
 {
     m_AllSceneNodes = current_scene.second->getSceneNodeVec();
     showCurrentSceneGUI(delta_time, current_scene, window);
 
-    for (auto item : m_WindowsVec)
-        item->windowLoop();
+    for (const auto& window : m_Windows)
+        window->windowLoop();
 }
 
 void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::shared_ptr<Scene>> current_scene, GLFWwindow* window)
@@ -50,15 +59,15 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     {
         ImGui::Separator();
 
-        std::vector<std::string> names = current_scene.second->m_PostProcessing->getScreenShaders(); // current screen shader names
+        std::vector<std::string> names = current_scene.second->m_PostProcessing.getScreenShaders(); // current screen shader names
 
-        for (const auto& entry : current_scene.second->m_PostProcessing->m_ShaderMap)
+        for (const auto& entry : current_scene.second->m_PostProcessing.m_ShaderMap)
         {
             auto it = std::find(names.begin(), names.end(), entry.first);
 
             if (ImGui::Selectable(entry.first.c_str(), (it != names.end())))
             {
-                current_scene.second->m_PostProcessing->setScreenShader(entry.first, (it == names.end()));
+                current_scene.second->m_PostProcessing.setScreenShader(entry.first, (it == names.end()));
                 glEnable(GL_DEPTH_TEST); // postprocessing disables depth test after as it's final step, so we need to turn it back on
             }
             ImGui::SameLine(ImGui::GetWindowSize().x - 64); ImGui::Text((it != names.end()) ? "enabled" : "disabled");
@@ -87,8 +96,8 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
     ImGui::SeparatorText("Engine");
 
     // TODO: rewrite this stuff more compact
-    ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", current_scene.second->m_Camera->m_pos.x, current_scene.second->m_Camera->m_pos.y, current_scene.second->m_Camera->m_pos.z);
-    ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", current_scene.second->m_Camera->m_orientation.x, current_scene.second->m_Camera->m_orientation.y, current_scene.second->m_Camera->m_orientation.z);
+    ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", current_scene.second->m_Camera.m_pos.x, current_scene.second->m_Camera.m_pos.y, current_scene.second->m_Camera.m_pos.z);
+    ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", current_scene.second->m_Camera.m_orientation.x, current_scene.second->m_Camera.m_orientation.y, current_scene.second->m_Camera.m_orientation.z);
     ImGui::Text("%.3f ms (%.1f FPS)", delta_time * 1000.0f, 1.0f / delta_time);
     ImGui::Text("Pos X%.2f Y%.2f Size X%.2f Y%.2f", ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
@@ -126,47 +135,47 @@ void GUI::showCurrentSceneGUI(GLfloat delta_time, std::pair<std::string, std::sh
 }
 
 // Making window using scene node
-void GUI::clickWindow(const std::shared_ptr<Scene_Node> obj_in)
+void GUI::createWindow(const std::shared_ptr<qtzl::Node> obj_in)
 {
     // Selecting and deselecting
-    auto window_it = std::find_if(m_WindowsVec.begin(), m_WindowsVec.end(), [&obj_in](std::shared_ptr<GUI_Window_object_properties>obj) {if (obj->getNode() == obj_in) return true; return false; });
+    auto window_it = std::find_if(m_Windows.begin(), m_Windows.end(), [&obj_in](std::shared_ptr<GUIWindow> obj) { return obj->getNode() == obj_in; });
     
-    if (window_it == m_WindowsVec.end())
-        m_WindowsVec.push_back(std::make_shared<GUI_Window_object_properties>(obj_in, m_AllSceneNodes));
+    if (window_it == m_Windows.end())
+        m_Windows.push_back(std::make_shared<GUIWindow>(obj_in, m_AllSceneNodes));
     else
-        m_WindowsVec.erase(window_it);
+        m_Windows.erase(window_it);
 }
 
 // Making window using renderable and convert renderable to scene_node
-void GUI::clickWindow(const std::shared_ptr<Renderable> obj_in) 
+void GUI::createWindow(const std::shared_ptr<qtzl::Node3D> obj_in)
 {
-    std::shared_ptr<Scene_Node> aux = std::dynamic_pointer_cast<Scene_Node>(obj_in);
+    std::shared_ptr<qtzl::Node> aux = std::dynamic_pointer_cast<qtzl::Node>(obj_in);
     if (aux == nullptr)
         return;
 
     // Selecting and deselecting
-    auto window_it = std::find_if(m_WindowsVec.begin(), m_WindowsVec.end(), [&aux](std::shared_ptr<GUI_Window_object_properties>obj) {if (obj->getNode() == aux) return true; return false; });
+    auto window_it = std::find_if(m_Windows.begin(), m_Windows.end(), [&aux](std::shared_ptr<GUIWindow>obj) { return obj->getNode() == aux; });
 
-    if (window_it == m_WindowsVec.end())
-        m_WindowsVec.push_back(std::make_shared<GUI_Window_object_properties>(aux, m_AllSceneNodes));
+    if (window_it == m_Windows.end())
+        m_Windows.push_back(std::make_shared<GUIWindow>(aux, m_AllSceneNodes));
     else
-        m_WindowsVec.erase(window_it);
+        m_Windows.erase(window_it);
 }
 
-GUI_Window_object_properties::GUI_Window_object_properties(const std::shared_ptr<Scene_Node> obj, const std::vector<std::shared_ptr<Scene_Node>> scene_nodes):
-    m_SceneNode(obj), m_AllSceneNodes(scene_nodes)
+GUIWindow::GUIWindow(const std::shared_ptr<qtzl::Node> obj, const std::vector<std::shared_ptr<qtzl::Node>> scene_nodes)
+    : m_SceneNode(obj), m_AllSceneNodes(scene_nodes)
 {
     m_AllSceneNodes.erase(std::find(m_AllSceneNodes.begin(), m_AllSceneNodes.end(), obj));
 };
 
-GUI_Window_object_properties::~GUI_Window_object_properties()
+GUIWindow::~GUIWindow()
 {
-    auto aux = std::dynamic_pointer_cast<Renderable>(m_SceneNode);
+    auto aux = std::dynamic_pointer_cast<qtzl::Node3D>(m_SceneNode);
     if (aux != nullptr)
         aux->is_selected = false;
 }
 
-void GUI_Window_object_properties::windowLoop()
+void GUIWindow::windowLoop()
 {
     GUIWindowPos.clear();
     GUIWindowSize.clear();
@@ -179,12 +188,12 @@ void GUI_Window_object_properties::windowLoop()
 }
 
 template <typename T>
-void GUI_Window_object_properties::showCurrentObjectGUI()
+void GUIWindow::showCurrentObjectGUI()
 {
     ASSERT(false);
 }
 template<>
-void GUI_Window_object_properties::showCurrentObjectGUI<Model>()
+void GUIWindow::showCurrentObjectGUI<Model>()
 {
     std::shared_ptr<Model> m_CurrentModel = std::dynamic_pointer_cast<Model>(m_SceneNode);
     //m_CurrentModel->is_selected = true;
@@ -244,7 +253,7 @@ void GUI_Window_object_properties::showCurrentObjectGUI<Model>()
     ImGui::End();
 }
 template<>
-void GUI_Window_object_properties::showCurrentObjectGUI<CylindricalBillboard>()
+void GUIWindow::showCurrentObjectGUI<CylindricalBillboard>()
 {
     std::shared_ptr<CylindricalBillboard> m_CurrentCylBill = std::dynamic_pointer_cast<CylindricalBillboard>(m_SceneNode);
     m_CurrentCylBill->is_selected = true;
@@ -262,7 +271,7 @@ void GUI_Window_object_properties::showCurrentObjectGUI<CylindricalBillboard>()
     ImGui::End();
 }
 template<>
-void GUI_Window_object_properties::showCurrentObjectGUI<SphericalBillboard>()
+void GUIWindow::showCurrentObjectGUI<SphericalBillboard>()
 {
     std::shared_ptr<SphericalBillboard> m_CurrentSphBill = std::dynamic_pointer_cast<SphericalBillboard>(m_SceneNode);
     m_CurrentSphBill->is_selected = true;
@@ -278,14 +287,4 @@ void GUI_Window_object_properties::showCurrentObjectGUI<SphericalBillboard>()
     // ------------------------- //
 
     ImGui::End();
-}
-
-template<class Type> requires constraint_window_properties<Type>
-void WindowProperties<Type>::positioningWindow(GLFWwindow* window, float part_of_width, float part_of_height, float pos_x, float pos_y)
-{
-    int w_width, w_height;
-    glfwGetWindowSize(window, &w_width, &w_height);
-
-    ImGui::SetWindowSize(ImVec2(w_width * part_of_width, w_height * part_of_height));
-    ImGui::SetWindowPos(ImVec2(w_width * pos_x, w_height * pos_y));
 }

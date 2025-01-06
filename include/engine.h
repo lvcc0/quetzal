@@ -51,8 +51,6 @@ public:
     void setCurrentScene(const std::string& name);
 
 private:
-    std::unique_ptr<GUI> gui;
-    
     bool shouldDrawGui = true;
 
     unsigned int winWidth;

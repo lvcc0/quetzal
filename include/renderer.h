@@ -28,9 +28,9 @@ public:
     Renderer(const Renderer&) = delete;
     Renderer(Renderer&&) = delete;
 
-    glm::mat4 currentProjectionMatrix;
-    std::shared_ptr<Shader> currentShader;
-    std::shared_ptr<Shader> currentStencilShader;
+    inline static glm::mat4 currentProjectionMatrix;
+    inline static std::shared_ptr<Shader> currentShader;
+    inline static std::shared_ptr<Shader> currentStencilShader;
 
-    void draw(Scene& scene, bool swap_buffers = true);
+    static void draw(std::shared_ptr<Scene> scene, bool swap_buffers = true);
 };
