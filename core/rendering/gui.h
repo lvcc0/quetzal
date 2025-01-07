@@ -95,6 +95,7 @@ public:
     static void onClick(const std::shared_ptr<qtzl::Node> obj);
     static void onClick(const std::shared_ptr<qtzl::Node3D> obj);
     
+    // Check if the given position is occupied by any gui window
     static bool isOccupied(double x, double y);
 
     inline static std::vector<std::shared_ptr<GUINodeWindow>> getNodeWindows();

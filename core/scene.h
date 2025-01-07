@@ -1,21 +1,21 @@
 #pragma once
 
+// std & stl
 #include <iostream>
 #include <vector>
 #include <map>
+#include <utility>
+#include <algorithm>
 
+// thirdparty
 #include <stb_image/stb_image.h>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <utility>
-#include <algorithm>
-
+// quetzal
 #include "resource_manager.h"
 #include "camera.h"
 #include "post_processing.h"
@@ -24,6 +24,8 @@
 #include "texture.h"
 #include "billboards.h"
 #include "physics.h"
+
+// TODO: rewrite all this stuff
 
 enum class ObjectType { SHADER, TEXTURE, RENDERABLE };
 

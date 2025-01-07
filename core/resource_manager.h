@@ -12,6 +12,8 @@
 #include "texture.h"
 #include "shader.h"
 
+// TODO: rewrite it for new resource types
+
 class ResourceManager
 {
 public:

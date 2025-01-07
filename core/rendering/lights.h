@@ -11,8 +11,6 @@
 
 #include "billboards.h"
 
-// TODO: rename some stuff here
-
 class Light
 {
 public:

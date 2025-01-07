@@ -1,9 +1,11 @@
 #pragma once
 
-#include "deque"
+// core
+#include "core/scene.h"
 
-#include "scene.h"
-#include "gui.h"
+// rendering
+#include "core/rendering/renderer.h"
+#include "core/rendering/gui.h"
 
 // Singleton
 class Engine

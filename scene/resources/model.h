@@ -16,6 +16,9 @@
 #include "base_classes.h"
 #include "collision.h"
 
+// a big TODO here
+// NOTE: ig we'll get rid of model as a resource
+
 // model is a collection of meshes, so by itself it's not renderable, its meshes are
 class Model : public Scene_Node, public Scene_Object
 {
