@@ -8,9 +8,9 @@
 #include <vector>
 #include <filesystem>
 
-#include "model.h"
-#include "texture.h"
-#include "shader.h"
+#include "scene/resources/mesh.h"
+#include "scene/resources/texture.h"
+#include "scene/resources/shader.h"
 
 // TODO: rewrite it for new resource types
 

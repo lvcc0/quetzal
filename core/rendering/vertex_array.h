@@ -1,21 +1,26 @@
 #pragma once
 
-#include <vector>
-#include "renderer.h"
-#include "buffers_objects.h"
-#include "buffer_layout.h"
+// thirdparty
+#include <glad/glad.h>
 
+#include "core/rendering/buffer_layout.h"
+#include "core/rendering/vertex_buffer.h"
+#include "core/rendering/element_buffer.h"
+
+// Vertex Array Object
 class VAO
 {
 public:
     VAO();
     ~VAO();
 
-    void addBuffer(const VBO& vbo, const VB_Vertex_Layout& layout);
+    GLuint getID() const;
 
+    void addBuffer(const VBO& vbo, const VB_Vertex_Layout& layout);
+    
     void bind() const;
     void unbind() const;
-    inline GLuint getID() const { return m_ID; }
+
 private:
-    GLuint m_ID;
+    GLuint ID;
 };

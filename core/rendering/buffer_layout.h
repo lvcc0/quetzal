@@ -1,9 +1,12 @@
 #pragma once
 
+// thirdparty
 #include <glad/glad.h>
 #include <vector>
-#include "renderer.h"
-#include "vertex.h"
+
+#include "core/rendering/vertex.h"
+
+// TODO: idk bro, i won't change this for now
 
 struct VB_Element
 {

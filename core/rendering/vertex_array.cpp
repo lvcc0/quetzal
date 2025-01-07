@@ -2,15 +2,21 @@
 
 VAO::VAO()
 {
-    GLCall(glGenVertexArrays(1, &m_ID));
+    glGenVertexArrays(1, &this->ID);
     this->bind();
 }
 
 VAO::~VAO()
 {
-    GLCall(glDeleteVertexArrays(1, &m_ID));
+    GLCall(glDeleteVertexArrays(1, &this->ID));
 }
 
+GLuint VAO::getID() const
+{
+    return this->ID;
+}
+
+// TODO: yeah
 void VAO::addBuffer(const VBO& vbo, const VB_Vertex_Layout& layout)
 {
     this->bind();
@@ -32,10 +38,10 @@ void VAO::addBuffer(const VBO& vbo, const VB_Vertex_Layout& layout)
 
 void VAO::bind() const
 {
-    GLCall(glBindVertexArray(m_ID));
+    glBindVertexArray(this->ID);
 }
 
 void VAO::unbind() const
 {
-    GLCall(glBindVertexArray(0));
+    glBindVertexArray(0);
 }
