@@ -1,20 +1,20 @@
-#include "resource_manager.h"
+#include "core/resource_manager.h"
 
-void ResourceManager::loadModel(const std::string& file_path)
+void ResourceManager::loadMesh(const std::string& file_path)
 {
     std::string name = std::filesystem::path(file_path).filename().string();
     
-    // do not load new model if it already exists
-    if (m_LoadedModels.find(name) != m_LoadedModels.end())
+    // do not load new mesh if it already exists
+    if (m_LoadedMeshes.find(name) != m_LoadedMeshes.end())
     {
-        std::cerr << "MODEL WITH NAME:: " << name << " ALREADY LOADED" << std::endl;
+        std::cerr << "MESH WITH NAME:: " << name << " ALREADY LOADED" << std::endl;
         return;
     }
 
-    m_LoadedModels.emplace(name, Model(file_path, true, name));
+    m_LoadedMeshes.emplace(name, qtzl::Mesh(name, file_path));
 }
 
-void ResourceManager::loadTexture(const std::string& file_path)
+void ResourceManager::loadTexture(const std::string& file_path, const std::string& texture_type)
 {
     std::string name = std::filesystem::path(file_path).filename().string();
 
@@ -25,41 +25,39 @@ void ResourceManager::loadTexture(const std::string& file_path)
         return;
     }
 
-    m_LoadedTextures.emplace(name, Texture(file_path));
+    m_LoadedTextures.emplace(name, qtzl::Texture(name, file_path, texture_type));
 }
 
-void ResourceManager::loadShader(const std::string& vertex_shader_path, const std::string& fragment_shader_path)
+void ResourceManager::loadShader(const std::string& file_path)
 {
-    std::string name = vertex_shader_path + "||" + fragment_shader_path;
+    std::filesystem::path path(file_path);
 
-    // do not load new shader program if it already exists
+    std::string name = path.filename().string();
+    std::string extension = path.extension().string();
+
+    // do not load new shader if it already exists
     if (m_LoadedShaders.find(name) != m_LoadedShaders.end())
     {
         std::cerr << "SHADER WITH NAME:: " << name << " ALREADY LOADED" << std::endl;
         return;
     }
 
-    m_LoadedShaders.emplace(name, makeShaderProgram(vertex_shader_path, fragment_shader_path));
+    GLenum shaderType{};
+
+    if (extension == VERTEX_FILE_EXTENSION)
+        shaderType = GL_VERTEX_SHADER;
+    else if (extension == FRAGMENT_FILE_EXTENSION)
+        shaderType = GL_FRAGMENT_SHADER;
+
+    m_LoadedShaders.emplace(name, qtzl::Shader(name, file_path, getFileString(file_path), shaderType));
 }
 
-void ResourceManager::loadPPShader(const std::string& vertex_shader_path, const std::string& fragment_shader_path)
-{
-    // do not load new shader program if it already exists
-    if (m_LoadedPPShaders.find(fragment_shader_path) != m_LoadedPPShaders.end())
-    {
-        std::cerr << "POSTPROCESSING SHADER WITH NAME:: " << fragment_shader_path << " ALREADY LOADED" << std::endl;
-        return;
-    }
-
-    m_LoadedPPShaders.emplace(fragment_shader_path, makeShaderProgram(vertex_shader_path, fragment_shader_path));
-}
-
-void ResourceManager::loadModels(const std::string& dir_path)
+void ResourceManager::loadMeshes(const std::string& dir_path)
 {
     for (const auto& entry : std::filesystem::directory_iterator(dir_path))
     {
-        if (entry.path().extension().string() == MODELS_MAIN_FILE_EXTENSION)
-            loadModel(entry.path().string());
+        if (entry.path().extension().string() == MESH_MAIN_FILE_EXTENSION)
+            loadMesh(entry.path().string());
     }
 }
 
@@ -74,50 +72,26 @@ void ResourceManager::loadTextures(const std::string& dir_path)
 
 void ResourceManager::loadShaders(const std::string& dir_path)
 {
-    // NOTE: for every shader_name.vert shader there should be one shader_name.frag
-
     for (const auto& entry : std::filesystem::directory_iterator(dir_path))
     {
-        std::string filepath = entry.path().string();
-
-        if (entry.path().extension().string() == VERTEX_FILE_EXTENSION) // kinda dumb but oh well
-            loadShader(filepath, filepath.replace(filepath.find(VERTEX_FILE_EXTENSION), VERTEX_FILE_EXTENSION.length(), FRAGMENT_FILE_EXTENSION));
+        if (entry.path().extension().string() == VERTEX_FILE_EXTENSION || entry.path().extension().string() == FRAGMENT_FILE_EXTENSION)
+            loadShader(entry.path().string());
     }
 }
 
-void ResourceManager::loadPPShaders(const std::string& dir_path)
+std::shared_ptr<qtzl::Mesh> ResourceManager::getMesh(const std::string& name)
 {
-    std::string vertPath;
-    std::vector<std::string> fragPaths;
+    if (m_LoadedMeshes.find(name) != m_LoadedMeshes.end())
+        return std::make_shared<qtzl::Mesh>(m_LoadedMeshes.at(name));
 
-    for (const auto& entry : std::filesystem::directory_iterator(dir_path))
-    {
-        std::string filepath = entry.path().string();
-        std::string extension = entry.path().extension().string();
-
-        if (extension == VERTEX_FILE_EXTENSION)
-            vertPath = filepath;
-        else if (extension == FRAGMENT_FILE_EXTENSION)
-            fragPaths.push_back(filepath);
-    }
-
-    for (const std::string& fragPath : fragPaths)
-        loadPPShader(vertPath, fragPath);
-}
-
-std::shared_ptr<Model> ResourceManager::getModel(const std::string& name)
-{
-    if (m_LoadedModels.find(name) != m_LoadedModels.end())
-        return std::make_shared<Model>(m_LoadedModels.at(name));
-
-    std::cerr << "MODEL WITH NAME:: " << name << " NOT LOADED" << std::endl;
+    std::cerr << "MESH WITH NAME:: " << name << " NOT LOADED" << std::endl;
     ASSERT(false);
 }
 
 std::shared_ptr<Texture> ResourceManager::getTexture(const std::string& name)
 {
     if (m_LoadedTextures.find(name) != m_LoadedTextures.end())
-        return std::make_shared<Texture>(m_LoadedTextures.at(name));
+        return std::make_shared<qtzl::Texture>(m_LoadedTextures.at(name));
 
     std::cerr << "TEXTURE WITH NAME:: " << name << " NOT LOADED" << std::endl;
     ASSERT(false);
@@ -126,18 +100,9 @@ std::shared_ptr<Texture> ResourceManager::getTexture(const std::string& name)
 std::shared_ptr<Shader> ResourceManager::getShader(const std::string& name)
 {
     if (m_LoadedShaders.find(name) != m_LoadedShaders.end())
-        return std::make_shared<Shader>(m_LoadedShaders.at(name));
+        return std::make_shared<qtzl::Shader>(m_LoadedShaders.at(name));
 
     std::cerr << "SHADER WITH NAME:: " << name << " NOT LOADED" << std::endl;
-    ASSERT(false);
-}
-
-std::shared_ptr<Shader> ResourceManager::getPPShader(const std::string& name)
-{
-    if (m_LoadedPPShaders.find(name) != m_LoadedPPShaders.end())
-        return std::make_shared<Shader>(m_LoadedPPShaders.at(name));
-
-    std::cerr << "POSTPROCESSING SHADER WITH NAME:: " << name << " NOT LOADED" << std::endl;
     ASSERT(false);
 }
 
@@ -145,24 +110,23 @@ void ResourceManager::preLoadResources()
 {
     // TODO: redo this without exclusive folder names, make it loop through all the res_path directory and load everything there
 
-    loadModels(relResPath + MODELS_FOLDER);
+    loadMeshes(relResPath + MODELS_FOLDER);
     loadTextures(relResPath + TEXTURES_FOLDER);
     loadShaders(relResPath + SHADERS_FOLDER);
-    loadPPShaders(relResPath + PPSHADERS_FOLDER);
 }
 
 std::string ResourceManager::getFileString(const std::string& file_path)
 {
-    std::string temp_file_path = file_path;
+    std::string tempFilePath = file_path;
 
     // check if file_path is relative
-    if (temp_file_path.find(relResPath) == std::string::npos)
-        temp_file_path = relResPath + file_path.c_str();
+    if (tempFilePath.find(relResPath) == std::string::npos)
+        tempFilePath = relResPath + file_path.c_str();
 
-    std::ifstream file(temp_file_path, std::ios::in | std::ios::binary);
+    std::ifstream file(tempFilePath, std::ios::in | std::ios::binary);
 
     if (!file.is_open()) {
-        std::cerr << "FILE AT PATH:: " << temp_file_path << " FAILED TO LOAD" << std::endl;
+        std::cerr << "FILE AT PATH:: " << tempFilePath << " FAILED TO LOAD" << std::endl;
         return {};
     }
 
@@ -170,13 +134,4 @@ std::string ResourceManager::getFileString(const std::string& file_path)
     std::stringstream readbuffer;
     readbuffer << file.rdbuf();
     return readbuffer.str();
-}
-
-Shader ResourceManager::makeShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path)
-{
-    // Getting shader files' contents (.vert and .frag)
-    std::string vertex_shader_src = getFileString(vertex_shader_path);
-    std::string fragment_shader_src = getFileString(fragment_shader_path);
-
-    return Shader(vertex_shader_src, fragment_shader_src);
 }
