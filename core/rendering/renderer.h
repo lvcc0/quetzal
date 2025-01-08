@@ -1,15 +1,18 @@
 #pragma once
 
-#include <glad/glad.h>
+// std
 #include <iostream>
 #include <algorithm>
 #include <vector>
 
+// thirdparty
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "scene.h"
+#include "core/scene.h"
+#include "core/rendering/shader_program.h"
 
 // TODO: move this stuff
 #define ASSERT(x) if (!(x)) __debugbreak();
@@ -28,9 +31,15 @@ public:
     Renderer(const Renderer&) = delete;
     Renderer(Renderer&&) = delete;
 
-    inline static glm::mat4 currentProjectionMatrix;
-    inline static std::shared_ptr<Shader> currentShader;
-    inline static std::shared_ptr<Shader> currentStencilShader;
+    static void setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& shader_program);
 
-    static void draw(std::shared_ptr<Scene> scene, bool swap_buffers = true);
+    static std::shared_ptr<ShaderProgram> getCurrentShaderProgram() const;
+    static glm::mat4                      getCurrentProjectionMatrix() const;
+
+    // Draw all the stuff on the scene
+    static void render(const std::shared_ptr<Scene>& scene);
+
+private:
+    inline static glm::mat4 m_CurrentProjectionMatrix;
+    inline static std::shared_ptr<ShaderProgram> m_CurrentShaderProgram;
 };

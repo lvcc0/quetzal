@@ -7,7 +7,7 @@ namespace qtzl
     {
     }
 
-    StaticBody::draw(const Shader& shader)
+    void StaticBody::draw(const ShaderProgram& shader_program)
     {
         // TODO
     }

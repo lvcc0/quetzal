@@ -16,7 +16,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "core/resource_manager.h"
-
 #include "core/rendering/post_processing.h"
 #include "core/rendering/camera.h"
 
@@ -35,11 +34,14 @@ class Scene
 public:
     Scene(int viewport_width, int viewport_height);
 
+    // NOTE: store not the camera, but it's position and stuff in a scene and have have the camera stored in the engine or be static?
     Camera m_Camera;
     PostProcessing m_PostProcessing;
 
     bool m_IsPostProcessing = false;
     bool m_IsPhysics = true;
+
+    std::vector<std::shared_ptr<qtzl::Node>> getNodes() const;
 
     // Gets called every frame in the engine class
     void update();

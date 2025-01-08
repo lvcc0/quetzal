@@ -40,24 +40,24 @@ namespace qtzl
         this->setBillboardEnabled(false)
     }
 
-    void SpotLight3D::updateUniforms(const std::shared_ptr<Shader>& shader, int index) const
+    void SpotLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const
     {
         std::string name = "spotLights[" + std::to_string(index) + "]";
 
-        shader->setVec3(name + ".position", m_Position);
-        shader->setVec3(name + ".direction", m_Direction);
+        shader_program->setVec3(name + ".position", m_Position);
+        shader_program->setVec3(name + ".direction", m_Direction);
 
-        shader->setVec3(name + ".ambient", m_Ambient);
-        shader->setVec3(name + ".diffuse", m_Diffuse);
-        shader->setVec3(name + ".specular", m_Specular);
+        shader_program->setVec3(name + ".ambient", m_Ambient);
+        shader_program->setVec3(name + ".diffuse", m_Diffuse);
+        shader_program->setVec3(name + ".specular", m_Specular);
 
-        shader->setFloat(name + ".constant", m_Constant);
-        shader->setFloat(name + ".linear", m_Linear);
-        shader->setFloat(name + ".quad", m_Quad);
+        shader_program->setFloat(name + ".constant", m_Constant);
+        shader_program->setFloat(name + ".linear", m_Linear);
+        shader_program->setFloat(name + ".quadratic", m_Quadratic);
 
-        shader->setFloat(name + ".innerCutoff", glm::cos(glm::radians(m_InnerCutoff)));
-        shader->setFloat(name + ".outerCutoff", glm::cos(glm::radians(m_OuterCutoff)));
+        shader_program->setFloat(name + ".innerCutoff", glm::cos(glm::radians(m_InnerCutoff)));
+        shader_program->setFloat(name + ".outerCutoff", glm::cos(glm::radians(m_OuterCutoff)));
 
-        shader->setVec3(name + ".color", m_Enabled ? m_Color : glm::vec3(0.0f));
+        shader_program->setVec3(name + ".color", m_Enabled ? m_Color : glm::vec3(0.0f));
     }
 }

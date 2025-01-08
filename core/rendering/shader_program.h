@@ -6,7 +6,7 @@
 class ShaderProgram
 {
 public:
-    ShaderProgram(unsigned int vertex_shader_id, unsigned int fragment_shader_id);
+    ShaderProgram(const std::string& name, unsigned int vertex_shader_id, unsigned int fragment_shader_id);
     ~ShaderProgram();
 
     // A bunch of functions to set shader uniforms
@@ -24,12 +24,14 @@ public:
     void setMat4(const std::string& name, const glm::mat4& value) const;
 
     GLuint getID() const;
+    std::string getName() const;
 
     void activateProgram() const;
     void deleteProgram() const;
 
 protected:
     GLuint ID;
+    std::string m_Name;
 
     void compileErrors(unsigned int shader_id, const std::string& type) const;
     bool isActive() const;

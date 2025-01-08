@@ -7,7 +7,7 @@ namespace qtzl
     {
     }
 
-    RigidBody::draw(const Shader& shader)
+    void RigidBody::draw(const ShaderProgram& shader_program)
     {
         // TODO
     }

@@ -1,43 +1,39 @@
 #include "camera.h"
 
-Camera::Camera(int width, int height, glm::vec3 pos)
-    : m_width(width), m_height(height), m_pos(pos)
-{
-}
-
-Camera::Camera(const Camera& obj)
-    : m_width(obj.m_width), m_height(obj.m_height), m_pos(obj.m_pos)
+Camera::Camera(int width, int height, glm::vec3 position)
+    : m_Width(width), m_Height(height), m_Position(position)
 {
 }
 
 glm::mat4 Camera::getViewMatrix() const
 {
-    return glm::lookAt(m_pos, m_pos + m_orientation, m_up);
+    return glm::lookAt(m_Position, m_Position + m_Orientation, m_Up);
 }
 
-void Camera::Inputs(GLFWwindow* window, float dt)
+void Camera::processInput(GLFWwindow* window, float dt)
 {
     // --- Keyboard --- //
     float velocity;
-    (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? velocity = m_speed * dt * 3 : velocity = m_speed * dt;
+
+    (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? velocity = m_Speed * dt * 3 : velocity = m_Speed * dt;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        m_pos += velocity * m_orientation;
+        m_Position += velocity * m_Orientation;
 
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        m_pos -= velocity * glm::normalize(glm::cross(m_orientation, m_up));
+        m_Position -= velocity * glm::normalize(glm::cross(m_Orientation, m_Up));
 
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        m_pos -= velocity * m_orientation;
+        m_Position -= velocity * m_Orientation;
 
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        m_pos += velocity * glm::normalize(glm::cross(m_orientation, m_up));
+        m_Position += velocity * glm::normalize(glm::cross(m_Orientation, m_Up));
 
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-        m_pos += velocity * m_up;
+        m_Position += velocity * m_Up;
 
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-        m_pos -= velocity * m_up;
+        m_Position -= velocity * m_Up;
     // --- //
     
     // --- Mouse --- //
@@ -45,38 +41,39 @@ void Camera::Inputs(GLFWwindow* window, float dt)
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-        if (m_firstClick)
+        if (m_FirstClick)
         {
-            glfwSetCursorPos(window, (double)m_width / 2, (double)m_height / 2);
-            m_firstClick = false;
+            glfwSetCursorPos(window, (double)m_Width / 2, (double)m_Height / 2);
+            m_FirstClick = false;
         }
 
         double mouseX, mouseY;
 
         glfwGetCursorPos(window, &mouseX, &mouseY);
 
-        float rotX = m_sens * (float)(mouseY - (m_height / 2)) / m_height;
-        float rotY = m_sens * (float)(mouseX - (m_width / 2)) / m_width;
+        float rotX = m_Sensitivity * (float)(mouseY - (m_Height / 2)) / m_Height;
+        float rotY = m_Sensitivity * (float)(mouseX - (m_Width / 2)) / m_Width;
 
-        glm::vec3 newOrientation = glm::rotate(m_orientation, glm::radians(-rotX), glm::normalize(glm::cross(m_orientation, m_up)));
+        glm::vec3 newOrientation = glm::rotate(m_Orientation, glm::radians(-rotX), glm::normalize(glm::cross(m_Orientation, m_Up)));
 
-        if (abs(glm::angle(newOrientation, m_up) - glm::radians(90.0f)) <= glm::radians(85.0f))
-            m_orientation = newOrientation;
+        if (abs(glm::angle(newOrientation, m_Up) - glm::radians(90.0f)) <= glm::radians(85.0f))
+            m_Orientation = newOrientation;
 
-        m_orientation = glm::rotate(m_orientation, glm::radians(-rotY), m_up);
+        m_Orientation = glm::rotate(m_Orientation, glm::radians(-rotY), m_Up);
 
-        glfwSetCursorPos(window, (double)m_width / 2, (double)m_height / 2);
+        glfwSetCursorPos(window, (double)m_Width / 2, (double)m_Height / 2);
     }
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+    
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        m_firstClick = true;
+        m_FirstClick = true;
     }
     // --- //
 }
 
-void Camera::UpdateSize(int w, int h)
+void Camera::updateSize(int weight, int height)
 {
-    m_width = w;
-    m_height = h;
+    m_Width = width;
+    m_Height = height;
 }

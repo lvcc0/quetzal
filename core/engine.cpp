@@ -89,7 +89,7 @@ void Engine::processInput()
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey( window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
-        this->scenes.at(this->currentScene)->m_Camera.Inputs(this->window, deltaTime);
+        this->scenes.at(this->currentScene)->m_Camera.processInput(this->window, deltaTime);
 }
 
 // Badly working with zero scaled objects

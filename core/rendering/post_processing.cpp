@@ -1,50 +1,110 @@
-#include "post_processing.h"
+#include "core/rendering/post_processing.h"
 
-PostProcessing::PostProcessing(std::map<const std::string, std::shared_ptr<Shader>>&& shaderMap, GLfloat width, GLfloat height)
-    : m_ShaderMap(shaderMap)
+PostProcessing::PostProcessing(GLfloat viewport_width, GLfloat viewport_height)
 {
-    this->setupBuffers(VAO, VBO);
-    this->setupFramebuffer(m_FirstFBO, m_FirstColorAttachment, m_RBO, width, height);
-    this->setupFramebuffer(m_SecondFBO, m_SecondColorAttachment, m_RBO, width, height);
+    for (const auto& shaderProgram : ResourceManager::getPPShaderPrograms())
+    {
+        this->m_ShaderPrograms.emplace(shaderProgram, false);
+    }
+
+    this->setupBuffers(this->VAO, this->VBO);
+    this->setupFramebuffer(this->m_FirstFBO, this->m_FirstColorAttachment, this->m_RBO, viewport_width, viewport_height);
+    this->setupFramebuffer(this->m_SecondFBO, this->m_SecondColorAttachment, this->m_RBO, viewport_width, viewport_height);
 }
 
 PostProcessing::~PostProcessing()
 {
-    glDeleteBuffers(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &this->VAO);
+    glDeleteBuffers(1, &this->VBO);
 
-    glDeleteBuffers(1, &m_FirstFBO);
-    glDeleteBuffers(1, &m_SecondFBO);
+    glDeleteBuffers(1, &this->m_FirstFBO);
+    glDeleteBuffers(1, &this->m_SecondFBO);
 
-    glDeleteBuffers(1, &m_FirstColorAttachment);
-    glDeleteBuffers(1, &m_SecondColorAttachment);
+    glDeleteBuffers(1, &this->m_FirstColorAttachment);
+    glDeleteBuffers(1, &this->m_SecondColorAttachment);
 
-    glDeleteBuffers(1, &m_RBO);
+    glDeleteBuffers(1, &this->m_RBO);
 
-    std::map<std::string, std::shared_ptr<Shader>>::iterator iter = m_ShaderMap.begin();
-    while (iter != m_ShaderMap.end())
+    for (const auto& entry : this->m_ShaderPrograms)
+        entry.first->deleteProgram();
+}
+
+void PostProcessing::setPPShaderEnabled(const std::string& name, bool enabled)
+{
+    for (auto& entry : m_ShaderPrograms)
     {
-        iter->second->deleteShader();
-        iter++;
+        if (entry.first->getName() == name)
+            entry.second = enabled;
     }
+}
+
+std::vector<std::string> PostProcessing::getEnabledPPShaders() const
+{
+    std::vector<std::string> result;
+
+    for (const auto& entry : m_ShaderPrograms)
+    {
+        if (entry.second)
+            result.push_back(entry.first->getName());
+    }
+
+    return result;
+}
+
+bool PostProcessing::isActive() const
+{
+    for (const auto& entry : m_ShaderPrograms)
+    {
+        if (entry.second)
+            return true
+    }
+
+    return false;
+}
+
+void PostProcessing::enablePPShader(const std::string& name)
+{
+    this->setPPShaderEnabled(name, true);
+}
+
+void PostProcessing::disablePPShader(const std::string& name)
+{
+    this->setPPShaderEnabled(name, false);
+}
+
+void PostProcessing::deactivate() const
+{
+    // Bind the custom framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, this->m_FirstFBO);
+    // Specify the color of the background
+    glClearColor(0.207f, 0.207f, 0.207f, 1.0f);
+    // Clear the back buffers
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    // Enable depth testing since it's disabled when drawing the framebuffer rectangle
+    glEnable(GL_DEPTH_TEST);
 }
 
 void PostProcessing::activate() const
 {
     // So called "ping-pong shading" ahead!
 
-    auto i = 0;
-    for (auto item: m_ActiveShaders)
+    unsigned int i = 0;
+    for (const auto& entry : m_ShaderPrograms)
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, (i % 2) ? m_FirstFBO : m_SecondFBO); // if i is odd, then we bind first fbo else we bind the second one
+        if (!entry.second)
+            continue;
+
+        // If i is odd, then we bind first fbo else we bind the second one
+        glBindFramebuffer(GL_FRAMEBUFFER, (i % 2) ? this->m_FirstFBO : this->m_SecondFBO);
         glDisable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        item->activateShader();
-        item->setInt("screenTexture", 0);
+        entry.first->activateProgram();
+        entry.first->setInt("screenTexture", 0);
 
-        glBindVertexArray(VAO);
-        glBindTexture(GL_TEXTURE_2D, (i % 2) ? m_SecondColorAttachment : m_FirstColorAttachment); // if i is odd, then we bind second color attachment else we bind the first one
+        // If i is odd, then we bind second color attachment else we bind the first one
+        glBindVertexArray(this->VAO);
+        glBindTexture(GL_TEXTURE_2D, (i % 2) ? this->m_SecondColorAttachment : this->m_FirstColorAttachment);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         i++;
@@ -55,78 +115,46 @@ void PostProcessing::activate() const
     glDisable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glBindVertexArray(VAO);
-    glBindTexture(GL_TEXTURE_2D, (i % 2) ? m_FirstColorAttachment : m_SecondColorAttachment); // set the next color attachment to draw all shader effects
+    // Set the next color attachment to draw all shader effects
+    glBindVertexArray(this->VAO);
+    glBindTexture(GL_TEXTURE_2D, (i % 2) ? this->m_FirstColorAttachment : this->m_SecondColorAttachment);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-}
-
-void PostProcessing::deactivate() const
-{
-    // Bind the custom framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, m_FirstFBO);
-    // Specify the color of the background
-    glClearColor(0.207f, 0.207f, 0.207f, 1.0f);
-    // Clear the back buffers
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    // Enable depth testing since it's disabled when drawing the framebuffer rectangle
-    glEnable(GL_DEPTH_TEST);
 }
 
 void PostProcessing::recreate(GLuint width, GLuint height) const
 {
     // Renderbuffer (for depth and stencil attachments)
-    glBindRenderbuffer(GL_RENDERBUFFER, m_RBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, this->m_RBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
     
     // First framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, m_FirstFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, this->m_FirstFBO);
 
     // First color attachment texture
-    glBindTexture(GL_TEXTURE_2D, m_FirstColorAttachment);
+    glBindTexture(GL_TEXTURE_2D, this->m_FirstColorAttachment);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FirstColorAttachment, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->m_FirstColorAttachment, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
 
     // Second framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, m_SecondFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, this->m_SecondFBO);
 
     // Second color attachment texture
-    glBindTexture(GL_TEXTURE_2D, m_SecondColorAttachment);
+    glBindTexture(GL_TEXTURE_2D, this->m_SecondColorAttachment);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_SecondColorAttachment, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->m_SecondColorAttachment, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RBO);
 
     // Bind default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void PostProcessing::setScreenShader(const std::string& name, bool enabled)
-{
-    std::vector<std::string> currentScreenShaderNames = getScreenShaders();
-
-    if (enabled)
-        this->m_ActiveShaders.push_back(this->m_ShaderMap.at(name));
-    else if (std::find(currentScreenShaderNames.begin(), currentScreenShaderNames.end(), name) != currentScreenShaderNames.end())
-        this->m_ActiveShaders.erase(std::find(m_ActiveShaders.begin(), m_ActiveShaders.end(), this->m_ShaderMap.at(name)));
-} 
-
-std::vector<std::string> PostProcessing::getScreenShaders()
-{
-    std::vector<std::string> result;
-
-    for (const auto& entry : this->m_ShaderMap)
-        if (std::find(this->m_ActiveShaders.begin(), this->m_ActiveShaders.end(), entry.second) != this->m_ActiveShaders.end())
-            result.push_back(entry.first);
-
-    return result;
 }
 
 void PostProcessing::setupBuffers(GLuint& VAO, GLuint& VBO)

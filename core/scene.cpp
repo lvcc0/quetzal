@@ -6,6 +6,11 @@ Scene::Scene(int viewport_width, int viewport_height)
 {
 }
 
+std::vector<std::shared_ptr<qtzl::Node>> Scene::getNodes() const
+{
+    return this->m_Nodes;
+}
+
 void Scene::update()
 {
     this->doProcessing();

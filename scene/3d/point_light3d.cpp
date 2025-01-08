@@ -33,23 +33,23 @@ namespace qtzl
 
     void PointLight3D::disableBillboard()
     {
-        this->setBillboardEnabled(false)
+        this->setBillboardEnabled(false);
     }
 
-    void PointLight3D::updateUniforms(const std::shared_ptr<Shader>& shader, int index) const
+    void PointLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const
     {
         std::string name = "pointLights[" + std::to_string(index) + "]";
 
-        shader->setVec3(name + ".position", m_Position);
+        shader_program->setVec3(name + ".position", m_Position);
 
-        shader->setVec3(name + ".ambient", m_Ambient);
-        shader->setVec3(name + ".diffuse", m_Diffuse);
-        shader->setVec3(name + ".specular", m_Specular);
+        shader_program->setVec3(name + ".ambient", m_Ambient);
+        shader_program->setVec3(name + ".diffuse", m_Diffuse);
+        shader_program->setVec3(name + ".specular", m_Specular);
 
-        shader->setFloat(name + ".constant", m_Constant);
-        shader->setFloat(name + ".linear", m_Linear);
-        shader->setFloat(name + ".quad", m_Quad);
+        shader_program->setFloat(name + ".constant", m_Constant);
+        shader_program->setFloat(name + ".linear", m_Linear);
+        shader_program->setFloat(name + ".quadratic", m_Quadratic);
 
-        shader->setVec3(name + ".color", m_Enabled ? m_Color : glm::vec3(0.0f));
+        shader_program->setVec3(name + ".color", m_Enabled ? m_Color : glm::vec3(0.0f));
     }
 }

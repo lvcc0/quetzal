@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/rendering/shader_program.h"
+
 #include "scene/3d/node3d.h"
 
 #include "scene/resources/mesh.h"
@@ -14,7 +16,7 @@ namespace qtzl
         StaticBody(const std::string& name, Mesh& mesh);
         virtual ~StaticBody() = default;
 
-        void draw(const Shader& shader);
+        void draw(const ShaderProgram& shader_program);
 
     private:
         Mesh m_Mesh;

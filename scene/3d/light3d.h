@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/rendering/shader_program.h"
+
 #include "scene/3d/node3d.h"
 #include "scene/resources/shader.h"
 
@@ -25,7 +27,7 @@ namespace qtzl
         void enable();
         void disable();
 
-        virtual void updateUniforms(const std::shared_ptr<Shader>& shader, int index) const = 0;
+        virtual void updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const = 0;
 
     protected:
         bool m_Enabled = true;

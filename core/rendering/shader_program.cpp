@@ -1,6 +1,7 @@
 #include "core/rendering/shader_program.h"
 
-ShaderProgram::ShaderProgram(unsigned int vertex_shader_id, unsigned int fragment_shader_id)
+ShaderProgram::ShaderProgram(const std::string&, unsigned int vertex_shader_id, unsigned int fragment_shader_id)
+    : m_Name(name)
 {
     this->compileErrors(vertex_shader_id, "");
     this->compileErrors(fragment_shader_id, "");
@@ -70,6 +71,11 @@ void ShaderProgram::setMat4(const std::string& name, const glm::mat4& value) con
 GLuint ShaderProgram::getID() const
 {
     return this->ID;
+}
+
+std::string ShaderProgram::getName() const
+{
+    return this->m_Name;
 }
 
 void ShaderProgram::activateProgram() const

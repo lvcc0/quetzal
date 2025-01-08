@@ -18,7 +18,7 @@ namespace qtzl
         );
         virtual ~DirectionalLight3D() = default;
 
-        void updateUniforms(const std::shared_ptr<Shader>& shader, int index) const override;
+        void updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const override;
 
     private:
         glm::vec3 m_Direction;

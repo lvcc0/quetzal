@@ -15,80 +15,66 @@ bool GLLogCall(const char* function, const char* file, int line)
     return true;
 }
 
-void Renderer::draw(std::shared_ptr<Scene> scene, bool swap_buffers)
+void Renderer::setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& shader_program)
 {
-    if (!scene->m_PostProcessing.m_ActiveShaders.empty() && scene->m_IsPostProcessing)
+    m_CurrentShaderProgram = shader_program;
+}
+
+std::shared_ptr<ShaderProgram> Renderer::getCurrentShaderProgram() const
+{
+    return m_CurrentShaderProgram;
+}
+
+glm::mat4 Renderer::getCurrentProjectionMatrix() const
+{
+    return m_CurrentProjectionMatrix;
+}
+
+void Renderer::render(const std::shared_ptr<Scene>& scene)
+{
+    if (!scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
         scene->m_PostProcessing.deactivate();
 
-    currentProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)scene->m_Camera.m_width / (float)scene->m_Camera.m_height, 0.1f, 100.0f);
-    glm::mat4 view = scene->m_Camera.getViewMatrix();
+    m_CurrentProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)scene->m_Camera.m_Width / (float)scene->m_Camera.m_Height, 0.1f, 100.0f);
 
-    // Default shader
-    currentShader->activateShader();
+    m_CurrentShaderProgram->activateProgram();
     
-    currentShader->setVec3("viewPos", scene->m_Camera.m_pos);
-    currentShader->setFloat("material.shininess", 32.0f);
+    m_CurrentShaderProgram->setVec3("viewPos", scene->m_Camera.m_Position);
+    m_CurrentShaderProgram->setFloat("material.shininess", 32.0f);
 
-    currentShader->setMat4("projection", currentProjectionMatrix);
-    currentShader->setMat4("view", view);
+    m_CurrentShaderProgram->setMat4("projection", m_CurrentProjectionMatrix);
+    m_CurrentShaderProgram->setMat4("view", scene->m_Camera.getViewMatrix());
 
-    // Stencil shader
-    currentStencilShader->activateShader();
-
-    currentStencilShader->setMat4("projection", currentProjectionMatrix);
-    currentStencilShader->setMat4("view", view);
-
-    // Rendering lights' influence
-    if (!scene->m_DirLights.empty())
-    {
-        for (auto i = 0; i < scene->m_DirLights.size(); i++)
-        {
-            scene->m_DirLights[i]->updateUni(currentShader, i);
-        }
-    }
-    if (!scene->m_PointLights.empty())
-    {
-        for (auto i = 0; i < scene->m_PointLights.size(); i++)
-        {
-            scene->m_PointLights[i]->updateUni(currentShader, i);
-            // TODO: draw the billboard
-        }
-    }
-    if (!scene->m_SpotLights.empty())
-    {
-        for (auto i = 0; i < scene->m_SpotLights.size(); i++)
-        {
-            scene->m_SpotLights[i]->updateUni(currentShader, i);
-            // TODO: draw the billboard
-        }
-    }
-
-    // TODO: yeah
-    // Draw all renderable
-    //if (!this->m_RenderableVec.empty())
+    // TODO: Rendering lights' influence
+    //if (!scene->m_DirLights.empty())
     //{
-    //    for (auto it: m_RenderableVec)
+    //    for (auto i = 0; i < scene->m_DirLights.size(); i++)
     //    {
-    //        auto object = it;
-    //        if (typeid(*object) == typeid(SphericalBillboard))
-    //        {
-    //            std::shared_ptr<SphericalBillboard> sph_bill = std::dynamic_pointer_cast<SphericalBillboard>(it);
-    //            sph_bill->m_Target = m_Camera->m_pos;
-    //            sph_bill->draw(shaders_active);
-    //        }
-    //        else if (typeid(*object) == typeid(CylindricalBillboard))
-    //        {
-    //            std::shared_ptr<CylindricalBillboard> cyl_bill = std::dynamic_pointer_cast<CylindricalBillboard>(it);
-    //            cyl_bill->m_Target = m_Camera->m_pos;
-    //            cyl_bill->draw(shaders_active);
-    //        }
-    //        else 
-    //        {
-    //            it->draw(shaders_active);
-    //        }
+    //        scene->m_DirLights[i]->updateUni(currentShader, i);
+    //    }
+    //}
+    //if (!scene->m_PointLights.empty())
+    //{
+    //    for (auto i = 0; i < scene->m_PointLights.size(); i++)
+    //    {
+    //        scene->m_PointLights[i]->updateUni(currentShader, i);
+    //        // TODO: draw the billboard
+    //    }
+    //}
+    //if (!scene->m_SpotLights.empty())
+    //{
+    //    for (auto i = 0; i < scene->m_SpotLights.size(); i++)
+    //    {
+    //        scene->m_SpotLights[i]->updateUni(currentShader, i);
+    //        // TODO: draw the billboard
     //    }
     //}
 
-    if (!scene->m_PostProcessing.m_ActiveShaders.empty() && scene->m_IsPostProcessing)
+    for (const auto& node : scene->getNodes())
+    {
+        // TODO: draw nodes
+    }
+
+    if (!scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
         scene->m_PostProcessing.activate();
 }
