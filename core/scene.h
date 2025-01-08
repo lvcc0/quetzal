@@ -1,6 +1,6 @@
 #pragma once
 
-// std & stl
+// std
 #include <iostream>
 #include <vector>
 #include <map>
@@ -15,19 +15,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// quetzal
-#include "resource_manager.h"
-#include "camera.h"
-#include "post_processing.h"
-#include "lights.h"
+#include "core/resource_manager.h"
 
-#include "texture.h"
-#include "billboards.h"
-#include "physics.h"
+#include "core/rendering/post_processing.h"
+#include "core/rendering/camera.h"
 
-// TODO: rewrite all this stuff
+#include "scene/3d/rigid_body.h"
+#include "scene/3d/static_body.h"
 
-enum class ObjectType { SHADER, TEXTURE, RENDERABLE };
+#include "scene/3d/cylindrical_billboard.h"
+#include "scene/3d/spherical_billboard.h"
+
+#include "scene/3d/directional_light3d.h"
+#include "scene/3d/point_light3d.h"
+#include "scene/3d/spot_light3d.h"
 
 class Scene
 {
@@ -39,10 +40,6 @@ public:
 
     bool m_IsPostProcessing = false;
     bool m_IsPhysics = true;
-
-    std::vector<std::unique_ptr<DirLight>>   m_DirLights;
-    std::vector<std::unique_ptr<PointLight>> m_PointLights;
-    std::vector<std::unique_ptr<SpotLight>>  m_SpotLights;
 
     // Gets called every frame in the engine class
     void update();
@@ -56,18 +53,15 @@ public:
     // Enable physics
     void enablePhysics();
 
-    // Some stuff to add to the scene
-    //void addModel(std::string name); // TODO: not a model, but a node that contains that model
-    void addCylBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
-    void addSphBillboard(std::string name, glm::vec3 pos, glm::vec2 size, const std::string& texture_name, std::vector<Vertex> verts);
-
-    // Add lights to the scene
-    // TODO: remove those verts from the argument list
-    void addDirLight(DirLight& dir_light);
-    void addPointLight(PointLight& point_light, std::vector<Vertex> verts);
-    void addSpotLight(SpotLight& spot_light, std::vector<Vertex> verts);
+    // TODO: Some stuff to add to the scene
+    qtzl::RigidBody            createRigidBody();
+    qtzl::StaticBody           createStaticBody();
+    qtzl::CylindricalBillboard createCylindricalBillboard();
+    qtzl::SphericalBillboard   createSphecricalBillboard();
+    qtzl::DirectionalLight3D   createDirectionalLight();
+    qtzl::PointLight3D         createPointLight();
+    qtzl::SpotLight3D          createSpotLight();
 
 private:
-    // Maps of loaded objects
-    std::map<const std::string, std::shared_ptr<Collision>> m_CollisionMap;
+    std::vector<std::shared_ptr<qtzl::Node>> m_Nodes;
 };

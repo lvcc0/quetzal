@@ -1,6 +1,6 @@
 #pragma once
 
-// std & stl
+// std
 #include <string>
 #include <memory>
 #include <map>
