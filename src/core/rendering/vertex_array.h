@@ -3,7 +3,7 @@
 // thirdparty
 #include <glad/glad.h>
 
-#include "core/rendering/buffer_layout.h"
+#include "core/rendering/vertex_buffer_layout.h"
 #include "core/rendering/vertex_buffer.h"
 #include "core/rendering/element_buffer.h"
 
@@ -16,7 +16,7 @@ public:
 
     GLuint getID() const;
 
-    void addBuffer(const VBO& vbo, const VB_Vertex_Layout& layout);
+    void addBuffer(const VBO& vbo, const VertexBufferLayout& layout) const;
     
     void bind() const;
     void unbind() const;

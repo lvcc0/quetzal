@@ -8,10 +8,8 @@ namespace qtzl
 	class SphericalBillboard : public Billboard
 	{
 	public:
-		SphericalBillboard(const std::string& name, std::shared_ptr<Texture>& texture);
+		SphericalBillboard(const std::string& name, std::shared_ptr<Texture> texture);
 		virtual ~SphericalBillboard() = default;
-
-		glm::mat4 getModelMatrix() const override;
 
 		// Draw billboard and change it's model matrix
 		void draw(const ShaderProgram& shader_program) override;

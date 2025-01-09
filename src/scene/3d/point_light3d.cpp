@@ -2,8 +2,7 @@
 
 namespace qtzl
 {
-    PointLight3D::PointLight3D
-    (
+    PointLight3D::PointLight3D(
         const std::string& name,
         glm::vec3 position,
         glm::vec3 color,

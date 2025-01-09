@@ -11,8 +11,7 @@ namespace qtzl
     class Light3D : public Node3D
     {
     public:
-        Light3D
-        (
+        Light3D(
             const std::string& name,
             glm::vec3 color = glm::vec3(1.0f),
             glm::vec3 ambient = glm::vec3(0.5f),

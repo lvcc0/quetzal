@@ -2,8 +2,7 @@
 
 namespace qtzl
 {
-    SpotLight3D::SpotLight3D
-    (
+    SpotLight3D::SpotLight3D(
         const std::string& name,
         glm::vec3 position,
         glm::vec3 direction,

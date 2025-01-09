@@ -35,53 +35,52 @@ void Scene::enablePhysics()
     this->m_IsPhysics = !this->m_IsPhysics;
 }
 
-qtzl::RigidBody Scene::createRigidBody()
-{
-    // TODO
-}
+//qtzl::RigidBody Scene::createRigidBody() TODO
+//{
+//}
 
-qtzl::StaticBody Scene::createStaticBody()
-{
-    // TODO
-}
+//qtzl::StaticBody Scene::createStaticBody() TODO
+//{
+//}
 
-qtzl::CylindricalBillboard Scene::createCylindricalBillboard(
+//qtzl::Billboard Scene::createBillboard() TODO
+//{
+//}
+
+std::shared_ptr < qtzl::CylindricalBillboard> Scene::createCylindricalBillboard(
     const std::string& name,
     const std::string& texture_name,
-    glm::vec3 position = glm::vec3(0.0f),
-    glm::vec2 size = glm::vec2(1.0f)
+    glm::vec3 position,
+    glm::vec2 size
 )
 {
     std::shared_ptr<qtzl::CylindricalBillboard> node_sptr = std::make_shared<qtzl::CylindricalBillboard>(name, ResourceManager::getTexture(texture_name));
 
     this->m_Nodes.push_back(node_sptr);
-    return *node_sptr;
+    return node_sptr;
 }
 
-qtzl::SphericalBillboard Scene::createSphericalBillboard(
+std::shared_ptr < qtzl::SphericalBillboard> Scene::createSphericalBillboard(
     const std::string& name,
     const std::string& texture_name,
-    glm::vec3 position = glm::vec3(0.0f),
-    glm::vec2 size = glm::vec2(1.0f)
+    glm::vec3 position,
+    glm::vec2 size
 )
 {
     std::shared_ptr<qtzl::SphericalBillboard> node_sptr = std::make_shared<qtzl::SphericalBillboard>(name, ResourceManager::getTexture(texture_name));
 
     this->m_Nodes.push_back(node_sptr);
-    return *node_sptr;
+    return node_sptr;
 }
 
-qtzl::DirectionalLight3D Scene::createDirectionalLight()
-{
-    // TODO
-}
+//qtzl::DirectionalLight3D Scene::createDirectionalLight() TODO
+//{
+//}
 
-qtzl::PointLight3D Scene::createPointLight()
-{
-    // TODO
-}
+//qtzl::PointLight3D Scene::createPointLight() TODO
+//{
+//}
 
-qtzl::SpotLight3D Scene::createSpotLight()
-{
-    // TODO
-}
+//qtzl::SpotLight3D Scene::createSpotLight() TODO
+//{
+//}

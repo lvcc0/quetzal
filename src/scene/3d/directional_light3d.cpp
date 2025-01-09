@@ -2,8 +2,7 @@
 
 namespace qtzl
 {
-    DirectionalLight3D::DirectionalLight3D
-    (
+    DirectionalLight3D::DirectionalLight3D(
         const std::string& name,
         glm::vec3 direction,
         glm::vec3 color,

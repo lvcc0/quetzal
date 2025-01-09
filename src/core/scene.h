@@ -55,26 +55,27 @@ public:
     // Enable physics
     void enablePhysics();
 
-    qtzl::RigidBody            createRigidBody();
-    qtzl::StaticBody           createStaticBody();
+    std::shared_ptr<qtzl::RigidBody> createRigidBody();
+    std::shared_ptr<qtzl::StaticBody> createStaticBody();
+    std::shared_ptr<qtzl::Billboard> createBillboard();
 
-    qtzl::CylindricalBillboard createCylindricalBillboard(
+    std::shared_ptr<qtzl::CylindricalBillboard> createCylindricalBillboard(
         const std::string& name,
         const std::string& texture_name,
         glm::vec3 position = glm::vec3(0.0f),
         glm::vec2 size = glm::vec2(1.0f)
     );
 
-    qtzl::SphericalBillboard createSphericalBillboard(
+    std::shared_ptr<qtzl::SphericalBillboard> createSphericalBillboard(
         const std::string& name,
         const std::string& texture_name,
         glm::vec3 position = glm::vec3(0.0f),
         glm::vec2 size = glm::vec2(1.0f)
     );
 
-    qtzl::DirectionalLight3D   createDirectionalLight();
-    qtzl::PointLight3D         createPointLight();
-    qtzl::SpotLight3D          createSpotLight();
+    std::shared_ptr<qtzl::DirectionalLight3D> createDirectionalLight();
+    std::shared_ptr<qtzl::PointLight3D> createPointLight();
+    std::shared_ptr<qtzl::SpotLight3D> createSpotLight();
 
 private:
     std::vector<std::shared_ptr<qtzl::Node>> m_Nodes;

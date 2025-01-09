@@ -16,22 +16,20 @@ GLuint VAO::getID() const
     return this->ID;
 }
 
-// TODO: yeah
-void VAO::addBuffer(const VBO& vbo, const VB_Vertex_Layout& layout)
+void VAO::addBuffer(const VBO& vbo, const VertexBufferLayout& layout) const
 {
     this->bind();
     vbo.bind();
+
     const auto& elements = layout.getElements();
-    unsigned int offset = 0;
     for (unsigned int i = 0; i < elements.size(); i++)
     {
         const auto& element = elements[i];
 
-        offset = element.vertex_offset;
-
         glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, element.count, element.type, element.normalised, layout.getStride(), (const void*)offset);
+        glVertexAttribPointer(i, element.size, element.type, element.normalized, layout.getStride(), (const void*)element.vertexOffset);
     }
+
     this->unbind();
     vbo.unbind();
 }
