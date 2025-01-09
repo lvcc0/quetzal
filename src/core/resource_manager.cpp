@@ -11,7 +11,7 @@ void ResourceManager::loadMesh(const std::string& file_path)
         return;
     }
 
-    m_LoadedMeshes.emplace(name, qtzl::Mesh(name, file_path));
+    m_LoadedMeshes.emplace(name, std::make_shared<qtzl::Mesh>(name, file_path));
 }
 
 void ResourceManager::loadTexture(const std::string& file_path, const std::string& texture_type)
@@ -25,7 +25,7 @@ void ResourceManager::loadTexture(const std::string& file_path, const std::strin
         return;
     }
 
-    m_LoadedTextures.emplace(name, qtzl::Texture(name, file_path, texture_type));
+    m_LoadedTextures.emplace(name, std::make_shared<qtzl::Texture>(name, file_path, texture_type));
 }
 
 void ResourceManager::loadShader(const std::string& file_path)
@@ -49,7 +49,7 @@ void ResourceManager::loadShader(const std::string& file_path)
     else if (extension == FRAGMENT_SHADER_FILE_EXTENSION)
         shaderType = GL_FRAGMENT_SHADER;
 
-    m_LoadedShaders.emplace(name, qtzl::Shader(name, file_path, getFileString(file_path), shaderType));
+    m_LoadedShaders.emplace(name, std::make_shared<qtzl::Shader>(name, file_path, getFileString(file_path), shaderType));
 }
 
 void ResourceManager::loadMeshes(const std::string& dir_path)
@@ -82,7 +82,7 @@ void ResourceManager::loadShaders(const std::string& dir_path)
 std::shared_ptr<qtzl::Mesh> ResourceManager::getMesh(const std::string& name)
 {
     if (m_LoadedMeshes.find(name) != m_LoadedMeshes.end())
-        return std::make_shared<qtzl::Mesh>(m_LoadedMeshes.at(name));
+        return m_LoadedMeshes.at(name);
 
     std::cerr << "MESH WITH NAME:: " << name << " NOT LOADED" << std::endl;
     //ASSERT(false);
@@ -91,7 +91,7 @@ std::shared_ptr<qtzl::Mesh> ResourceManager::getMesh(const std::string& name)
 std::shared_ptr<qtzl::Texture> ResourceManager::getTexture(const std::string& name)
 {
     if (m_LoadedTextures.find(name) != m_LoadedTextures.end())
-        return std::make_shared<qtzl::Texture>(m_LoadedTextures.at(name));
+        return m_LoadedTextures.at(name);
 
     std::cerr << "TEXTURE WITH NAME:: " << name << " NOT LOADED" << std::endl;
     //ASSERT(false);
@@ -100,7 +100,7 @@ std::shared_ptr<qtzl::Texture> ResourceManager::getTexture(const std::string& na
 std::shared_ptr<qtzl::Shader> ResourceManager::getShader(const std::string& name)
 {
     if (m_LoadedShaders.find(name) != m_LoadedShaders.end())
-        return std::make_shared<qtzl::Shader>(m_LoadedShaders.at(name));
+        return m_LoadedShaders.at(name);
 
     std::cerr << "SHADER WITH NAME:: " << name << " NOT LOADED" << std::endl;
     //ASSERT(false);

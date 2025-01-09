@@ -217,7 +217,7 @@ void Engine::process()
 
 std::shared_ptr<Scene> Engine::createScene(const std::string& name, bool set_current)
 {
-    std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+    std::shared_ptr<Scene> scene = std::make_shared<Scene>(this->winWidth, this->winHeight);
 
     this->scenes.emplace(name, scene);
     
