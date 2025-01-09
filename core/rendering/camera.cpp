@@ -72,7 +72,7 @@ void Camera::processInput(GLFWwindow* window, float dt)
     // --- //
 }
 
-void Camera::updateSize(int weight, int height)
+void Camera::updateSize(int width, int height)
 {
     m_Width = width;
     m_Height = height;

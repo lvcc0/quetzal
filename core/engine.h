@@ -1,11 +1,9 @@
 #pragma once
 
-// core
-#include "core/scene.h"
-
-// rendering
 #include "core/rendering/renderer.h"
 #include "core/rendering/gui.h"
+
+#include "core/scene.h"
 
 // Singleton
 class Engine

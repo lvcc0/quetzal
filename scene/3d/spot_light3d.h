@@ -8,7 +8,8 @@ namespace qtzl
     class SpotLight3D : public Light3D
     {
     public:
-        SpotLight3D(
+        SpotLight3D
+        (
             const std::string& name,
             glm::vec3 position = glm::vec3(0.0f),
             glm::vec3 direction = glm::vec3(0.0f),

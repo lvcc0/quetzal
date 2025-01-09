@@ -9,10 +9,15 @@ namespace qtzl
 
 	glm::mat4 CylindricalBillboard::getModelMatrix() const
 	{
-		// TODO
+		glm::mat4 matrix = glm::mat4(1.0f);
+		matrix = glm::translate(matrix, this->m_Position);
+		matrix = glm::rotate(matrix, this->m_VerticalAngle, this->m_Up);
+		matrix = glm::scale(matrix, glm::vec3(this->m_Scale.x, this->m_Scale.y, 1.0f));
+
+		return matrix;
 	}
 
-	void CylindricalBillboard::draw(const Shader& shader)
+	void CylindricalBillboard::draw(const ShaderProgram& shader_program)
 	{
         // TODO
 	}

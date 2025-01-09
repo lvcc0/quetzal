@@ -61,12 +61,12 @@ void ResourceManager::loadMeshes(const std::string& dir_path)
     }
 }
 
-void ResourceManager::loadTextures(const std::string& dir_path)
+void ResourceManager::loadTextures(const std::string& dir_path, const std::string& texture_type)
 {
     for (const auto& entry : std::filesystem::directory_iterator(dir_path))
     {
         if (std::find(TEXTURES_FILE_EXTENSIONS.begin(), TEXTURES_FILE_EXTENSIONS.end(), entry.path().extension().string()) != TEXTURES_FILE_EXTENSIONS.end())
-            loadTexture(entry.path().string());
+            loadTexture(entry.path().string(), texture_type);
     }
 }
 
@@ -79,72 +79,69 @@ void ResourceManager::loadShaders(const std::string& dir_path)
     }
 }
 
-std::shared_ptr<qtzl::Mesh> ResourceManager::getMesh(const std::string& name) const
+std::shared_ptr<qtzl::Mesh> ResourceManager::getMesh(const std::string& name)
 {
     if (m_LoadedMeshes.find(name) != m_LoadedMeshes.end())
         return std::make_shared<qtzl::Mesh>(m_LoadedMeshes.at(name));
 
     std::cerr << "MESH WITH NAME:: " << name << " NOT LOADED" << std::endl;
-    ASSERT(false);
+    //ASSERT(false);
 }
 
-std::shared_ptr<Texture> ResourceManager::getTexture(const std::string& name) const
+std::shared_ptr<qtzl::Texture> ResourceManager::getTexture(const std::string& name)
 {
     if (m_LoadedTextures.find(name) != m_LoadedTextures.end())
         return std::make_shared<qtzl::Texture>(m_LoadedTextures.at(name));
 
     std::cerr << "TEXTURE WITH NAME:: " << name << " NOT LOADED" << std::endl;
-    ASSERT(false);
+    //ASSERT(false);
 }
 
-std::shared_ptr<Shader> ResourceManager::getShader(const std::string& name) const
+std::shared_ptr<qtzl::Shader> ResourceManager::getShader(const std::string& name)
 {
     if (m_LoadedShaders.find(name) != m_LoadedShaders.end())
         return std::make_shared<qtzl::Shader>(m_LoadedShaders.at(name));
 
     std::cerr << "SHADER WITH NAME:: " << name << " NOT LOADED" << std::endl;
-    ASSERT(false);
+    //ASSERT(false);
 }
 
-std::map<const std::string, std::shared_ptr<qtzl::Mesh>> ResourceManager::getMeshes() const
+std::map<const std::string, std::shared_ptr<qtzl::Mesh>> ResourceManager::getMeshes()
 {
     return m_LoadedMeshes;
 }
 
-std::map<const std::string, std::shared_ptr<qtzl::Texture>> ResourceManager::getTextures() const
+std::map<const std::string, std::shared_ptr<qtzl::Texture>> ResourceManager::getTextures()
 {
     return m_LoadedTextures;
 }
 
-std::map<const std::string, std::shared_ptr<qtzl::Shader>> ResourceManager::getShaders() const
+std::map<const std::string, std::shared_ptr<qtzl::Shader>> ResourceManager::getShaders()
 {
-    return m_LoadedShaders();
+    return m_LoadedShaders;
 }
 
-std::shared_ptr<ShaderProgram> ResourceManager::getShaderProgram(const std::string& name) const
+std::shared_ptr<ShaderProgram> ResourceManager::createShaderProgram(const std::string& vertex_shader_name, const std::string& fragment_shader_name)
 {
-    // TODO
+    std::string name = vertex_shader_name + "||" + fragment_shader_name;
+
+    if (auto iterator = std::find_if(m_ShaderPrograms.begin(), m_ShaderPrograms.end(), [name](std::shared_ptr<ShaderProgram> shader_program) { return shader_program->getName() == name; }); iterator != m_ShaderPrograms.end())
+        return *iterator;
+
+    std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>(name, m_LoadedShaders.at(vertex_shader_name)->getID(), m_LoadedShaders.at(fragment_shader_name)->getID());
+    m_ShaderPrograms.push_back(shaderProgram);
+
+    return shaderProgram;
 }
 
-std::shared_ptr<ShaderProgram> ResourceManager::getPPShaderProgram(const std::string& name) const
-{
-    // TODO
-}
-
-std::vector<std::shared_ptr<ShaderProgram>> ResourceManager::getShaderPrograms() const
-{
-    // TODO
-}
-
-std::vector<std::shared_ptr<ShaderProgram>> ResourceManager::getPPShaderPrograms() const
+std::vector<std::shared_ptr<ShaderProgram>> ResourceManager::createPPShaderPrograms()
 {
     std::string vertexShaderName;
     std::vector<std::string> fragmentShaderNames;
 
-    std::vector<std::shared_ptr<ShaderProgram>> result;
-
     for (const auto& entry : m_LoadedShaders)
     {
+        // kinda lame, we'll rewrite this stuff
         if (entry.second->getPath().find(PPSHADERS_FOLDER) == std::string::npos)
             continue; // not a postprocessing shader
 
@@ -154,12 +151,40 @@ std::vector<std::shared_ptr<ShaderProgram>> ResourceManager::getPPShaderPrograms
             fragmentShaderNames.push_back(entry.first);
     }
 
-    for (const auto& name : fragmentShaderNames)
+    for (const auto& fragmentShaderName : fragmentShaderNames)
     {
-        result.push_back(std::make_shared<ShaderProgram>(name, m_LoadedShaders.at(vertexShaderName)->getID(), m_LoadedShaders.at(name)->getID()));
+        std::string name = vertexShaderName + "||" + fragmentShaderName;
+        auto iterator = std::find_if(m_PPShaderPrograms.begin(), m_PPShaderPrograms.end(), [name](std::shared_ptr<ShaderProgram> shader_program) { return shader_program->getName() == name; });
+
+        if (iterator == m_PPShaderPrograms.end())
+            m_PPShaderPrograms.push_back(std::make_shared<ShaderProgram>(name, m_LoadedShaders.at(vertexShaderName)->getID(), m_LoadedShaders.at(name)->getID()));
     }
 
-    return result;
+    return m_PPShaderPrograms;
+}
+
+std::shared_ptr<ShaderProgram> ResourceManager::getShaderProgram(const std::string& name)
+{
+    // NOTE: i'm not sure if this will work
+    auto result = std::find_if(m_ShaderPrograms.begin(), m_ShaderPrograms.end(), [name](std::shared_ptr<ShaderProgram> shader_program) { return shader_program->getName() == name; });
+    return *result;
+}
+
+std::shared_ptr<ShaderProgram> ResourceManager::getPPShaderProgram(const std::string& name)
+{
+    // NOTE: same
+    auto result = std::find_if(m_PPShaderPrograms.begin(), m_PPShaderPrograms.end(), [name](std::shared_ptr<ShaderProgram> shader_program) { return shader_program->getName() == name; });
+    return *result;
+}
+
+std::vector<std::shared_ptr<ShaderProgram>> ResourceManager::getShaderPrograms()
+{
+    return m_ShaderPrograms;
+}
+
+std::vector<std::shared_ptr<ShaderProgram>> ResourceManager::getPPShaderPrograms()
+{
+    return m_PPShaderPrograms;
 }
 
 void ResourceManager::preLoadResources()
@@ -167,7 +192,7 @@ void ResourceManager::preLoadResources()
     // TODO: redo this without exclusive folder names, make it loop through all the res_path directory and load everything there
 
     loadMeshes(RES_PATH + MESHES_FOLDER);
-    loadTextures(RES_PATH + TEXTURES_FOLDER);
+    loadTextures(RES_PATH + TEXTURES_FOLDER, "texture_diffuse");
     loadShaders(RES_PATH + SHADERS_FOLDER);
     loadShaders(RES_PATH + PPSHADERS_FOLDER);
 }
@@ -178,7 +203,7 @@ std::string ResourceManager::getFileString(const std::string& file_path)
 
     // check if file_path is relative
     if (tempFilePath.find(RES_PATH) == std::string::npos)
-        tempFilePath = RES_PATH + file_path.c_str();
+        tempFilePath = RES_PATH + file_path;
 
     std::ifstream file(tempFilePath, std::ios::in | std::ios::binary);
 

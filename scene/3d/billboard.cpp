@@ -16,9 +16,4 @@ namespace qtzl
 	{
 		return this->m_Target;
 	}
-
-	glm::mat4 Billboard::getModelMatrix() const
-	{
-		// TODO
-	}
 }

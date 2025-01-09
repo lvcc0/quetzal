@@ -95,57 +95,59 @@ void Engine::processInput()
 // Badly working with zero scaled objects
 void Engine::pickObject()
 {
-    GLdouble mouse_x, mouse_y;
-    glfwGetCursorPos(window, &mouse_x, &mouse_y);
+    // TODO: yeeeah
+    // 
+    //GLdouble mouse_x, mouse_y;
+    //glfwGetCursorPos(window, &mouse_x, &mouse_y);
 
-    // Blocking that part of screen which is already occupied by:
-    // Main GUI of scene
-    // Main GUI contains more than one window
-    for (int i{ 0 }; i < gui->getGUIWindowPos().size(); i++)
-    {
-        if (gui->getGUIWindowPos()[i].x + gui->getGUIWindowSize()[i].x > mouse_x && mouse_x > gui->getGUIWindowPos()[i].x
-            && gui->getGUIWindowPos()[i].y + gui->getGUIWindowSize()[i].y > mouse_y && mouse_y > gui->getGUIWindowPos()[i].y)
-            return;
-    }
+    //// Blocking that part of screen which is already occupied by:
+    //// Main GUI of scene
+    //// Main GUI contains more than one window
+    //for (int i{ 0 }; i < gui->getGUIWindowPos().size(); i++)
+    //{
+    //    if (gui->getGUIWindowPos()[i].x + gui->getGUIWindowSize()[i].x > mouse_x && mouse_x > gui->getGUIWindowPos()[i].x
+    //        && gui->getGUIWindowPos()[i].y + gui->getGUIWindowSize()[i].y > mouse_y && mouse_y > gui->getGUIWindowPos()[i].y)
+    //        return;
+    //}
 
-    // Window_obj_props
-    for (auto item : gui->getWindowsObjProps())
-    {
-        for (int i{ 0 }; i < item->getGUIWindowPos().size(); i++)
-        {
-            if (item->getGUIWindowPos()[i].x + item->getGUIWindowSize()[i].x > mouse_x && mouse_x > item->getGUIWindowPos()[i].x
-                && item->getGUIWindowPos()[i].y + item->getGUIWindowSize()[i].y > mouse_y && mouse_y > item->getGUIWindowPos()[i].y)
-                return;
-        }
-    }
-    // ----------------------------- //
+    //// Window_obj_props
+    //for (auto item : gui->getWindowsObjProps())
+    //{
+    //    for (int i{ 0 }; i < item->getGUIWindowPos().size(); i++)
+    //    {
+    //        if (item->getGUIWindowPos()[i].x + item->getGUIWindowSize()[i].x > mouse_x && mouse_x > item->getGUIWindowPos()[i].x
+    //            && item->getGUIWindowPos()[i].y + item->getGUIWindowSize()[i].y > mouse_y && mouse_y > item->getGUIWindowPos()[i].y)
+    //            return;
+    //    }
+    //}
+    //// ----------------------------- //
 
-    glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Camera.m_pos;
-    glm::vec3 direction = ExpMath::getGlobalCoordsFromScreen(mouse_x, mouse_y, this->scenes.at(currentScene)->m_Camera.m_width, this->scenes.at(currentScene)->m_Camera.m_height, Renderer::currentProjectionMatrix, this->scenes.at(currentScene)->m_Camera.getViewMatrix());
+    //glm::vec3 cam_coords = this->scenes.at(currentScene)->m_Camera.m_pos;
+    //glm::vec3 direction = ExpMath::getGlobalCoordsFromScreen(mouse_x, mouse_y, this->scenes.at(currentScene)->m_Camera.m_width, this->scenes.at(currentScene)->m_Camera.m_height, Renderer::currentProjectionMatrix, this->scenes.at(currentScene)->m_Camera.getViewMatrix());
 
-    Ray ray(cam_coords, direction);
-    
-    // At this section checking models of rigid bodies (two corners of model make square)
-    std::vector <std::pair<std::shared_ptr<Renderable>, GLfloat >> inter_render_body_vector;
+    //Ray ray(cam_coords, direction);
+    //
+    //// At this section checking models of rigid bodies (two corners of model make square)
+    //std::vector <std::pair<std::shared_ptr<Renderable>, GLfloat >> inter_render_body_vector;
 
-    for (auto item : this->scenes.at(currentScene)->getRenderableVec()) 
-    {
-        GLfloat intersection_distance;
-        if (ray.TestRayOBBIntersection(ExpMath::makeAABB(item->m_Vertices).first, ExpMath::makeAABB(item->m_Vertices).second, item->getModelMatrix(), intersection_distance))
-        {
-            inter_render_body_vector.push_back(std::pair(item, intersection_distance));
-        }
-    }
-    
-    // Picking object with lesser intersection_distance
-    if (inter_render_body_vector.size() != 0) {
-        std::shared_ptr<Renderable> curr_renderable_ptr = ExpMath::getItemWithMinimumFloat(inter_render_body_vector).first;
+    //for (auto item : this->scenes.at(currentScene)->getRenderableVec()) 
+    //{
+    //    GLfloat intersection_distance;
+    //    if (ray.TestRayOBBIntersection(ExpMath::makeAABB(item->m_Vertices).first, ExpMath::makeAABB(item->m_Vertices).second, item->getModelMatrix(), intersection_distance))
+    //    {
+    //        inter_render_body_vector.push_back(std::pair(item, intersection_distance));
+    //    }
+    //}
+    //
+    //// Picking object with lesser intersection_distance
+    //if (inter_render_body_vector.size() != 0) {
+    //    std::shared_ptr<Renderable> curr_renderable_ptr = ExpMath::getItemWithMinimumFloat(inter_render_body_vector).first;
 
-        if (curr_renderable_ptr != nullptr)
-        {
-            gui->clickWindow(curr_renderable_ptr);
-        }
-    }
+    //    if (curr_renderable_ptr != nullptr)
+    //    {
+    //        gui->clickWindow(curr_renderable_ptr);
+    //    }
+    //}
 }
 
 // Gets called upon window resize
@@ -155,7 +157,7 @@ void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
     {
-        this->scenes.at(this->currentScene)->m_Camera.UpdateSize(width, height);
+        this->scenes.at(this->currentScene)->m_Camera.updateSize(width, height);
         this->scenes.at(this->currentScene)->m_PostProcessing.recreate(width, height);
     }
 }
@@ -184,7 +186,7 @@ void Engine::process()
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
-        GUI::render(this->deltaTime, std::make_pair(currentScene, scenes.at(currentScene)), window);
+        GUI::render(currentScene, scenes.at(currentScene), this->deltaTime);
     // --- //
 
     float curFrame = (float)glfwGetTime();
@@ -201,7 +203,7 @@ void Engine::process()
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
     {
         this->scenes.at(this->currentScene)->update();
-        Renderer::draw(this->scenes.at(this->currentScene));
+        Renderer::render(this->scenes.at(this->currentScene));
     }
     
     // GUI // 

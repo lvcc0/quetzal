@@ -1,5 +1,11 @@
 #pragma once
 
+// std
+#include <vector>
+
+#include "core/rendering/vertex.h"
+#include "core/rendering/shader_program.h"
+
 #include "scene/3d/node3d.h"
 
 #include "scene/resources/shader.h"
@@ -19,9 +25,9 @@ namespace qtzl
 		void setTarget(glm::vec3 target);
 
 		glm::vec3         getTarget() const;
-		virtual glm::mat4 getModelMatrix() const;
+		virtual glm::mat4 getModelMatrix() const = 0;
 
-		virtual void draw(const Shader& shader) = 0;
+		virtual void draw(const ShaderProgram& shader_program) = 0;
 
 	protected:
 		std::shared_ptr<Texture> m_Texture;
@@ -32,5 +38,15 @@ namespace qtzl
 
 		float m_HorizontalAngle = 0.0f; // in radians!
 		float m_VerticalAngle = 0.0f; // in radians!
+
+		std::vector<Vertex> m_Vertices =
+		{
+			Vertex(glm::vec3(0.5f,  0.5f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)),  // upper right
+			Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),  // lower right
+			Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper left
+			Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),  // lower right
+			Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower left
+			Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // upper left
+		};
 	};
 }

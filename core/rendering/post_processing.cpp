@@ -2,7 +2,7 @@
 
 PostProcessing::PostProcessing(GLfloat viewport_width, GLfloat viewport_height)
 {
-    for (const auto& shaderProgram : ResourceManager::getPPShaderPrograms())
+    for (const auto& shaderProgram : ResourceManager::createPPShaderPrograms())
     {
         this->m_ShaderPrograms.emplace(shaderProgram, false);
     }
@@ -51,12 +51,36 @@ std::vector<std::string> PostProcessing::getEnabledPPShaders() const
     return result;
 }
 
+std::vector<std::string> PostProcessing::getPPShaderNames() const
+{
+    std::vector<std::string> result;
+
+    for (const auto& entry : m_ShaderPrograms)
+    {
+         result.push_back(entry.first->getName());
+    }
+
+    return result;
+}
+
+std::vector<std::shared_ptr<ShaderProgram>> PostProcessing::getPPShaders() const
+{
+    std::vector<std::shared_ptr<ShaderProgram>> result;
+
+    for (const auto& entry : m_ShaderPrograms)
+    {
+        result.push_back(entry.first);
+    }
+
+    return result;
+}
+
 bool PostProcessing::isActive() const
 {
     for (const auto& entry : m_ShaderPrograms)
     {
         if (entry.second)
-            return true
+            return true;
     }
 
     return false;

@@ -21,7 +21,9 @@ public:
 
     void setPPShaderEnabled(const std::string& name, bool enabled);
 
-    std::vector<std::string> getEnabledPPShaders() const;
+    std::vector<std::string>                    getEnabledPPShaders() const;
+    std::vector<std::string>                    getPPShaderNames() const;
+    std::vector<std::shared_ptr<ShaderProgram>> getPPShaders() const;
 
     // Returns true if at least one shader program is enabled
     bool isActive() const;

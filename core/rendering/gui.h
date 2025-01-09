@@ -15,7 +15,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "scene.h"
+#include "core/scene.h"
 
 enum class EngineWindowType { SceneCfg, NodeMgr, ResourceMgr };
 
@@ -61,9 +61,9 @@ public:
     GUINodeWindow(std::shared_ptr<qtzl::Node3D> node);
     ~GUINodeWindow();
 
-    void render();
+    std::shared_ptr<qtzl::Node3D> getNode() const;
 
-    inline std::shared_ptr<qtzl::Node3D> getNode() const { return m_Node; }
+    void render();
 
 private:
     std::shared_ptr<qtzl::Node3D> m_Node;
@@ -92,8 +92,7 @@ public:
     static void showResourceManager();
 
     // Creating or destroying windows for nodes
-    static void onClick(const std::shared_ptr<qtzl::Node> obj);
-    static void onClick(const std::shared_ptr<qtzl::Node3D> obj);
+    static void onClick(const std::shared_ptr<qtzl::Node3D> node);
     
     // Check if the given position is occupied by any gui window
     static bool isOccupied(double x, double y);

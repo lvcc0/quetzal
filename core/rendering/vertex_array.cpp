@@ -8,7 +8,7 @@ VAO::VAO()
 
 VAO::~VAO()
 {
-    GLCall(glDeleteVertexArrays(1, &this->ID));
+    glDeleteVertexArrays(1, &this->ID);
 }
 
 GLuint VAO::getID() const
@@ -29,8 +29,8 @@ void VAO::addBuffer(const VBO& vbo, const VB_Vertex_Layout& layout)
 
         offset = element.vertex_offset;
 
-        GLCall(glEnableVertexAttribArray(i));
-        GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalised, layout.getStride(), (const void*)offset));
+        glEnableVertexAttribArray(i);
+        glVertexAttribPointer(i, element.count, element.type, element.normalised, layout.getStride(), (const void*)offset);
     }
     this->unbind();
     vbo.unbind();

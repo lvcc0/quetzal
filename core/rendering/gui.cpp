@@ -68,15 +68,15 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
     {
         ImGui::Separator();
 
-        std::vector<std::string> names = scene->m_PostProcessing.getScreenShaders(); // current screen shader names
+        std::vector<std::string> names = scene->m_PostProcessing.getPPShaderNames(); // current screen shader names
 
-        for (const auto& entry : scene->m_PostProcessing.m_ShaderMap)
+        for (const auto& shader : scene->m_PostProcessing.getEnabledPPShaders())
         {
-            auto it = std::find(names.begin(), names.end(), entry.first);
+            auto it = std::find(names.begin(), names.end(), shader);
 
-            if (ImGui::Selectable(entry.first.c_str(), (it != names.end())))
+            if (ImGui::Selectable(shader.c_str(), it != names.end()))
             {
-                scene->m_PostProcessing.setScreenShader(entry.first, (it == names.end()));
+                scene->m_PostProcessing.setPPShaderEnabled(shader, it == names.end());
                 glEnable(GL_DEPTH_TEST); // postprocessing disables depth test after as it's final step, so we need to turn it back on
             }
             ImGui::SameLine(ImGui::GetWindowSize().x - 64); ImGui::Text((it != names.end()) ? "enabled" : "disabled");
@@ -105,8 +105,8 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
     ImGui::SeparatorText("Engine");
 
     // TODO: rewrite this stuff more compact
-    ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_pos.x, scene->m_Camera.m_pos.y, scene->m_Camera.m_pos.z);
-    ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_orientation.x, scene->m_Camera.m_orientation.y, scene->m_Camera.m_orientation.z);
+    ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_Position.x, scene->m_Camera.m_Position.y, scene->m_Camera.m_Position.z);
+    ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_Orientation.x, scene->m_Camera.m_Orientation.y, scene->m_Camera.m_Orientation.z);
     ImGui::Text("%.3f ms (%.1f FPS)", delta_time * 1000.0f, 1.0f / delta_time);
     ImGui::Text("Pos X%.2f Y%.2f Size X%.2f Y%.2f", ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
@@ -138,29 +138,25 @@ void GUI::showResourceManager()
 }
 
 // Making window using node
-void GUI::onClick(const std::shared_ptr<qtzl::Node> obj)
+//void GUI::onClick(const std::shared_ptr<qtzl::Node> obj)
+//{
+//    // Selecting and deselecting
+//    auto window_it = std::find_if(m_NodeWindows.begin(), m_NodeWindows.end(), [&obj](std::shared_ptr<GUINodeWindow> obj) { return obj->getNode() == obj; });
+//    
+//    if (window_it == m_NodeWindows.end())
+//        m_NodeWindows.push_back(std::make_shared<GUINodeWindow>(obj));
+//    else
+//        m_NodeWindows.erase(window_it);
+//}
+
+// Making window using node3D
+void GUI::onClick(const std::shared_ptr<qtzl::Node3D> node)
 {
     // Selecting and deselecting
-    auto window_it = std::find_if(m_NodeWindows.begin(), m_NodeWindows.end(), [&obj](std::shared_ptr<GUINodeWindow> obj) { return obj->getNode() == obj; });
-    
-    if (window_it == m_NodeWindows.end())
-        m_NodeWindows.push_back(std::make_shared<GUINodeWindow>(obj));
-    else
-        m_NodeWindows.erase(window_it);
-}
-
-// Making window using node3D and casting it to node
-void GUI::onClick(const std::shared_ptr<qtzl::Node3D> obj)
-{
-    std::shared_ptr<qtzl::Node> aux = std::dynamic_pointer_cast<qtzl::Node>(obj);
-    if (aux == nullptr)
-        return;
-
-    // Selecting and deselecting
-    auto window_it = std::find_if(m_NodeWindows.begin(), m_NodeWindows.end(), [&aux](std::shared_ptr<GUINodeWindow>obj) { return obj->getNode() == aux; });
+    auto window_it = std::find_if(m_NodeWindows.begin(), m_NodeWindows.end(), [&node](std::shared_ptr<GUINodeWindow> window) { return window->getNode() == node; });
 
     if (window_it == m_NodeWindows.end())
-        m_NodeWindows.push_back(std::make_shared<GUINodeWindow>(aux));
+        m_NodeWindows.push_back(std::make_shared<GUINodeWindow>(node));
     else
         m_NodeWindows.erase(window_it);
 }
@@ -169,13 +165,13 @@ bool GUI::isOccupied(double x, double y)
 {
     for (const auto& window : m_NodeWindows)
     {
-        if (window->getPosition().x > x > window->getPosition().x + window->getSize().x && window->getPosition().y > y > window->getPosition().y + window->getSize().y)
+        if (window->getPosition().x > x && x > window->getPosition().x + window->getSize().x && window->getPosition().y > y && y > window->getPosition().y + window->getSize().y)
             return true;
     }
 
     for (const auto& window : m_EngineWindows)
     {
-        if (window->getPosition().x > x > window->getPosition().x + window->getSize().x && window->getPosition().y > y > window->getPosition().y + window->getSize().y)
+        if (window->getPosition().x > x && x > window->getPosition().x + window->getSize().x && window->getPosition().y > y && y > window->getPosition().y + window->getSize().y)
             return true;
     }
 
@@ -221,6 +217,11 @@ GUINodeWindow::~GUINodeWindow()
     //auto aux = std::dynamic_pointer_cast<qtzl::Node3D>(m_Node);
     //if (aux != nullptr)
     //    aux->is_selected = false;
+}
+
+std::shared_ptr<qtzl::Node3D> GUINodeWindow::getNode() const
+{
+    return this->m_Node;
 }
 
 void GUINodeWindow::render()

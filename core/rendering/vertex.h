@@ -6,8 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-enum class VERTEX_VARIABLE{ NONE, POS, TEX, NOR }; // NOTE: do we need this?
-
 // A single vertex in 3D space
 class Vertex
 {

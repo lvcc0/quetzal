@@ -33,8 +33,8 @@ public:
 
     static void setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& shader_program);
 
-    static std::shared_ptr<ShaderProgram> getCurrentShaderProgram() const;
-    static glm::mat4                      getCurrentProjectionMatrix() const;
+    static std::shared_ptr<ShaderProgram> getCurrentShaderProgram();
+    static glm::mat4                      getCurrentProjectionMatrix();
 
     // Draw all the stuff on the scene
     static void render(const std::shared_ptr<Scene>& scene);

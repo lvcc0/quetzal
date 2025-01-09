@@ -14,6 +14,6 @@ namespace qtzl
 		glm::mat4 getModelMatrix() const override;
 
 		// Draw billboard and change it's model matrix
-		void draw(const Shader& shader) override;
+		void draw(const ShaderProgram& shader_program) override;
 	};
 }

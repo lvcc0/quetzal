@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include "scene/resources/mesh.h"
 #include "scene/resources/texture.h"
@@ -19,6 +20,7 @@ class ResourceManager
 {
 public:
     // Delete all constructors
+
     ResourceManager() = delete;
     ResourceManager(const ResourceManager&) = delete;
     ResourceManager(ResourceManager&&) = delete;
@@ -32,28 +34,32 @@ public:
     // Load multiple resources
 
     static void loadMeshes(const std::string& dir_path);
-    static void loadTextures(const std::string& dir_path);
+    static void loadTextures(const std::string& dir_path, const std::string& texture_type);
     static void loadShaders(const std::string& dir_path);
 
     // Return resource
 
-    static std::shared_ptr<qtzl::Mesh>    getMesh(const std::string& name) const;
-    static std::shared_ptr<qtzl::Texture> getTexture(const std::string& name) const;
-    static std::shared_ptr<qtzl::Shader>  getShader(const std::string& name) const;
+    static std::shared_ptr<qtzl::Mesh>    getMesh(const std::string& name);
+    static std::shared_ptr<qtzl::Texture> getTexture(const std::string& name);
+    static std::shared_ptr<qtzl::Shader>  getShader(const std::string& name);
 
     // Return maps
 
-    static std::map<const std::string, std::shared_ptr<qtzl::Mesh>>    getMeshes() const;
-    static std::map<const std::string, std::shared_ptr<qtzl::Texture>> getTextures() const;
-    static std::map<const std::string, std::shared_ptr<qtzl::Shader>>  getShaders() const;
+    static std::map<const std::string, std::shared_ptr<qtzl::Mesh>>    getMeshes();
+    static std::map<const std::string, std::shared_ptr<qtzl::Texture>> getTextures();
+    static std::map<const std::string, std::shared_ptr<qtzl::Shader>>  getShaders();
 
-    // Return binded shader programs, must be used after loading shaders!
+    // Shader program stuff, must be used after loading shaders!
 
-    static std::shared_ptr<ShaderProgram> getShaderProgram(const std::string& name) const;
-    static std::shared_ptr<ShaderProgram> getPPShaderProgram(const std::string& name) const;
+    static std::shared_ptr<ShaderProgram> createShaderProgram(const std::string& vertex_shader_name, const std::string& fragment_shader_name);
 
-    static std::vector<std::shared_ptr<ShaderProgram>> getShaderPrograms() const;
-    static std::vector<std::shared_ptr<ShaderProgram>> getPPShaderPrograms() const;
+    static std::vector<std::shared_ptr<ShaderProgram>> createPPShaderPrograms();
+
+    static std::shared_ptr<ShaderProgram> getShaderProgram(const std::string& name);
+    static std::shared_ptr<ShaderProgram> getPPShaderProgram(const std::string& name);
+
+    static std::vector<std::shared_ptr<ShaderProgram>> getShaderPrograms();
+    static std::vector<std::shared_ptr<ShaderProgram>> getPPShaderPrograms();
 
     // Preload all the resources in the res directory
     static void preLoadResources();
@@ -72,9 +78,15 @@ private:
 
     // Maps of loaded resources
     // NOTE: do we really need maps now when every resource has its name in it?
+    
     inline static std::map<const std::string, std::shared_ptr<qtzl::Mesh>>    m_LoadedMeshes;   // "mesh_name", *Mesh
     inline static std::map<const std::string, std::shared_ptr<qtzl::Texture>> m_LoadedTextures; // "texture_name", *Texture
     inline static std::map<const std::string, std::shared_ptr<qtzl::Shader>>  m_LoadedShaders;  // "shader_name", *Shader
+    
+    // Not exactly resources but oh well
+
+    inline static std::vector<std::shared_ptr<ShaderProgram>> m_ShaderPrograms;   // "vert_shader_name||frag_shader_name", *ShaderProgram
+    inline static std::vector<std::shared_ptr<ShaderProgram>> m_PPShaderPrograms; // "vert_shader_name||frag_shader_name", *ShaderProgram
 
     // Returns file contents as a string
     static std::string getFileString(const std::string& file_path);

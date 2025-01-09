@@ -1,8 +1,7 @@
 #include "scene.h"
 
 Scene::Scene(int viewport_width, int viewport_height)
-    : m_Camera(viewport_width, viewport_height, glm::vec3(0.0f)),
-      m_PostProcessing(ResourceManager::getPPShaders(), viewport_width, viewport_height)
+    : m_Camera(viewport_width, viewport_height), m_PostProcessing(viewport_width, viewport_height)
 {
 }
 

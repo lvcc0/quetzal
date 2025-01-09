@@ -2,7 +2,8 @@
 
 namespace qtzl
 {
-    SpotLight3D::SpotLight3D(
+    SpotLight3D::SpotLight3D
+    (
         const std::string& name,
         glm::vec3 position,
         glm::vec3 direction,
@@ -37,7 +38,7 @@ namespace qtzl
 
     void SpotLight3D::disableBillboard()
     {
-        this->setBillboardEnabled(false)
+        this->setBillboardEnabled(false);
     }
 
     void SpotLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const

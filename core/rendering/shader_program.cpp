@@ -1,6 +1,6 @@
 #include "core/rendering/shader_program.h"
 
-ShaderProgram::ShaderProgram(const std::string&, unsigned int vertex_shader_id, unsigned int fragment_shader_id)
+ShaderProgram::ShaderProgram(const std::string& name, unsigned int vertex_shader_id, unsigned int fragment_shader_id)
     : m_Name(name)
 {
     this->compileErrors(vertex_shader_id, "");

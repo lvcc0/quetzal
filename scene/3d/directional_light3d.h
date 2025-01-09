@@ -8,7 +8,8 @@ namespace qtzl
     class DirectionalLight3D : public Light3D
     {
     public:
-        DirectionalLight3D(
+        DirectionalLight3D
+        (
             const std::string& name,
             glm::vec3 direction = glm::vec3(0.0f, -1.0f, 0.0f),
             glm::vec3 color = glm::vec3(1.0f),

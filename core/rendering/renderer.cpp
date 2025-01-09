@@ -20,12 +20,12 @@ void Renderer::setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& sha
     m_CurrentShaderProgram = shader_program;
 }
 
-std::shared_ptr<ShaderProgram> Renderer::getCurrentShaderProgram() const
+std::shared_ptr<ShaderProgram> Renderer::getCurrentShaderProgram()
 {
     return m_CurrentShaderProgram;
 }
 
-glm::mat4 Renderer::getCurrentProjectionMatrix() const
+glm::mat4 Renderer::getCurrentProjectionMatrix()
 {
     return m_CurrentProjectionMatrix;
 }
