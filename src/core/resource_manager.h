@@ -85,8 +85,8 @@ private:
     
     // Not exactly resources but oh well
 
-    inline static std::vector<std::shared_ptr<ShaderProgram>> m_ShaderPrograms;   // "vert_shader_name||frag_shader_name", *ShaderProgram
-    inline static std::vector<std::shared_ptr<ShaderProgram>> m_PPShaderPrograms; // "vert_shader_name||frag_shader_name", *ShaderProgram
+    inline static std::vector<std::shared_ptr<ShaderProgram>> m_ShaderPrograms;
+    inline static std::vector<std::shared_ptr<ShaderProgram>> m_PPShaderPrograms;
 
     // Returns file contents as a string
     static std::string getFileString(const std::string& file_path);

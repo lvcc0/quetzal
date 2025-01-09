@@ -157,7 +157,7 @@ std::vector<std::shared_ptr<ShaderProgram>> ResourceManager::createPPShaderProgr
         auto iterator = std::find_if(m_PPShaderPrograms.begin(), m_PPShaderPrograms.end(), [name](std::shared_ptr<ShaderProgram> shader_program) { return shader_program->getName() == name; });
 
         if (iterator == m_PPShaderPrograms.end())
-            m_PPShaderPrograms.push_back(std::make_shared<ShaderProgram>(name, m_LoadedShaders.at(vertexShaderName)->getID(), m_LoadedShaders.at(name)->getID()));
+            m_PPShaderPrograms.push_back(std::make_shared<ShaderProgram>(name, m_LoadedShaders.at(vertexShaderName)->getID(), m_LoadedShaders.at(fragmentShaderName)->getID()));
     }
 
     return m_PPShaderPrograms;

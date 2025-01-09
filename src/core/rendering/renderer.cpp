@@ -30,7 +30,7 @@ glm::mat4 Renderer::getCurrentProjectionMatrix()
     return m_CurrentProjectionMatrix;
 }
 
-void Renderer::render(const std::shared_ptr<Scene>& scene)
+void Renderer::render(std::shared_ptr<Scene> scene)
 {
     if (!scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
         scene->m_PostProcessing.deactivate();

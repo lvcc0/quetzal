@@ -37,7 +37,7 @@ public:
     static glm::mat4                      getCurrentProjectionMatrix();
 
     // Draw all the stuff on the scene
-    static void render(const std::shared_ptr<Scene>& scene);
+    static void render(std::shared_ptr<Scene> scene);
 
 private:
     inline static glm::mat4 m_CurrentProjectionMatrix;
