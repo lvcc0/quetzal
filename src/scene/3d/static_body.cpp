@@ -3,11 +3,11 @@
 namespace qtzl
 {
     StaticBody::StaticBody(const std::string& name, Mesh& mesh)
-        : Node3D(name), m_Mesh(mesh)
+        : VisualNode3D(name), m_Mesh(mesh)
     {
     }
 
-    void StaticBody::draw(const ShaderProgram& shader_program)
+    void StaticBody::render(std::shared_ptr<ShaderProgram> shader_program)
     {
         // TODO
     }

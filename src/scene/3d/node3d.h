@@ -7,8 +7,6 @@
 
 #include "scene/main/node.h"
 
-// TODO: make a class for visual 3d stuff?
-
 namespace qtzl
 {
     // Base class for every 3D node

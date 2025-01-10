@@ -12,27 +12,31 @@ std::vector<std::shared_ptr<qtzl::Node>> Scene::getNodes() const
 
 void Scene::update()
 {
-    this->doProcessing();
+    if (m_IsPhysicsProcessing)
+    {
+        //Physics::processPhysics(m_CollisionMap);
+    }
+
+    // Processing nodes' stuff
+    for (const auto& node_sptr : m_Nodes)
+    {
+        // NOTE: is this alright? we'll keep it like this for now ig
+        if (typeid(*node_sptr) == typeid(qtzl::CylindricalBillboard))
+        {
+            std::shared_ptr<qtzl::CylindricalBillboard> casted_sptr = std::dynamic_pointer_cast<qtzl::CylindricalBillboard>(node_sptr);
+            casted_sptr->setTarget(m_Camera.m_Position);
+        }
+        else if (typeid(*node_sptr) == typeid(qtzl::SphericalBillboard))
+        {
+            std::shared_ptr<qtzl::SphericalBillboard> casted_sptr = std::dynamic_pointer_cast<qtzl::SphericalBillboard>(node_sptr);
+            casted_sptr->setTarget(m_Camera.m_Position);
+        }
+    }
 }
 
-void Scene::doPhysicsProcessing()
+void Scene::togglePhysicsProcessing()
 {
-    // TODO: Change this
-    //Physics::processPhysics(m_CollisionMap);
-}
-
-void Scene::doProcessing()
-{
-    // Do smth
-
-    // Turning on physics 
-    if (m_IsPhysics)
-        doPhysicsProcessing();
-}
-
-void Scene::enablePhysics()
-{
-    this->m_IsPhysics = !this->m_IsPhysics;
+    this->m_IsPhysicsProcessing = !this->m_IsPhysicsProcessing;
 }
 
 //qtzl::RigidBody Scene::createRigidBody() TODO
@@ -47,7 +51,7 @@ void Scene::enablePhysics()
 //{
 //}
 
-std::shared_ptr < qtzl::CylindricalBillboard> Scene::createCylindricalBillboard(
+std::shared_ptr<qtzl::CylindricalBillboard> Scene::createCylindricalBillboard(
     const std::string& name,
     const std::string& texture_name,
     glm::vec3 position,
@@ -55,12 +59,14 @@ std::shared_ptr < qtzl::CylindricalBillboard> Scene::createCylindricalBillboard(
 )
 {
     std::shared_ptr<qtzl::CylindricalBillboard> node_sptr = std::make_shared<qtzl::CylindricalBillboard>(name, ResourceManager::getTexture(texture_name));
+    node_sptr->setPosition(position);
+    node_sptr->setScale(glm::vec3(size.x, size.y, 1.0f));
 
     this->m_Nodes.push_back(node_sptr);
     return node_sptr;
 }
 
-std::shared_ptr < qtzl::SphericalBillboard> Scene::createSphericalBillboard(
+std::shared_ptr<qtzl::SphericalBillboard> Scene::createSphericalBillboard(
     const std::string& name,
     const std::string& texture_name,
     glm::vec3 position,
@@ -68,6 +74,8 @@ std::shared_ptr < qtzl::SphericalBillboard> Scene::createSphericalBillboard(
 )
 {
     std::shared_ptr<qtzl::SphericalBillboard> node_sptr = std::make_shared<qtzl::SphericalBillboard>(name, ResourceManager::getTexture(texture_name));
+    node_sptr->setPosition(position);
+    node_sptr->setScale(glm::vec3(size.x, size.y, 1.0f));
 
     this->m_Nodes.push_back(node_sptr);
     return node_sptr;

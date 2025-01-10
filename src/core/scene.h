@@ -38,22 +38,16 @@ public:
     Camera m_Camera;
     PostProcessing m_PostProcessing;
 
+    // TODO: move these to private
     bool m_IsPostProcessing = false;
-    bool m_IsPhysics = true;
+    bool m_IsPhysicsProcessing = true;
 
     std::vector<std::shared_ptr<qtzl::Node>> getNodes() const;
 
     // Gets called every frame in the engine class
     void update();
 
-    // Do physics
-    void doPhysicsProcessing();
-
-    // Do processing
-    void doProcessing();
-
-    // Enable physics
-    void enablePhysics();
+    void togglePhysicsProcessing();
 
     std::shared_ptr<qtzl::RigidBody> createRigidBody();
     std::shared_ptr<qtzl::StaticBody> createStaticBody();

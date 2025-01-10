@@ -14,8 +14,6 @@ namespace qtzl
         VisualNode3D(const std::string& name);
         virtual ~VisualNode3D() = default;
 
-        virtual void draw(const ShaderProgram& shader_program) = 0;
-
     protected:
         std::unique_ptr<VAO> m_VAO_uptr = nullptr;
         std::unique_ptr<VBO> m_VBO_uptr = nullptr;

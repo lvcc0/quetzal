@@ -180,14 +180,12 @@ void Engine::mouseButtonCallback(GLFWwindow* window, int button, int action, int
 
 void Engine::process()
 {
-    // GUI //
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
         GUI::render(currentScene, scenes.at(currentScene), this->deltaTime);
-    // --- //
 
     float curFrame = (float)glfwGetTime();
     this->deltaTime = curFrame - lastFrame;
@@ -206,10 +204,8 @@ void Engine::process()
         Renderer::render(this->scenes.at(this->currentScene));
     }
     
-    // GUI // 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    // --- //
 
     glfwSwapBuffers(this->window);
     glfwPollEvents();

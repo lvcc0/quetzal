@@ -7,7 +7,7 @@ namespace qtzl
 	{
 	}
 
-	void SphericalBillboard::draw(const ShaderProgram& shader_program)
+	void SphericalBillboard::render(std::shared_ptr<ShaderProgram> shader_program)
 	{
         glm::vec3 vectorToTarget = glm::normalize(this->m_Target - this->m_Position); // vector to the target
         glm::vec3 projToTarget = glm::normalize(glm::vec3(this->m_Target.x - this->m_Position.x, 0.0f, this->m_Target.z - this->m_Position.z)); // projection of vector to target in the XZ plane
@@ -31,16 +31,16 @@ namespace qtzl
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_HorizontalAngle, this->m_Right);
         this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(this->m_Scale.x, this->m_Scale.y, 1.0f));
 
-        shader_program.activateProgram();
+        shader_program->activateProgram();
 
-        shader_program.setInt("material.texture_diffuse1", 0);
+        shader_program->setInt("material.texture_diffuse1", 0);
 
         glBindTexture(GL_TEXTURE_2D, this->m_Texture->getID());
         glActiveTexture(GL_TEXTURE0);
 
         // Convert local coordinates to world coordinates
-        shader_program.setMat4("model", this->m_ModelMatrix);
-        shader_program.setMat4("inversed", glm::inverse(this->m_ModelMatrix));
+        shader_program->setMat4("model", this->m_ModelMatrix);
+        shader_program->setMat4("inversed", glm::inverse(this->m_ModelMatrix));
 
         this->m_ModelMatrix = glm::mat4(1.0f);
 

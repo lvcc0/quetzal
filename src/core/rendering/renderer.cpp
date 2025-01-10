@@ -32,7 +32,7 @@ glm::mat4 Renderer::getCurrentProjectionMatrix()
 
 void Renderer::render(std::shared_ptr<Scene> scene)
 {
-    if (!scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
+    if (scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
         scene->m_PostProcessing.deactivate();
 
     m_CurrentProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)scene->m_Camera.m_Width / (float)scene->m_Camera.m_Height, 0.1f, 100.0f);
@@ -70,11 +70,13 @@ void Renderer::render(std::shared_ptr<Scene> scene)
     //    }
     //}
 
+    // Rendering renderable nodes
     for (const auto& node : scene->getNodes())
     {
-        // TODO: draw nodes
+        if (node->isRenderable())
+            node->render(m_CurrentShaderProgram);
     }
 
-    if (!scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
+    if (scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
         scene->m_PostProcessing.activate();
 }

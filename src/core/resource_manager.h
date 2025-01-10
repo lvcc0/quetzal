@@ -19,8 +19,6 @@
 class ResourceManager
 {
 public:
-    // Delete all constructors
-
     ResourceManager() = delete;
     ResourceManager(const ResourceManager&) = delete;
     ResourceManager(ResourceManager&&) = delete;

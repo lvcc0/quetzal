@@ -5,5 +5,6 @@ namespace qtzl
     VisualNode3D::VisualNode3D(const std::string& name)
         : Node3D(name)
     {
+        this->m_Renderable = true;
     }
 }

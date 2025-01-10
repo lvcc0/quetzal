@@ -26,16 +26,16 @@ namespace qtzl
 		glm::vec3 getTarget() const;
 		glm::mat4 getModelMatrix() const;
 
-		void draw(const ShaderProgram& shader_program) override;
+		void render(std::shared_ptr<ShaderProgram> shader_program) override;
 
 	protected:
 		glm::mat4 m_ModelMatrix = glm::mat4(0.0f);
 
 		std::shared_ptr<Texture> m_Texture;
-		glm::vec3 m_Target = glm::vec3(0.0f);
+		glm::vec3 m_Target = glm::vec3(0.0f, 0.0f, 1.0f);
 
-		glm::vec3 m_Up = glm::vec3(0.0f);
-		glm::vec3 m_Right = glm::vec3(0.0f);
+		glm::vec3 m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 m_Right = glm::vec3(1.0f, 0.0f, 0.0f);
 
 		float m_HorizontalAngle = 0.0f; // in radians!
 		float m_VerticalAngle = 0.0f; // in radians!
