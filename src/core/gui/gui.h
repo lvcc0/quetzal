@@ -1,16 +1,14 @@
 #pragma once
 
+// std
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <map>
 #include <vector>
 #include <algorithm>
-#include <typeinfo>
-#include <concepts>
-#include <type_traits>
 
+// thirdparty
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"

@@ -38,16 +38,19 @@ public:
     Camera m_Camera;
     PostProcessing m_PostProcessing;
 
-    // TODO: move these to private
     bool m_IsPostProcessing = false;
     bool m_IsPhysicsProcessing = true;
+
+    std::vector<std::shared_ptr<qtzl::DirectionalLight3D>> getDirectionalLights() const;
+    std::vector<std::shared_ptr<qtzl::PointLight3D>> getPointLights() const;
+    std::vector<std::shared_ptr<qtzl::SpotLight3D>> getSpotLights() const;
 
     std::vector<std::shared_ptr<qtzl::Node>> getNodes() const;
 
     // Gets called every frame in the engine class
     void update();
 
-    void togglePhysicsProcessing();
+    // Node creating
 
     std::shared_ptr<qtzl::RigidBody> createRigidBody();
     std::shared_ptr<qtzl::StaticBody> createStaticBody();
@@ -67,10 +70,46 @@ public:
         glm::vec2 size = glm::vec2(1.0f)
     );
 
-    std::shared_ptr<qtzl::DirectionalLight3D> createDirectionalLight();
-    std::shared_ptr<qtzl::PointLight3D> createPointLight();
-    std::shared_ptr<qtzl::SpotLight3D> createSpotLight();
+    std::shared_ptr<qtzl::DirectionalLight3D> createDirectionalLight(
+        const std::string& name,
+        glm::vec3 direction = glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3 color = glm::vec3(1.0f),
+        glm::vec3 ambient = glm::vec3(0.5f),
+        glm::vec3 diffuse = glm::vec3(0.5f),
+        glm::vec3 specular = glm::vec3(0.5f)
+    );
+
+    std::shared_ptr<qtzl::PointLight3D> createPointLight(
+        const std::string& name,
+        glm::vec3 position = glm::vec3(0.0f),
+        glm::vec3 color = glm::vec3(1.0f),
+        glm::vec3 ambient = glm::vec3(0.5f),
+        glm::vec3 diffuse = glm::vec3(0.5f),
+        glm::vec3 specular = glm::vec3(0.5f),
+        float constant = 1.0f,
+        float linear = 0.09f,
+        float quadratic = 0.032f
+    );
+
+    std::shared_ptr<qtzl::SpotLight3D> createSpotLight(
+        const std::string& name,
+        glm::vec3 position = glm::vec3(0.0f),
+        glm::vec3 direction = glm::vec3(0.0f),
+        glm::vec3 color = glm::vec3(1.0f),
+        glm::vec3 ambient = glm::vec3(0.5f),
+        glm::vec3 diffuse = glm::vec3(0.5f),
+        glm::vec3 specular = glm::vec3(0.5f),
+        float constant = 1.0f,
+        float linear = 0.09f,
+        float quadratic = 0.032f,
+        float inner_cutoff = 7.5f,
+        float outer_cutoff = 10.0f
+    );
 
 private:
+    std::vector<std::shared_ptr<qtzl::DirectionalLight3D>> m_DirectionalLights;
+    std::vector<std::shared_ptr<qtzl::PointLight3D>> m_PointLights;
+    std::vector<std::shared_ptr<qtzl::SpotLight3D>> m_SpotLights;
+
     std::vector<std::shared_ptr<qtzl::Node>> m_Nodes;
 };

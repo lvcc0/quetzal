@@ -60,4 +60,8 @@ namespace qtzl
 
         shader_program->setVec3(name + ".color", m_Enabled ? m_Color : glm::vec3(0.0f));
     }
+
+    void SpotLight3D::render(std::shared_ptr<ShaderProgram> shader_program)
+    {
+    }
 }

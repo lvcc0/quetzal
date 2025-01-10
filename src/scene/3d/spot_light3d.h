@@ -31,6 +31,8 @@ namespace qtzl
 
         void updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const override;
 
+        void render(std::shared_ptr<ShaderProgram> shader_program) override;
+
     private:
         bool m_BillboardEnabled = true;
 

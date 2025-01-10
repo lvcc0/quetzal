@@ -1,4 +1,4 @@
-#include "gui.h"
+#include "core/gui/gui.h"
 
 void GUI::init(GLFWwindow* window)
 {

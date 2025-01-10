@@ -1,4 +1,4 @@
-#include "vertex_array.h"
+#include "core/rendering/vertex_array.h"
 
 VAO::VAO()
 {

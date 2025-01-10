@@ -16,6 +16,8 @@ namespace qtzl
 
     void DirectionalLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const
     {
+        //std::cout << "ARRRRGH" << std::endl;
+
         std::string name = "dirLights[" + std::to_string(index) + "]";
 
         shader_program->setVec3(name + ".direction", m_Direction);
@@ -25,5 +27,9 @@ namespace qtzl
         shader_program->setVec3(name + ".specular", m_Specular);
 
         shader_program->setVec3(name + ".color", m_Enabled ? m_Color : glm::vec3(0.0f));
+    }
+
+    void DirectionalLight3D::render(std::shared_ptr<ShaderProgram> shader_program)
+    {
     }
 }

@@ -16,44 +16,9 @@ int main()
     first_scene->createCylindricalBillboard("pepeboard", "pepe.png");
     first_scene->createSphericalBillboard("containerboard", "container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));
 
-    //first_scene->addDirLight(DirLight(
-    //    true,
-    //    "dirLight0",
-    //    glm::vec3(-0.2f, -1.0f, -0.3f),
-    //    glm::vec3(0.5f, 0.5f, 0.5f),
-    //    glm::vec3(0.4f, 0.4f, 0.4f),
-    //    glm::vec3(0.5f, 0.5f, 0.5f),
-    //    glm::vec3(0.5f, 1.0f, 1.0f)
-    //));
-
-    //first_scene->addPointLight(PointLight(
-    //    true,
-    //    "pointLight0",
-    //    glm::vec3(0.7f, 0.2f, 2.0f),
-    //    glm::vec3(0.05f, 0.05f, 0.05f),
-    //    glm::vec3(0.8f, 0.8f, 0.8f),
-    //    glm::vec3(1.0f, 1.0f, 1.0f),
-    //    1.0f,
-    //    0.09f,
-    //    0.032f,
-    //    glm::vec3(1.0f, 0.0f, 0.0f)
-    //), billboard_verts);
-
-    //first_scene->addSpotLight(SpotLight(
-    //    true,
-    //    "spotLight0",
-    //    glm::vec3(5.0f, 0.0f, -3.5f),
-    //    glm::vec3(-1.0f, 0.0f, 0.0f),
-    //    glm::vec3(0.05f, 0.05f, 0.05f),
-    //    glm::vec3(0.8f, 0.8f, 0.8f),
-    //    glm::vec3(1.0f, 1.0f, 1.0f),
-    //    1.0f,
-    //    0.09f,
-    //    0.032f,
-    //    7.5f,
-    //    10.0f,
-    //    glm::vec3(0.0f, 0.0f, 1.0f)
-    //), billboard_verts);
+    first_scene->createDirectionalLight("dir_light0");
+    first_scene->createPointLight("point_light0");
+    first_scene->createSpotLight("spot_light0");
 
     // Main loop
     while (engine.isRunning())
