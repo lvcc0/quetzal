@@ -72,7 +72,7 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
         {
             auto it = std::find(enabledShaders.begin(), enabledShaders.end(), name);
 
-            if (ImGui::Selectable(name.c_str(), it != enabledShaders.end()))
+            if (ImGui::Selectable(name.substr(name.find("||") + 2).c_str(), it != enabledShaders.end()))
             {
                 scene->m_PostProcessing.setPPShaderEnabled(name, it == enabledShaders.end());
                 glEnable(GL_DEPTH_TEST); // postprocessing disables depth test after as it's final step, so we need to turn it back on
@@ -96,11 +96,21 @@ void GUI::showNodeManager(std::shared_ptr<Scene> scene)
 {
     ImGui::Begin("Node manager", 0);
 
+    ImGui::Checkbox("Show Class Names", &m_NodeMgrShowClassNames);
+
     ImGui::SeparatorText("Current Nodes");
 
     for (const auto& node_sptr : scene->getNodes())
     {
-        ImGui::Text(node_sptr->getName().c_str());
+        std::string name = node_sptr->getName();
+
+        if (m_NodeMgrShowClassNames)
+        {
+            std::string className = typeid(*node_sptr).name();
+            name = className.substr(className.find_last_of("::") + 1) + " :: " + name;
+        }
+
+        ImGui::Text(name.c_str());
     }
 
     ImGui::Separator();
@@ -133,18 +143,6 @@ void GUI::showResourceManager()
     ImGui::End();
 }
 
-// Making window using node
-//void GUI::onClick(const std::shared_ptr<qtzl::Node> obj)
-//{
-//    // Selecting and deselecting
-//    auto window_it = std::find_if(m_NodeWindows.begin(), m_NodeWindows.end(), [&obj](std::shared_ptr<GUINodeWindow> obj) { return obj->getNode() == obj; });
-//    
-//    if (window_it == m_NodeWindows.end())
-//        m_NodeWindows.push_back(std::make_shared<GUINodeWindow>(obj));
-//    else
-//        m_NodeWindows.erase(window_it);
-//}
-
 // Making window using node3D
 void GUI::onClick(const std::shared_ptr<qtzl::Node3D> node)
 {
@@ -159,17 +157,20 @@ void GUI::onClick(const std::shared_ptr<qtzl::Node3D> node)
 
 bool GUI::isOccupied(double x, double y)
 {
-    //for (const auto& window : m_NodeWindows)
-    //{
-    //    if (window->getPosition().x > x && x > window->getPosition().x + window->getSize().x && window->getPosition().y > y && y > window->getPosition().y + window->getSize().y)
-    //        return true;
-    //}
+    for (const auto& window : m_NodeWindows)
+    {
+        if (window->getPosition().x > x && x > window->getPosition().x + window->getSize().x && window->getPosition().y > y && y > window->getPosition().y + window->getSize().y)
+            return true;
+    }
 
-    //for (const auto& window : m_EngineWindows)
-    //{
-    //    if (window->getPosition().x > x && x > window->getPosition().x + window->getSize().x && window->getPosition().y > y && y > window->getPosition().y + window->getSize().y)
-    //        return true;
-    //}
+    for (const auto& window : m_EngineWindows)
+    {
+        if (!window->isVisible())
+            continue;
+
+        if (window->getPosition().x > x && x > window->getPosition().x + window->getSize().x && window->getPosition().y > y && y > window->getPosition().y + window->getSize().y)
+            return true;
+    }
 
     return false;
 }

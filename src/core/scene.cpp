@@ -120,9 +120,16 @@ std::shared_ptr<qtzl::PointLight3D> Scene::createPointLight(
 )
 {
     std::shared_ptr<qtzl::PointLight3D> node_sptr = std::make_shared<qtzl::PointLight3D>(name, position, color, ambient, diffuse, specular, constant, linear, quadratic);
+    std::shared_ptr<qtzl::SphericalBillboard> billboard_sptr = std::make_shared<qtzl::SphericalBillboard>(name + "_bb", ResourceManager::getTexture("lightbulb.png"));
+
+    billboard_sptr->setPosition(position);
+    billboard_sptr->setScale(glm::vec3(0.5f, 0.5f, 1.0f));
+    node_sptr->addChild(billboard_sptr);
 
     this->m_PointLights.push_back(node_sptr);
     this->m_Nodes.push_back(node_sptr);
+    this->m_Nodes.push_back(billboard_sptr);
+    
     return node_sptr;
 }
 
@@ -142,8 +149,15 @@ std::shared_ptr<qtzl::SpotLight3D> Scene::createSpotLight(
 )
 {
     std::shared_ptr<qtzl::SpotLight3D> node_sptr = std::make_shared<qtzl::SpotLight3D>(name, position, direction, color, ambient, diffuse, specular, constant, linear, quadratic, inner_cutoff, outer_cutoff);
+    std::shared_ptr<qtzl::SphericalBillboard> billboard_sptr = std::make_shared<qtzl::SphericalBillboard>(name + "_bb", ResourceManager::getTexture("highlight.png"));
+
+    billboard_sptr->setPosition(position);
+    billboard_sptr->setScale(glm::vec3(0.5f, 0.5f, 1.0f));
+    node_sptr->addChild(billboard_sptr);
 
     this->m_SpotLights.push_back(node_sptr);
     this->m_Nodes.push_back(node_sptr);
+    this->m_Nodes.push_back(billboard_sptr);
+
     return node_sptr;
 }

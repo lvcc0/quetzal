@@ -44,6 +44,8 @@ public:
     inline static std::vector<std::shared_ptr<qtzl::NodeWindow>> getNodeWindows();
 
 private:
+    inline static bool m_NodeMgrShowClassNames = false;
+
     inline static std::vector<std::shared_ptr<qtzl::NodeWindow>> m_NodeWindows;
     inline static std::vector<std::shared_ptr<qtzl::EngineWindow>> m_EngineWindows;
 };

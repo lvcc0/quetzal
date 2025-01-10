@@ -165,6 +165,10 @@ void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 // Gets called upon key press
 void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+    if (key == GLFW_KEY_P && action == GLFW_PRESS) // debugging purposes
+        for (const auto& node : this->scenes.at(this->currentScene)->getNodes())
+            std::cout << node->getName() << ": " << node->getParent() << std::endl;
+
     if (key == GLFW_KEY_M && action == GLFW_PRESS)
         this->shouldDrawGui = !this->shouldDrawGui;
 

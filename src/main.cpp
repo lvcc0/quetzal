@@ -17,8 +17,8 @@ int main()
     first_scene->createSphericalBillboard("containerboard", "container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));
 
     first_scene->createDirectionalLight("dir_light0");
-    first_scene->createPointLight("point_light0");
-    first_scene->createSpotLight("spot_light0");
+    first_scene->createPointLight("point_light0", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+    first_scene->createSpotLight("spot_light0", glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.5f, 1.0f));
 
     // Main loop
     while (engine.isRunning())
