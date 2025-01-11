@@ -23,10 +23,13 @@ Engine& Engine::instance(unsigned int width, unsigned int height)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    glfwSwapInterval(true); // turn VSync on by default :)
+
     engine.createWindow();
 
     gladLoadGL();
     stbi_set_flip_vertically_on_load(true);
+    
     GUI::init(engine.window);
 
     // Depth testing

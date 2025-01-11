@@ -2,10 +2,7 @@
 
 int main()
 {
-    const unsigned int WIN_WIDTH = 1280;
-    const unsigned int WIN_HEIGHT = 720;
-    
-    Engine& engine = Engine::instance(WIN_WIDTH, WIN_HEIGHT);
+    Engine& engine = Engine::instance(1280, 720);
     ResourceManager::preLoadResources();
 
     auto first_scene = engine.createScene("first_scene");
@@ -13,8 +10,10 @@ int main()
     std::shared_ptr<ShaderProgram> default_shader = ResourceManager::createShaderProgram("default.vert", "default.frag");
     Renderer::setCurrentShaderProgram(default_shader);
 
-    first_scene->createCylindricalBillboard("pepeboard", "pepe.png");
+    first_scene->createCylindricalBillboard("pepeboard", "pepe.png", glm::vec3(-4.0f, 2.0f, 0.0f));
     first_scene->createSphericalBillboard("containerboard", "container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));
+
+    first_scene->createStaticBody("catcube", "catcube.obj");
 
     first_scene->createDirectionalLight("dir_light0");
     first_scene->createPointLight("point_light0", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));

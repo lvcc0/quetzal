@@ -47,7 +47,6 @@ void Renderer::render(std::shared_ptr<Scene> scene)
         for (unsigned int i = 0; i < scene->getPointLights().size(); i++)
         {
             scene->getPointLights()[i]->updateUniforms(m_CurrentShaderProgram, i);
-            // TODO: draw the billboard
         }
     }
     if (!scene->getSpotLights().empty())
@@ -55,7 +54,6 @@ void Renderer::render(std::shared_ptr<Scene> scene)
         for (unsigned int i = 0; i < scene->getSpotLights().size(); i++)
         {
             scene->getSpotLights()[i]->updateUniforms(m_CurrentShaderProgram, i);
-            // TODO: draw the billboard
         }
     }
 

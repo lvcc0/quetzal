@@ -16,20 +16,26 @@ namespace qtzl
         Node3D(const std::string& name);
         virtual ~Node3D() = default;
 
-        void setPosition(const glm::vec3& position);
-        void setRotationDegrees(const glm::vec3& degrees);
         void setScale(const glm::vec3& scale);
+
+        void setPosition(const glm::vec3& position);
+        void setRotation(const glm::vec3& radians);
+        void setRotationDegrees(const glm::vec3& degrees);
         
         void setGlobalPosition(const glm::vec3& position);
+        void setGlobalRotation(const glm::vec3& radians);
         void setGlobalRotationDegrees(const glm::vec3& degrees);
         
         void setVisible(bool visible);
 
-        glm::vec3 getPosition() const;
-        glm::vec3 getRotationDegrees() const;
         glm::vec3 getScale() const;
+
+        glm::vec3 getPosition() const;
+        glm::vec3 getRotation() const;
+        glm::vec3 getRotationDegrees() const;
         
         glm::vec3 getGlobalPosition() const;
+        glm::vec3 getGlobalRotation() const;
         glm::vec3 getGlobalRotationDegrees() const;
 
         bool isVisible() const;
@@ -40,12 +46,12 @@ namespace qtzl
     protected:
         bool m_Visible = true;
 
+        glm::vec3 m_Scale = glm::vec3(1.0f);
+
         glm::vec3 m_Position = glm::vec3(0.0f);
         glm::vec3 m_GlobalPosition = glm::vec3(0.0f);
 
-        glm::vec3 m_RotationDegrees = glm::vec3(0.0f);
-        glm::vec3 m_GlobalRotationDegrees = glm::vec3(0.0f);
-
-        glm::vec3 m_Scale = glm::vec3(1.0f);
+        glm::vec3 m_Rotation = glm::vec3(0.0f);       // in radians
+        glm::vec3 m_GlobalRotation = glm::vec3(0.0f); // in radians
     };
 }

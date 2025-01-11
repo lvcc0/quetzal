@@ -53,7 +53,7 @@ private:
     inline static int m_EngineFramebufferWidth;
     inline static int m_EngineFramebufferHeight;
 
-    inline static std::string m_EngineCurrentNodeName;
+    inline static std::shared_ptr<qtzl::Node> m_EngineCurrentNode_sptr;
 
     inline static bool m_NodeMgrShowClassNames = false;
 

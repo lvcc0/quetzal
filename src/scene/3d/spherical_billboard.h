@@ -11,7 +11,6 @@ namespace qtzl
 		SphericalBillboard(const std::string& name, std::shared_ptr<Texture> texture);
 		virtual ~SphericalBillboard() = default;
 
-		// Draw billboard and change it's model matrix
 		void render(std::shared_ptr<ShaderProgram> shader_program) override;
 	};
 }

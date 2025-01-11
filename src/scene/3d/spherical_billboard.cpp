@@ -9,24 +9,25 @@ namespace qtzl
 
 	void SphericalBillboard::render(std::shared_ptr<ShaderProgram> shader_program)
 	{
-        glm::vec3 vectorToTarget = glm::normalize(this->m_Target - this->m_Position); // vector to the target
-        glm::vec3 projToTarget = glm::normalize(glm::vec3(this->m_Target.x - this->m_Position.x, 0.0f, this->m_Target.z - this->m_Position.z)); // projection of vector to target in the XZ plane
+        glm::vec3 vectorToTarget = glm::normalize(this->m_Target - this->m_GlobalPosition); // vector to the target
 
-        this->m_Up = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), projToTarget); // flips the up vector if going the second half of the loop
-        this->m_Right = glm::vec3(1.0f, 0.0f, 0.0f);
+        // Projection of vector to target in different planes
+        glm::vec3 targetYZ = glm::normalize(glm::vec3(0.0f, this->m_Target.y - this->m_GlobalPosition.y, this->m_Target.z - this->m_GlobalPosition.z)); // for X axis
+        glm::vec3 targetXZ = glm::normalize(glm::vec3(this->m_Target.x - this->m_GlobalPosition.x, 0.0f, this->m_Target.z - this->m_GlobalPosition.z)); // for Y axis
+        glm::vec3 targetXY = glm::normalize(glm::vec3(this->m_Target.x - this->m_GlobalPosition.x, this->m_Target.y - this->m_GlobalPosition.y, 0.0f)); // for Z axis
 
-        if (vectorToTarget.y < 0)
-            this->m_Right = -this->m_Right; // flip the right vector if target is under the billboard
+        this->m_Up = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), targetXZ); // flips the up vector if going the second half of the loop, so it's either {0.0f, 1.0f, 0.0f} or {0.0f, -1.0f, 0.0f}
+        this->m_Right = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), targetYZ); // flips the right vector if target is under the billboard, so it's either {1.0f, 0.0f, 0.0f} or {-1.0f, 0.0f, 0.0f}
 
-        this->m_VerticalAngle = glm::acos(glm::dot(projToTarget, glm::vec3(0.0f, 0.0f, -1.0f)));
-        this->m_HorizontalAngle = glm::acos(glm::dot(projToTarget, vectorToTarget));
+        this->m_VerticalAngle = glm::acos(glm::dot(targetXZ, glm::vec3(0.0f, 0.0f, -1.0f)));
+        this->m_HorizontalAngle = glm::acos(glm::dot(targetXZ, vectorToTarget));
 
         if (this->m_VerticalAngle < 0.01 || this->m_VerticalAngle > 3.14)
             this->m_Up = glm::vec3(0.0f, 1.0f, 0.0f); // stability reasons
         if (!(this->m_HorizontalAngle > 0 || this->m_HorizontalAngle < 3.15))
             this->m_HorizontalAngle = 0.0; // stability reasons
 
-        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_Position);
+        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_GlobalPosition);
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_VerticalAngle, this->m_Up);
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_HorizontalAngle, this->m_Right);
         this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(this->m_Scale.x, this->m_Scale.y, 1.0f));

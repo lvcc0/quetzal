@@ -2,6 +2,7 @@
 
 // std
 #include <vector>
+#include <filesystem>
 
 // thirdparty
 #include <glad/glad.h>
@@ -25,9 +26,11 @@ namespace qtzl
         Mesh(const std::string& name, const std::string& path);
         virtual ~Mesh() = default;
 
-    private:
-        unsigned int VAO, VBO, EBO;
+        std::vector<Vertex> getVertices() const;
+        std::vector<unsigned int> getIndices() const;
+        std::vector<Texture> getTextures() const;
 
+    private:
         std::vector<Vertex> m_Vertices;
         std::vector<unsigned int> m_Indices;
         std::vector<Texture> m_Textures;

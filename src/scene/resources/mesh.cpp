@@ -5,8 +5,6 @@ namespace qtzl
     Mesh::Mesh(const std::string& name, const std::string& path)
         : Resource(name, path)
     {
-        // Setup mesh data
-
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
@@ -16,7 +14,7 @@ namespace qtzl
             return;
         }
 
-        aiMesh* mesh = scene->mMeshes[scene->mRootNode->mMeshes[0]];
+        aiMesh* mesh = scene->mMeshes[0];
 
         // reserve some space for all the data
         this->m_Vertices.reserve(mesh->mNumVertices);
@@ -74,32 +72,21 @@ namespace qtzl
 
         this->m_Textures.insert(this->m_Textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         this->m_Textures.insert(this->m_Textures.end(), specularMaps.begin(), specularMaps.end());
+    }
 
-        // Setup buffers
+    std::vector<Vertex> Mesh::getVertices() const
+    {
+        return this->m_Vertices;
+    }
 
-        glGenVertexArrays(1, &this->VAO);
-        glGenBuffers(1, &this->VBO);
-        glGenBuffers(1, &this->EBO);
+    std::vector<unsigned int> Mesh::getIndices() const
+    {
+        return this->m_Indices;
+    }
 
-        glBindVertexArray(this->VAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-        glBufferData(GL_ARRAY_BUFFER, this->m_Vertices.size() * sizeof(Vertex), &this->m_Vertices[0], GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->m_Indices.size() * sizeof(unsigned int), &this->m_Indices[0], GL_STATIC_DRAW);
-
-        // positions
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-        // normals
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-        // texture coords
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
-
-        glBindVertexArray(0);
+    std::vector<Texture> Mesh::getTextures() const
+    {
+        return this->m_Textures;
     }
 
     std::vector<Texture> Mesh::loadTextures(aiMaterial* material, aiTextureType type, std::string type_name)
@@ -125,7 +112,7 @@ namespace qtzl
 
             if (!skip)
             {
-                Texture texture = Texture(path.C_Str(), path.C_Str(), type_name); // TODO: change texture name here
+                Texture texture = Texture(path.C_Str(), std::filesystem::path(m_Path).parent_path().string() + "/" + path.C_Str(), type_name); // TODO: change texture name here
 
                 textures.push_back(texture);
                 this->m_Textures.push_back(texture);

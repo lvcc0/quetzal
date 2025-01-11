@@ -56,8 +56,11 @@ void ResourceManager::loadMeshes(const std::string& dir_path)
 {
     for (const auto& entry : std::filesystem::directory_iterator(dir_path))
     {
-        if (entry.path().extension().string() == MESH_MAIN_FILE_EXTENSION)
-            loadMesh(entry.path().string());
+        for (const auto& file : std::filesystem::directory_iterator(entry.path()))
+        {
+            if (file.path().extension().string() == MESH_MAIN_FILE_EXTENSION)
+                loadMesh(file.path().string());
+        }
     }
 }
 

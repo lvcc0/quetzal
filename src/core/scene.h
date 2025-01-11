@@ -52,8 +52,16 @@ public:
 
     // Node creating
 
+    std::shared_ptr<qtzl::StaticBody> createStaticBody(
+        const std::string& name,
+        const std::string& mesh_name,
+        glm::vec3 position = glm::vec3(0.0f),
+        glm::vec3 rotation = glm::vec3(0.0f),
+        glm::vec3 scale = glm::vec3(1.0f)
+    );
+
     std::shared_ptr<qtzl::RigidBody> createRigidBody();
-    std::shared_ptr<qtzl::StaticBody> createStaticBody();
+    
     std::shared_ptr<qtzl::Billboard> createBillboard();
 
     std::shared_ptr<qtzl::CylindricalBillboard> createCylindricalBillboard(

@@ -131,9 +131,9 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
                 displayName = className.substr(className.find_last_of("::") + 1) + " :: " + displayName;
             }
 
-            if (ImGui::Selectable(displayName.c_str(), m_EngineCurrentNodeName == node_sptr->getName()))
+            if (ImGui::Selectable(displayName.c_str(), m_EngineCurrentNode_sptr == node_sptr))
             {
-                m_EngineCurrentNodeName = node_sptr->getName();
+                m_EngineCurrentNode_sptr = node_sptr;
                 ImGui::SetItemDefaultFocus();
             }
         }
@@ -141,9 +141,9 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
     }
 
     // Selected node config
-    if (!m_EngineCurrentNodeName.empty())
+    if (m_EngineCurrentNode_sptr != nullptr)
     {
-        ImGui::SeparatorText(m_EngineCurrentNodeName.c_str());
+        ImGui::SeparatorText(m_EngineCurrentNode_sptr->getName().c_str());
 
         // TODO: do smth like "std::map<std::string, std::any/std::optional> Node::getData()" to configure here
     }

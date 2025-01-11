@@ -13,12 +13,14 @@ namespace qtzl
     class StaticBody : public VisualNode3D
     {
     public:
-        StaticBody(const std::string& name, Mesh& mesh);
+        StaticBody(const std::string& name, std::shared_ptr<Mesh> mesh_sptr);
         virtual ~StaticBody() = default;
 
         void render(std::shared_ptr<ShaderProgram> shader_program) override;
 
     private:
-        Mesh m_Mesh;
+        std::shared_ptr<Mesh> m_Mesh_sptr;
+
+        void setupRender() override;
     };
 }

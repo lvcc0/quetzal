@@ -29,8 +29,6 @@ namespace qtzl
 		void render(std::shared_ptr<ShaderProgram> shader_program) override;
 
 	protected:
-		glm::mat4 m_ModelMatrix = glm::mat4(0.0f);
-
 		std::shared_ptr<Texture> m_Texture;
 		glm::vec3 m_Target = glm::vec3(0.0f, 0.0f, 1.0f);
 

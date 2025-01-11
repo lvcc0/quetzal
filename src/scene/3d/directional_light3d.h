@@ -19,7 +19,7 @@ namespace qtzl
         virtual ~DirectionalLight3D() = default;
 
         void updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const override;
-        
+
         void render(std::shared_ptr<ShaderProgram> shader_program) override;
 
     private:
