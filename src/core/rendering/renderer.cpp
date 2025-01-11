@@ -17,6 +17,10 @@ glm::mat4 Renderer::getCurrentProjectionMatrix()
 
 void Renderer::render(std::shared_ptr<Scene> scene)
 {
+    glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // setting bg color
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clearing stuff in the default framebuffer
+    glStencilMask(0x00); // turn off writing to the stencil buffer
+
     if (scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
         scene->m_PostProcessing.deactivate();
 

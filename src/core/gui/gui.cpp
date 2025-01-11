@@ -9,6 +9,8 @@ void GUI::init(GLFWwindow* window)
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init();
+    
+    glfwGetFramebufferSize(window, &m_EngineFramebufferWidth, &m_EngineFramebufferHeight);
 
     m_EngineWindows.push_back(std::make_shared<qtzl::EngineWindow>(qtzl::EngineWindowType::SceneCfg));
     m_EngineWindows.push_back(std::make_shared<qtzl::EngineWindow>(qtzl::EngineWindowType::NodeMgr));
@@ -38,7 +40,7 @@ void GUI::render(const std::string& scene_name, std::shared_ptr<Scene> scene, GL
             showSceneConfig(scene_name, scene, delta_time);
             break;
         case qtzl::EngineWindowType::NodeMgr:
-            showNodeManager(scene);
+            showNodeManager(scene_name, scene);
             break;
         case qtzl::EngineWindowType::ResourceMgr:
             showResourceManager();
@@ -83,39 +85,68 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
         ImGui::Separator();
     }
 
+    // TODO: tools to create nodes on the fly
+
     ImGui::SeparatorText("Engine");
+
+    // VSync
+    ImGui::Checkbox("VSync Enabled", &m_EngineVSyncCur);
+    if (m_EngineVSyncCur != m_EngineVSyncOld)
+    {
+        m_EngineVSyncOld = m_EngineVSyncCur;
+        glfwSwapInterval(m_EngineVSyncCur);
+    }
+
+    // Camera config
+    ImGui::DragFloat("Cam speed", &scene->m_Camera.m_Speed, 0.1f, 0.1f, 1000.0f, "%.1f");
+    ImGui::DragFloat("Cam sens", &scene->m_Camera.m_Sensitivity, 0.1f, 0.1f, 1000.0f, "%.2f");
+
+    ImGui::Separator();
 
     ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_Position.x, scene->m_Camera.m_Position.y, scene->m_Camera.m_Position.z);
     ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_Orientation.x, scene->m_Camera.m_Orientation.y, scene->m_Camera.m_Orientation.z);
+    ImGui::Text("Framebuffer size: %ux%u", m_EngineFramebufferWidth, m_EngineFramebufferHeight);
     ImGui::Text("%.3f ms (%.1f FPS)", delta_time * 1000.0f, 1.0f / delta_time);
 
     ImGui::End();
 }
 
-void GUI::showNodeManager(std::shared_ptr<Scene> scene)
+void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> scene)
 {
-    ImGui::Begin("Node manager", 0);
+    ImGui::Begin((scene_name + " node mgr").c_str(), 0);
 
     ImGui::Checkbox("Show Class Names", &m_NodeMgrShowClassNames);
 
-    ImGui::SeparatorText("Current Nodes");
-
-    for (const auto& node_sptr : scene->getNodes())
+    // Scene nodes list
+    ImGui::Text("Current Nodes");
+    if (ImGui::BeginListBox("##nodes", ImVec2(-FLT_MIN, std::min((int)scene->getNodes().size(), 10) * ImGui::GetTextLineHeightWithSpacing())))
     {
-        std::string name = node_sptr->getName();
-
-        if (m_NodeMgrShowClassNames)
+        for (const auto& node_sptr : scene->getNodes())
         {
-            std::string className = typeid(*node_sptr).name();
-            name = className.substr(className.find_last_of("::") + 1) + " :: " + name;
-        }
+            std::string displayName = node_sptr->getName();
 
-        ImGui::Text(name.c_str());
+            if (m_NodeMgrShowClassNames)
+            {
+                std::string className = typeid(*node_sptr).name();
+                displayName = className.substr(className.find_last_of("::") + 1) + " :: " + displayName;
+            }
+
+            if (ImGui::Selectable(displayName.c_str(), m_EngineCurrentNodeName == node_sptr->getName()))
+            {
+                m_EngineCurrentNodeName = node_sptr->getName();
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndListBox();
     }
 
-    ImGui::Separator();
+    // Selected node config
+    if (!m_EngineCurrentNodeName.empty())
+    {
+        ImGui::SeparatorText(m_EngineCurrentNodeName.c_str());
 
-    // TODO: tools to create nodes on the fly
+        // TODO: do smth like "std::map<std::string, std::any/std::optional> Node::getData()" to configure here
+    }
 
     ImGui::End();
 }
@@ -173,6 +204,12 @@ bool GUI::isOccupied(double x, double y)
     }
 
     return false;
+}
+
+void GUI::updateFramebufferSize(int width, int height)
+{
+    m_EngineFramebufferWidth = width;
+    m_EngineFramebufferHeight = height;
 }
 
 std::vector<std::shared_ptr<qtzl::NodeWindow>> GUI::getNodeWindows()

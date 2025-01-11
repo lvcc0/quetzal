@@ -32,7 +32,7 @@ public:
     static void render(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time);
 
     static void showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time);
-    static void showNodeManager(std::shared_ptr<Scene> scene);
+    static void showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> scene);
     static void showResourceManager();
 
     // Creating or destroying windows for nodes
@@ -41,9 +41,20 @@ public:
     // Check if the given position is occupied by any gui window
     static bool isOccupied(double x, double y);
 
-    inline static std::vector<std::shared_ptr<qtzl::NodeWindow>> getNodeWindows();
+    // Calls upon Engine::framebufferSizeCallback
+    static void updateFramebufferSize(int width, int height);
+
+    static std::vector<std::shared_ptr<qtzl::NodeWindow>> getNodeWindows();
 
 private:
+    inline static bool m_EngineVSyncCur = true;
+    inline static bool m_EngineVSyncOld = m_EngineVSyncCur;
+
+    inline static int m_EngineFramebufferWidth;
+    inline static int m_EngineFramebufferHeight;
+
+    inline static std::string m_EngineCurrentNodeName;
+
     inline static bool m_NodeMgrShowClassNames = false;
 
     inline static std::vector<std::shared_ptr<qtzl::NodeWindow>> m_NodeWindows;

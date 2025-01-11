@@ -45,7 +45,7 @@ public:
     void process();
 
     // Create a scene, add it to the scenes map and set currentScene to it
-    std::shared_ptr<Scene> createScene(const std::string& name, bool set_current = true); // TODO: setting current scene should be optional
+    std::shared_ptr<Scene> createScene(const std::string& name, bool set_current = true);
 
     // Set current scene and TODO: send some stuff to the renderer and such
     void setCurrentScene(const std::string& name);

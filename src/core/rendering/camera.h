@@ -23,7 +23,6 @@ public:
     int m_Width;
     int m_Height;
 
-    // TODO: some options to change this stuff
     float m_Speed = 3.0f;
     float m_Sensitivity = 100.0f;
 

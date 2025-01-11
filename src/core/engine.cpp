@@ -154,6 +154,7 @@ void Engine::pickObject()
 void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    GUI::updateFramebufferSize(width, height);
 
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
     {
@@ -196,10 +197,6 @@ void Engine::process()
     this->lastFrame = curFrame;
 
     this->processInput();
-
-    glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // clearing stuff in the default framebuffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //
-    glStencilMask(0x00); // turn off writing to the stencil buffer
     
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
@@ -221,7 +218,8 @@ std::shared_ptr<Scene> Engine::createScene(const std::string& name, bool set_cur
 
     this->scenes.emplace(name, scene);
     
-    if (set_current)
+    // if the scene list is empty then we force set the first created one to be selected
+    if (set_current || (!set_current && this->scenes.empty()))
         this->setCurrentScene(name);
 
     return scene;
