@@ -98,6 +98,7 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
     }
 
     // Camera config
+    ImGui::DragFloat("Cam FOV", &Renderer::m_FOV, 0.5f, 30.0f, 110.0f, "%.1f");
     ImGui::DragFloat("Cam speed", &scene->m_Camera.m_Speed, 0.1f, 0.1f, 1000.0f, "%.1f");
     ImGui::DragFloat("Cam sens", &scene->m_Camera.m_Sensitivity, 0.1f, 0.1f, 1000.0f, "%.2f");
 

@@ -14,6 +14,7 @@
 #include "imgui_impl_opengl3.h"
 
 #include "core/scene.h"
+#include "core/rendering/renderer.h"
 
 #include "core/gui/engine_window.h"
 #include "core/gui/node_window.h"

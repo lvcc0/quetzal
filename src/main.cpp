@@ -13,7 +13,8 @@ int main()
     first_scene->createCylindricalBillboard("pepeboard", "pepe.png", glm::vec3(-4.0f, 2.0f, 0.0f));
     first_scene->createSphericalBillboard("containerboard", "container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));
 
-    first_scene->createStaticBody("catcube", "catcube.obj");
+    auto catcube = first_scene->createStaticBody("catcube", "catcube.obj");
+    first_scene->createStaticBody("catsphere", "catsphere.obj", glm::vec3(-5.0f, 0.0f, 0.0f));
 
     first_scene->createDirectionalLight("dir_light0");
     first_scene->createPointLight("point_light0", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
@@ -22,6 +23,8 @@ int main()
     // Main loop
     while (engine.isRunning())
     {
+        catcube->setGlobalRotation(glm::vec3(0.0f, engine.getLastFrame(), 0.0f));
+
         engine.process();
     }
 

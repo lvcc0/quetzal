@@ -48,6 +48,9 @@ namespace qtzl
 			Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // upper left
 		};
 
+		std::unique_ptr<VAO> m_VAO_uptr = nullptr;
+		std::unique_ptr<VBO> m_VBO_uptr = nullptr;
+
 		void setupRender() override;
 	};
 }

@@ -22,6 +22,8 @@ public:
     Renderer(const Renderer&) = delete;
     Renderer(Renderer&&) = delete;
 
+    inline static float m_FOV = 45.0f;
+
     static void setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& shader_program);
 
     static std::shared_ptr<ShaderProgram> getCurrentShaderProgram();

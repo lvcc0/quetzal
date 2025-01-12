@@ -17,10 +17,6 @@ namespace qtzl
     protected:
         glm::mat4 m_ModelMatrix = glm::mat4(0.0f);
 
-        std::unique_ptr<VAO> m_VAO_uptr = nullptr;
-        std::unique_ptr<VBO> m_VBO_uptr = nullptr;
-        std::unique_ptr<EBO> m_EBO_uptr = nullptr;
-
         virtual void setupRender() = 0;
     };
 }
