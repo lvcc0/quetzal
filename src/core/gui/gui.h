@@ -60,4 +60,7 @@ private:
 
     inline static std::vector<std::shared_ptr<qtzl::NodeWindow>> m_NodeWindows;
     inline static std::vector<std::shared_ptr<qtzl::EngineWindow>> m_EngineWindows;
+
+    // Used to fill the file tree in the resource manager window
+    static void processDirEntry(std::filesystem::directory_entry entry);
 };

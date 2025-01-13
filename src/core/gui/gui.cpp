@@ -26,14 +26,13 @@ void GUI::shutdown()
 
 void GUI::render(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time)
 {
-    //m_AllSceneNodes = current_scene.second->getSceneNodeVec();
-
     // Engine windows
     for (const auto& window : m_EngineWindows)
     {
         if (!window->isVisible())
             continue;
 
+        // TODO: rewrite this stuff
         switch (window->getType())
         {
         case qtzl::EngineWindowType::SceneCfg:
@@ -156,21 +155,21 @@ void GUI::showResourceManager()
 {
     ImGui::Begin("Resource manager", 0);
 
-    ImGui::SeparatorText("Meshes");
-    for (const auto& entry : ResourceManager::getMeshes())
-        ImGui::Text(entry.first.c_str());
-
-    ImGui::SeparatorText("Textures");
-    for (const auto& entry : ResourceManager::getTextures())
-        ImGui::Text(entry.first.c_str());
-
-    ImGui::SeparatorText("Shaders");
-    for (const auto& entry : ResourceManager::getShaders())
-        ImGui::Text(entry.first.c_str());
-
-    ImGui::Separator();
-
     // TODO: tools to load resources on the fly
+    // TODO: update files button
+    // TODO: get full path upon right click or smth
+
+    if (ImGui::BeginTable("Resources", 3, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
+    {
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
+        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 12.0f);
+        ImGui::TableSetupColumn("Loaded", ImGuiTableColumnFlags_WidthFixed, 12.0f);
+        ImGui::TableHeadersRow();
+
+        processDirEntry(std::filesystem::directory_entry(RES_PATH));
+
+        ImGui::EndTable();
+    }
 
     ImGui::End();
 }
@@ -216,4 +215,36 @@ void GUI::updateFramebufferSize(int width, int height)
 std::vector<std::shared_ptr<qtzl::NodeWindow>> GUI::getNodeWindows()
 {
     return m_NodeWindows;
+}
+
+void GUI::processDirEntry(std::filesystem::directory_entry entry)
+{
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+
+    if (entry.is_directory())
+    {
+        bool open = ImGui::TreeNodeEx(entry.path().string().c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+        ImGui::TableNextColumn();
+        ImGui::TextUnformatted("Folder");
+        ImGui::TableNextColumn();
+        ImGui::TextDisabled("--");
+
+        if (open)
+        {
+            for (const auto& child_entry : std::filesystem::directory_iterator(entry))
+            {
+                processDirEntry(child_entry);
+            }
+            ImGui::TreePop();
+        }
+    }
+    else
+    {
+        ImGui::TreeNodeEx(entry.path().filename().string().c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+        ImGui::TableNextColumn();
+        ImGui::TextUnformatted(ResourceManager::getType(entry.path().string()).c_str());
+        ImGui::TableNextColumn();
+        ImGui::TextUnformatted((ResourceManager::isLoaded(entry.path().string())) ? "Yes" : "No");
+    }
 }

@@ -3,18 +3,18 @@
 int main()
 {
     Engine& engine = Engine::instance(1280, 720);
-    ResourceManager::preLoadResources();
+    ResourceManager::preloadResources();
 
     auto first_scene = engine.createScene("first_scene");
 
-    std::shared_ptr<ShaderProgram> default_shader = ResourceManager::createShaderProgram("default.vert", "default.frag");
+    std::shared_ptr<ShaderProgram> default_shader = ResourceManager::createShaderProgram("shaders/default.vert", "shaders/default.frag");
     Renderer::setCurrentShaderProgram(default_shader);
 
-    first_scene->createCylindricalBillboard("pepeboard", "pepe.png", glm::vec3(-4.0f, 2.0f, 0.0f));
-    first_scene->createSphericalBillboard("containerboard", "container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));
+    first_scene->createCylindricalBillboard("pepeboard", "textures/pepe.png", glm::vec3(-4.0f, 2.0f, 0.0f));
+    first_scene->createSphericalBillboard("containerboard", "textures/container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));
 
-    auto catcube = first_scene->createStaticBody("catcube", "catcube.obj");
-    first_scene->createStaticBody("catsphere", "catsphere.obj", glm::vec3(-5.0f, 0.0f, 0.0f));
+    auto catcube = first_scene->createStaticBody("catcube", "objects/catcube/catcube.obj");
+    first_scene->createStaticBody("catsphere", "objects/catsphere/catsphere.obj", glm::vec3(-5.0f, 0.0f, 0.0f));
 
     first_scene->createDirectionalLight("dir_light0");
     first_scene->createPointLight("point_light0", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
