@@ -30,16 +30,34 @@ namespace qtzl
     void Node3D::setGlobalPosition(const glm::vec3& position)
     {
         this->m_GlobalPosition = position;
+
+        for (auto& entry : this->m_Children)
+        {
+            if (std::shared_ptr<qtzl::Node3D> casted_sptr = std::dynamic_pointer_cast<qtzl::Node3D>(entry.second))
+                casted_sptr->setGlobalPosition(position + casted_sptr->getPosition());
+        }
     }
 
     void Node3D::setGlobalRotation(const glm::vec3& radians)
     {
         this->m_GlobalRotation = radians;
+
+        for (auto& entry : this->m_Children)
+        {
+            if (std::shared_ptr<qtzl::Node3D> casted_sptr = std::dynamic_pointer_cast<qtzl::Node3D>(entry.second))
+                casted_sptr->setGlobalPosition(radians + casted_sptr->getRotation());
+        }
     }
 
     void Node3D::setGlobalRotationDegrees(const glm::vec3& degrees)
     {
         this->m_GlobalRotation = glm::radians(degrees);
+
+        for (auto& entry : this->m_Children)
+        {
+            if (std::shared_ptr<qtzl::Node3D> casted_sptr = std::dynamic_pointer_cast<qtzl::Node3D>(entry.second))
+                casted_sptr->setGlobalPosition(glm::radians(degrees) + casted_sptr->getRotation());
+        }
     }
 
     void Node3D::setVisible(bool visible)

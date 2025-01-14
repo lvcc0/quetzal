@@ -1,4 +1,4 @@
-#include "core/resource_manager.h"
+#include "static/resource_manager.h"
 
 void ResourceManager::loadMesh(const std::string& file_path)
 {

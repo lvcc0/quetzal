@@ -16,15 +16,15 @@ namespace qtzl
         Node3D(const std::string& name);
         virtual ~Node3D() = default;
 
-        void setScale(const glm::vec3& scale);
+        virtual void setScale(const glm::vec3& scale);
 
-        void setPosition(const glm::vec3& position);
-        void setRotation(const glm::vec3& radians);
-        void setRotationDegrees(const glm::vec3& degrees);
+        virtual void setPosition(const glm::vec3& position);
+        virtual void setRotation(const glm::vec3& radians);
+        virtual void setRotationDegrees(const glm::vec3& degrees);
         
-        void setGlobalPosition(const glm::vec3& position);
-        void setGlobalRotation(const glm::vec3& radians);
-        void setGlobalRotationDegrees(const glm::vec3& degrees);
+        virtual void setGlobalPosition(const glm::vec3& position);
+        virtual void setGlobalRotation(const glm::vec3& radians);
+        virtual void setGlobalRotationDegrees(const glm::vec3& degrees);
         
         void setVisible(bool visible);
 

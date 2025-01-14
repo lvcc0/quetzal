@@ -180,6 +180,7 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(this->window, true);
 }
 
+// Gets called upon mouse click
 void Engine::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)

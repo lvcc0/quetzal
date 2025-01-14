@@ -10,11 +10,11 @@
 namespace qtzl
 {
     // 3D body that can't be affected by external forces
-    class StaticBody : public VisualNode3D
+    class StaticBody3D : public VisualNode3D
     {
     public:
-        StaticBody(const std::string& name, std::shared_ptr<Mesh> mesh_sptr);
-        virtual ~StaticBody() = default;
+        StaticBody3D(const std::string& name, std::shared_ptr<Mesh> mesh_sptr);
+        virtual ~StaticBody3D() = default;
 
         void render(std::shared_ptr<ShaderProgram> shader_program) override;
 

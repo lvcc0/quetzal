@@ -1,4 +1,4 @@
-#include "core/rendering/renderer.h"
+#include "static/renderer.h"
 
 void Renderer::setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& shader_program)
 {

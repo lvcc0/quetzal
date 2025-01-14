@@ -10,7 +10,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "core/resource_manager.h"
+#include "static/resource_manager.h"
 #include "core/rendering/shader_program.h"
 
 class PostProcessing

@@ -15,12 +15,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "core/resource_manager.h"
+#include "static/resource_manager.h"
 #include "core/rendering/post_processing.h"
 #include "core/rendering/camera.h"
 
-#include "scene/3d/rigid_body.h"
-#include "scene/3d/static_body.h"
+#include "scene/3d/rigid_body3d.h"
+#include "scene/3d/static_body3d.h"
 
 #include "scene/3d/cylindrical_billboard.h"
 #include "scene/3d/spherical_billboard.h"
@@ -52,28 +52,34 @@ public:
 
     // Node creating
 
-    std::shared_ptr<qtzl::StaticBody> createStaticBody(
+    std::shared_ptr<qtzl::StaticBody3D> createStaticBody(
         const std::string& name,
-        const std::string& mesh_name,
+        const std::string& mesh_path,
         glm::vec3 position = glm::vec3(0.0f),
         glm::vec3 rotation = glm::vec3(0.0f),
         glm::vec3 scale = glm::vec3(1.0f)
     );
 
-    std::shared_ptr<qtzl::RigidBody> createRigidBody();
+    std::shared_ptr<qtzl::RigidBody3D> createRigidBody(
+        const std::string& name,
+        const std::string& mesh_path,
+        glm::vec3 position = glm::vec3(0.0f),
+        glm::vec3 rotation = glm::vec3(0.0f),
+        glm::vec3 scale = glm::vec3(1.0f)
+    );
     
     std::shared_ptr<qtzl::Billboard> createBillboard();
 
     std::shared_ptr<qtzl::CylindricalBillboard> createCylindricalBillboard(
         const std::string& name,
-        const std::string& texture_name,
+        const std::string& texture_path,
         glm::vec3 position = glm::vec3(0.0f),
         glm::vec2 size = glm::vec2(1.0f)
     );
 
     std::shared_ptr<qtzl::SphericalBillboard> createSphericalBillboard(
         const std::string& name,
-        const std::string& texture_name,
+        const std::string& texture_path,
         glm::vec3 position = glm::vec3(0.0f),
         glm::vec2 size = glm::vec2(1.0f)
     );

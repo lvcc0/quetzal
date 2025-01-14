@@ -13,8 +13,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#include "static/renderer.h"
 #include "core/scene.h"
-#include "core/rendering/renderer.h"
 
 // This is the main part of scene GUI. It contains more than one window
 class GUI

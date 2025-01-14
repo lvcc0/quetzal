@@ -1,21 +1,15 @@
-#include "scene/3d/static_body.h"
+#include "scene/3d/static_body3d.h"
 
 namespace qtzl
 {
-    StaticBody::StaticBody(const std::string& name, std::shared_ptr<Mesh> mesh_sptr)
+    StaticBody3D::StaticBody3D(const std::string& name, std::shared_ptr<Mesh> mesh_sptr)
         : VisualNode3D(name), m_Mesh_sptr(mesh_sptr)
     {
         this->setupRender();
     }
 
-    void StaticBody::render(std::shared_ptr<ShaderProgram> shader_program)
+    void StaticBody3D::render(std::shared_ptr<ShaderProgram> shader_program)
     {
-        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_GlobalPosition);
-        this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_GlobalRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_GlobalRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_GlobalRotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, m_Scale);
-
         for (const auto& submesh : this->m_Mesh_sptr->getSubMeshes())
         {
             // bind appropriate textures
@@ -51,11 +45,9 @@ namespace qtzl
 
             glActiveTexture(GL_TEXTURE0);
         }
-
-        this->m_ModelMatrix = glm::mat4(1.0f);
     }
 
-    void StaticBody::setupRender()
+    void StaticBody3D::setupRender()
     {
         for (auto& submesh : this->m_Mesh_sptr->getSubMeshes())
         {

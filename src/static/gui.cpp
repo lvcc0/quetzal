@@ -1,4 +1,4 @@
-#include "core/gui/gui.h"
+#include "static/gui.h"
 
 void GUI::init(GLFWwindow* window)
 {
@@ -37,7 +37,7 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
     if (!TEXT_BASE_WIDTH)
         TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
 
-    ImGui::Checkbox("Show node manager", &m_ResourceMgrVisible);
+    ImGui::Checkbox("Show node manager", &m_NodeMgrVisible);
     ImGui::Checkbox("Show resource manager", &m_ResourceMgrVisible);
 
     ImGui::Separator();
@@ -117,6 +117,8 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
 
         ImGui::EndTable();
     }
+
+    // TODO: selected node
 
     // Selected node config
     if (m_CurrentNode_sptr != nullptr)

@@ -49,23 +49,32 @@ void Scene::update()
     }
 }
 
-//qtzl::RigidBody Scene::createRigidBody() TODO
-//{
-//}
-
-//qtzl::StaticBody Scene::createStaticBody() TODO
-//{
-//}
-
-std::shared_ptr<qtzl::StaticBody> Scene::createStaticBody(
+std::shared_ptr<qtzl::RigidBody3D> Scene::createRigidBody(
     const std::string& name,
-    const std::string& mesh_name,
+    const std::string& mesh_path,
     glm::vec3 position,
     glm::vec3 rotation,
     glm::vec3 scale
 )
 {
-    std::shared_ptr<qtzl::StaticBody> node_sptr = std::make_shared<qtzl::StaticBody>(name, ResourceManager::getMesh(mesh_name));
+    std::shared_ptr<qtzl::RigidBody3D> node_sptr = std::make_shared<qtzl::RigidBody3D>(name, ResourceManager::getMesh(mesh_path));
+    node_sptr->setGlobalPosition(position);
+    node_sptr->setGlobalRotation(rotation);
+    node_sptr->setScale(scale);
+
+    this->m_Nodes.push_back(node_sptr);
+    return node_sptr;
+}
+
+std::shared_ptr<qtzl::StaticBody3D> Scene::createStaticBody(
+    const std::string& name,
+    const std::string& mesh_path,
+    glm::vec3 position,
+    glm::vec3 rotation,
+    glm::vec3 scale
+)
+{
+    std::shared_ptr<qtzl::StaticBody3D> node_sptr = std::make_shared<qtzl::StaticBody3D>(name, ResourceManager::getMesh(mesh_path));
     node_sptr->setGlobalPosition(position);
     node_sptr->setGlobalRotation(rotation);
     node_sptr->setScale(scale);
@@ -76,12 +85,12 @@ std::shared_ptr<qtzl::StaticBody> Scene::createStaticBody(
 
 std::shared_ptr<qtzl::CylindricalBillboard> Scene::createCylindricalBillboard(
     const std::string& name,
-    const std::string& texture_name,
+    const std::string& texture_path,
     glm::vec3 position,
     glm::vec2 size
 )
 {
-    std::shared_ptr<qtzl::CylindricalBillboard> node_sptr = std::make_shared<qtzl::CylindricalBillboard>(name, ResourceManager::getTexture(texture_name));
+    std::shared_ptr<qtzl::CylindricalBillboard> node_sptr = std::make_shared<qtzl::CylindricalBillboard>(name, ResourceManager::getTexture(texture_path));
     node_sptr->setGlobalPosition(position);
     node_sptr->setScale(glm::vec3(size.x, size.y, 1.0f));
 
@@ -91,12 +100,12 @@ std::shared_ptr<qtzl::CylindricalBillboard> Scene::createCylindricalBillboard(
 
 std::shared_ptr<qtzl::SphericalBillboard> Scene::createSphericalBillboard(
     const std::string& name,
-    const std::string& texture_name,
+    const std::string& texture_path,
     glm::vec3 position,
     glm::vec2 size
 )
 {
-    std::shared_ptr<qtzl::SphericalBillboard> node_sptr = std::make_shared<qtzl::SphericalBillboard>(name, ResourceManager::getTexture(texture_name));
+    std::shared_ptr<qtzl::SphericalBillboard> node_sptr = std::make_shared<qtzl::SphericalBillboard>(name, ResourceManager::getTexture(texture_path));
     node_sptr->setGlobalPosition(position);
     node_sptr->setScale(glm::vec3(size.x, size.y, 1.0f));
 

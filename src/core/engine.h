@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/rendering/renderer.h"
-#include "core/gui/gui.h"
+#include "static/renderer.h"
+#include "static/gui.h"
 
 #include "core/scene.h"
 
