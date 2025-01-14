@@ -38,7 +38,7 @@ struct PointLight {
 
     float constant;
     float linear;
-    float quad;
+    float quadratic;
 
     vec3 color;
 };
@@ -53,7 +53,7 @@ struct SpotLight {
 
     float constant;
     float linear;
-    float quad;
+    float quadratic;
 
     float innerCutoff;
     float outerCutoff;
@@ -119,7 +119,7 @@ vec3 GetPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
     float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quad * (distance * distance));
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
     vec3 ambient = light.ambient * vec3(texture(material.texture_diffuse1, TexCoord));
     vec3 diffuse = light.diffuse * vec3(texture(material.texture_diffuse1, TexCoord)) * diff;
@@ -141,7 +141,7 @@ vec3 GetSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
     float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quad * (distance * distance));
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
     float theta = dot(lightDir, normalize(-light.direction));
     float intensity = clamp((theta - light.outerCutoff) / (light.innerCutoff - light.outerCutoff), 0.0, 1.0);

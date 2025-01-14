@@ -1,73 +1,32 @@
-#include "engine.h"
+#include "core/engine.h"
 
 int main()
 {
-    // Setting these verts as static part of billboard isnt working (idk why)
-    std::vector<Vertex> billboard_verts = {
-        Vertex(glm::vec3(0.5f,  0.5f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper right
-        Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
-        Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper left
-        Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower right
-        Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower left
-        Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // upper left
-    };
-
-    const unsigned int WIN_WIDTH = 1280;
-    const unsigned int WIN_HEIGHT = 720;
-    
-    Engine& engine = Engine::Instance(WIN_WIDTH, WIN_HEIGHT);
-    ResourceManager::preLoadResources();
+    Engine& engine = Engine::instance(1280, 720);
+    ResourceManager::preloadResources();
 
     auto first_scene = engine.createScene("first_scene");
 
-    first_scene->addShader("default_shader", "shaders/default.vert", "shaders/default.frag", ShaderType::MAIN);
-    first_scene->addShader("stencil_shader", "shaders/stencil.vert", "shaders/stencil.frag", ShaderType::STENCIL);
+    std::shared_ptr<ShaderProgram> default_shader = ResourceManager::createShaderProgram("shaders/default.vert", "shaders/default.frag");
+    Renderer::setCurrentShaderProgram(default_shader);
 
-    first_scene->addSphBillboard("pepeboard", glm::vec3(0.0f), glm::vec2(7.5f, 5.0f), "pepe.png", billboard_verts);
-    first_scene->addCylBillboard("container_billboard", glm::vec3(-5.0f, -2.0f, 0.0f), glm::vec2(4.0f, 4.0f), "container.png", billboard_verts);
+    first_scene->createCylindricalBillboard("pepeboard", "textures/pepe.png", glm::vec3(-4.0f, 2.0f, 0.0f));
+    first_scene->createSphericalBillboard("containerboard", "textures/container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));
 
-    first_scene->addDirLight(DirLight(
-        true,
-        "dirLight0",
-        glm::vec3(-0.2f, -1.0f, -0.3f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(0.4f, 0.4f, 0.4f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(0.5f, 1.0f, 1.0f)
-    ));
+    auto catcube = first_scene->createStaticBody("catcube", "objects/catcube/catcube.obj");
+    first_scene->createStaticBody("catsphere", "objects/catsphere/catsphere.obj", glm::vec3(-5.0f, 0.0f, 0.0f));
 
-    first_scene->addPointLight(PointLight(
-        true,
-        "pointLight0",
-        glm::vec3(0.7f, 0.2f, 2.0f),
-        glm::vec3(0.05f, 0.05f, 0.05f),
-        glm::vec3(0.8f, 0.8f, 0.8f),
-        glm::vec3(1.0f, 1.0f, 1.0f),
-        1.0f,
-        0.09f,
-        0.032f,
-        glm::vec3(1.0f, 0.0f, 0.0f)
-    ), billboard_verts);
-
-    first_scene->addSpotLight(SpotLight(
-        true,
-        "spotLight0",
-        glm::vec3(5.0f, 0.0f, -3.5f),
-        glm::vec3(-1.0f, 0.0f, 0.0f),
-        glm::vec3(0.05f, 0.05f, 0.05f),
-        glm::vec3(0.8f, 0.8f, 0.8f),
-        glm::vec3(1.0f, 1.0f, 1.0f),
-        1.0f,
-        0.09f,
-        0.032f,
-        7.5f,
-        10.0f,
-        glm::vec3(0.0f, 0.0f, 1.0f)
-    ), billboard_verts);
+    first_scene->createDirectionalLight("dir_light0");
+    first_scene->createPointLight("point_light0", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+    first_scene->createSpotLight("spot_light0", glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.5f, 1.0f));
 
     // Main loop
     while (engine.isRunning())
     {
+        catcube->setGlobalRotation(glm::vec3(0.0f, engine.getLastFrame(), 0.0f));
+
         engine.process();
     }
+
+    return 0;
 }

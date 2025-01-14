@@ -29,7 +29,7 @@ set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_NO_EXCEPTIONS ON CACHE BOOL "" FORCE)
-# assimp importers
+# assimp importers&exporters
 set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_OBJ_EXPORTER OFF CACHE BOOL "" FORCE)
@@ -40,19 +40,21 @@ set(ASSIMP_BUILD_GLTF_EXPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_GLTFB_IMPORTER ON CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_GLTFB_EXPORTER OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(deps/glfw-3.3.2)
-add_subdirectory(deps/glad)
-add_subdirectory(deps/stb_image)
-add_subdirectory(deps/stb_truetype)
-add_subdirectory(deps/glm)
-add_subdirectory(deps/imgui-docking)
-add_subdirectory(deps/assimp-5.4.3)
+file(GLOB_RECURSE QTZL_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+add_subdirectory(thirdparty/assimp-5.4.3)
+add_subdirectory(thirdparty/glad)
+add_subdirectory(thirdparty/glfw-3.3.2)
+add_subdirectory(thirdparty/glm)
+add_subdirectory(thirdparty/imgui-docking)
+add_subdirectory(thirdparty/stb_image)
+add_subdirectory(thirdparty/stb_truetype)
 
 add_executable("${CMAKE_PROJECT_NAME}")
 
 set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 20)
+
+target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC GLFW_INCLUDE_NONE=1) 
 
 if(PRODUCTION_BUILD)
 	# setup the RES_PATH macro to be in the root folder of your exe
@@ -64,14 +66,13 @@ else()
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0) 
 endif()
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES})
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${QTZL_SOURCE})
 
-#if(MSVC)
-#	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
-#	set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-#endif()
+if(MSVC AND PRODUCTION_BUILD)
+	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
+	set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+endif()
 
-target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
-target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps/")
+target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glm glfw glad stb_image stb_truetype imgui assimp)
