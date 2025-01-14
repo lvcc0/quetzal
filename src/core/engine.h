@@ -53,8 +53,8 @@ public:
 private:
     bool shouldDrawGui = true;
 
-    unsigned int winWidth;
-    unsigned int winHeight;
+    int winWidth;
+    int winHeight;
     
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;

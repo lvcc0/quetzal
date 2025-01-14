@@ -10,11 +10,7 @@ void GUI::init(GLFWwindow* window)
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init();
     
-    glfwGetFramebufferSize(window, &m_EngineFramebufferWidth, &m_EngineFramebufferHeight);
-
-    m_EngineWindows.push_back(std::make_shared<qtzl::EngineWindow>(qtzl::EngineWindowType::SceneCfg));
-    m_EngineWindows.push_back(std::make_shared<qtzl::EngineWindow>(qtzl::EngineWindowType::NodeMgr));
-    m_EngineWindows.push_back(std::make_shared<qtzl::EngineWindow>(qtzl::EngineWindowType::ResourceMgr));
+    glfwGetFramebufferSize(window, &m_FramebufferWidth, &m_FramebufferHeight);
 }
 
 void GUI::shutdown()
@@ -26,47 +22,36 @@ void GUI::shutdown()
 
 void GUI::render(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time)
 {
-    // Engine windows
-    for (const auto& window : m_EngineWindows)
-    {
-        if (!window->isVisible())
-            continue;
+    showSceneConfig(scene_name, scene, delta_time); // scene config is always visible
 
-        // TODO: rewrite this stuff
-        switch (window->getType())
-        {
-        case qtzl::EngineWindowType::SceneCfg:
-            showSceneConfig(scene_name, scene, delta_time);
-            break;
-        case qtzl::EngineWindowType::NodeMgr:
-            showNodeManager(scene_name, scene);
-            break;
-        case qtzl::EngineWindowType::ResourceMgr:
-            showResourceManager();
-            break;
-        }
-    }
-
-    // Node windows
-    for (const auto& window : m_NodeWindows)
-    {
-        window->render();
-    }
+    if (m_NodeMgrVisible)
+        showNodeManager(scene_name, scene);
+    if (m_ResourceMgrVisible)
+        showResourceManager();
 }
 
 void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time)
 {
     ImGui::Begin((scene_name + " config").c_str(), 0);
 
-    ImGui::Checkbox("Physics Enabled", &scene->m_IsPhysicsProcessing);
+    if (!TEXT_BASE_WIDTH)
+        TEXT_BASE_WIDTH = ImGui::CalcTextSize("A").x;
+
+    ImGui::Checkbox("Show node manager", &m_ResourceMgrVisible);
+    ImGui::Checkbox("Show resource manager", &m_ResourceMgrVisible);
 
     ImGui::Separator();
+
+    ImGui::Checkbox("Physics Enabled", &scene->m_IsPhysicsProcessing);
 
     if (ImGui::Checkbox("Postprocessing Enabled", &scene->m_IsPostProcessing))
         glEnable(GL_DEPTH_TEST);
 
+    // TODO: also do this as a table?
     if (scene->m_IsPostProcessing)
     {
+        ImGui::Separator();
+
         std::vector<std::string> enabledShaders = scene->m_PostProcessing.getEnabledPPShaders(); // current screen shader names
 
         for (const auto& name : scene->m_PostProcessing.getPPShaderNames())
@@ -78,7 +63,7 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
                 scene->m_PostProcessing.setPPShaderEnabled(name, it == enabledShaders.end());
                 glEnable(GL_DEPTH_TEST); // postprocessing disables depth test after as it's final step, so we need to turn it back on
             }
-            ImGui::SameLine(ImGui::GetWindowSize().x - 64); ImGui::Text((it != enabledShaders.end()) ? "enabled" : "disabled");
+            ImGui::SameLine(ImGui::GetWindowSize().x - TEXT_BASE_WIDTH * 12.0f); ImGui::Text((it != enabledShaders.end()) ? "enabled" : "disabled");
         }
 
         ImGui::Separator();
@@ -89,11 +74,11 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
     ImGui::SeparatorText("Engine");
 
     // VSync
-    ImGui::Checkbox("VSync Enabled", &m_EngineVSyncCur);
-    if (m_EngineVSyncCur != m_EngineVSyncOld)
+    ImGui::Checkbox("VSync Enabled", &m_VSyncCur);
+    if (m_VSyncCur != m_VSyncOld)
     {
-        m_EngineVSyncOld = m_EngineVSyncCur;
-        glfwSwapInterval(m_EngineVSyncCur);
+        m_VSyncOld = m_VSyncCur;
+        glfwSwapInterval(m_VSyncCur);
     }
 
     // Camera config
@@ -105,7 +90,7 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
 
     ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_Position.x, scene->m_Camera.m_Position.y, scene->m_Camera.m_Position.z);
     ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_Orientation.x, scene->m_Camera.m_Orientation.y, scene->m_Camera.m_Orientation.z);
-    ImGui::Text("Framebuffer size: %ux%u", m_EngineFramebufferWidth, m_EngineFramebufferHeight);
+    ImGui::Text("Framebuffer size: %ux%u", m_FramebufferWidth, m_FramebufferHeight);
     ImGui::Text("%.3f ms (%.1f FPS)", delta_time * 1000.0f, 1.0f / delta_time);
 
     ImGui::End();
@@ -115,35 +100,28 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
 {
     ImGui::Begin((scene_name + " node mgr").c_str(), 0);
 
-    ImGui::Checkbox("Show Class Names", &m_NodeMgrShowClassNames);
+    ImGui::Checkbox("Show node types", &m_NodeMgrShowType);
 
     // Scene nodes list
-    ImGui::Text("Current Nodes");
-    if (ImGui::BeginListBox("##nodes", ImVec2(-FLT_MIN, std::min((int)scene->getNodes().size(), 10) * ImGui::GetTextLineHeightWithSpacing())))
+    if (ImGui::BeginTable("Nodes", m_NodeMgrShowType ? 2 : 1, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
     {
-        for (const auto& node_sptr : scene->getNodes())
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
+        if (m_NodeMgrShowType) ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 20.0f);
+        ImGui::TableHeadersRow();
+
+        for (const auto& node : scene->getNodes())
         {
-            std::string displayName = node_sptr->getName();
-
-            if (m_NodeMgrShowClassNames)
-            {
-                std::string className = typeid(*node_sptr).name();
-                displayName = className.substr(className.find_last_of("::") + 1) + " :: " + displayName;
-            }
-
-            if (ImGui::Selectable(displayName.c_str(), m_EngineCurrentNode_sptr == node_sptr))
-            {
-                m_EngineCurrentNode_sptr = node_sptr;
-                ImGui::SetItemDefaultFocus();
-            }
+            if (node->getParent() == nullptr)
+                displayNode(node);
         }
-        ImGui::EndListBox();
+
+        ImGui::EndTable();
     }
 
     // Selected node config
-    if (m_EngineCurrentNode_sptr != nullptr)
+    if (m_CurrentNode_sptr != nullptr)
     {
-        ImGui::SeparatorText(m_EngineCurrentNode_sptr->getName().c_str());
+        ImGui::SeparatorText(m_CurrentNode_sptr->getName().c_str());
 
         // TODO: do smth like "std::map<std::string, std::any/std::optional> Node::getData()" to configure here
     }
@@ -162,11 +140,11 @@ void GUI::showResourceManager()
     if (ImGui::BeginTable("Resources", 3, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
     {
         ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 12.0f);
-        ImGui::TableSetupColumn("Loaded", ImGuiTableColumnFlags_WidthFixed, 12.0f);
+        ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 13.0f);
+        ImGui::TableSetupColumn("Loaded", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 7.0f);
         ImGui::TableHeadersRow();
 
-        processDirEntry(std::filesystem::directory_entry(RES_PATH));
+        displayDirEntry(std::filesystem::directory_entry(RES_PATH));
 
         ImGui::EndTable();
     }
@@ -177,54 +155,72 @@ void GUI::showResourceManager()
 // Making window using node3D
 void GUI::onClick(const std::shared_ptr<qtzl::Node3D> node)
 {
-    // Selecting and deselecting
-    auto window_it = std::find_if(m_NodeWindows.begin(), m_NodeWindows.end(), [&node](std::shared_ptr<qtzl::NodeWindow> window) { return window->getNode() == node; });
-
-    if (window_it == m_NodeWindows.end())
-        m_NodeWindows.push_back(std::make_shared<qtzl::NodeWindow>(node));
-    else
-        m_NodeWindows.erase(window_it);
+    // :)
 }
 
 bool GUI::isOccupied(double x, double y)
 {
-    for (const auto& window : m_NodeWindows)
-    {
-        if (window->getPosition().x > x && x > window->getPosition().x + window->getSize().x && window->getPosition().y > y && y > window->getPosition().y + window->getSize().y)
-            return true;
-    }
-
-    for (const auto& window : m_EngineWindows)
-    {
-        if (!window->isVisible())
-            continue;
-
-        if (window->getPosition().x > x && x > window->getPosition().x + window->getSize().x && window->getPosition().y > y && y > window->getPosition().y + window->getSize().y)
-            return true;
-    }
+    // TODO: there is some imgui property telling if the mouse is on the window or not
 
     return false;
 }
 
 void GUI::updateFramebufferSize(int width, int height)
 {
-    m_EngineFramebufferWidth = width;
-    m_EngineFramebufferHeight = height;
+    m_FramebufferWidth = width;
+    m_FramebufferHeight = height;
 }
 
-std::vector<std::shared_ptr<qtzl::NodeWindow>> GUI::getNodeWindows()
+void GUI::displayNode(std::shared_ptr<qtzl::Node> node)
 {
-    return m_NodeWindows;
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+
+    if (node->getChildren().size() > 0)
+    {
+        bool open = ImGui::TreeNodeEx(node->getName().c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+
+        if (m_NodeMgrShowType)
+        {
+            std::string className = typeid(*node).name();
+
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(className.erase(0, className.find_last_of("::") + 1).c_str());
+        }
+
+        if (open)
+        {
+            for (const auto& entry : node->getChildren())
+            {
+                displayNode(entry.second);
+            }
+            ImGui::TreePop();
+        }
+    }
+    else
+    {
+        ImGui::TreeNodeEx(node->getName().c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+
+        if (m_NodeMgrShowType)
+        {
+            std::string className = typeid(*node).name();
+
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(className.erase(0, className.find_last_of("::") + 1).c_str());
+        }
+    }
 }
 
-void GUI::processDirEntry(std::filesystem::directory_entry entry)
+void GUI::displayDirEntry(std::filesystem::directory_entry entry)
 {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
 
     if (entry.is_directory())
     {
-        bool open = ImGui::TreeNodeEx(entry.path().string().c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+        std::string filename = entry.path().filename().string();
+
+        bool open = ImGui::TreeNodeEx((!filename.empty()) ? filename.c_str() : entry.path().string().c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
         ImGui::TableNextColumn();
         ImGui::TextUnformatted("Folder");
         ImGui::TableNextColumn();
@@ -234,7 +230,7 @@ void GUI::processDirEntry(std::filesystem::directory_entry entry)
         {
             for (const auto& child_entry : std::filesystem::directory_iterator(entry))
             {
-                processDirEntry(child_entry);
+                displayDirEntry(child_entry);
             }
             ImGui::TreePop();
         }

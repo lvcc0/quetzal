@@ -16,9 +16,6 @@
 #include "core/scene.h"
 #include "core/rendering/renderer.h"
 
-#include "core/gui/engine_window.h"
-#include "core/gui/node_window.h"
-
 // This is the main part of scene GUI. It contains more than one window
 class GUI
 {
@@ -36,7 +33,7 @@ public:
     static void showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> scene);
     static void showResourceManager();
 
-    // Creating or destroying windows for nodes
+    // TODO: repurpose this stuff
     static void onClick(const std::shared_ptr<qtzl::Node3D> node);
     
     // Check if the given position is occupied by any gui window
@@ -45,22 +42,25 @@ public:
     // Calls upon Engine::framebufferSizeCallback
     static void updateFramebufferSize(int width, int height);
 
-    static std::vector<std::shared_ptr<qtzl::NodeWindow>> getNodeWindows();
-
 private:
-    inline static bool m_EngineVSyncCur = true;
-    inline static bool m_EngineVSyncOld = m_EngineVSyncCur;
+    inline static float TEXT_BASE_WIDTH;
 
-    inline static int m_EngineFramebufferWidth;
-    inline static int m_EngineFramebufferHeight;
+    inline static bool m_NodeMgrVisible = true;
+    inline static bool m_ResourceMgrVisible = true;
 
-    inline static std::shared_ptr<qtzl::Node> m_EngineCurrentNode_sptr;
+    inline static bool m_VSyncCur = true;
+    inline static bool m_VSyncOld = m_VSyncCur;
 
-    inline static bool m_NodeMgrShowClassNames = false;
+    inline static int m_FramebufferWidth;
+    inline static int m_FramebufferHeight;
 
-    inline static std::vector<std::shared_ptr<qtzl::NodeWindow>> m_NodeWindows;
-    inline static std::vector<std::shared_ptr<qtzl::EngineWindow>> m_EngineWindows;
+    inline static std::shared_ptr<qtzl::Node> m_CurrentNode_sptr;
+
+    inline static bool m_NodeMgrShowType = false;
+
+    // Used to fill the node tree in the node manager window
+    static void displayNode(std::shared_ptr<qtzl::Node> node);
 
     // Used to fill the file tree in the resource manager window
-    static void processDirEntry(std::filesystem::directory_entry entry);
+    static void displayDirEntry(std::filesystem::directory_entry entry);
 };

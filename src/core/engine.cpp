@@ -201,11 +201,15 @@ void Engine::process()
 
     this->processInput();
     
+    glfwGetWindowSize(window, &winWidth, &winHeight);
+
     // Update current scene here
     if (!this->scenes.empty() && this->scenes.count(this->currentScene))
     {
         this->scenes.at(this->currentScene)->update();
-        Renderer::render(this->scenes.at(this->currentScene));
+
+        if (winWidth > 0 && winHeight > 0) // we don't wanna render the window if it isn't open
+            Renderer::render(this->scenes.at(this->currentScene));
     }
     
     ImGui::Render();
