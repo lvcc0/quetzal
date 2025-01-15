@@ -13,14 +13,16 @@ namespace qtzl
     class Texture : public Resource
     {
     public:
-        Texture(const std::string& name, const std::string& path, const std::string& type);
+        Texture(const std::string& name, const std::string& path, const std::string& texture_type);
         virtual ~Texture() = default;
 
         GLuint getID() const;
         std::string getType() const;
 
     private:
+        Variant::Type m_Type = Variant::Type::TEXTURE;
+
         GLuint ID;
-        std::string m_Type;
+        std::string m_TextureType;
     };
 }

@@ -93,7 +93,7 @@ std::map<const std::string, std::shared_ptr<qtzl::Shader>> ResourceManager::getS
     return m_LoadedShaders;
 }
 
-std::shared_ptr<ShaderProgram> ResourceManager::createShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path)
+std::shared_ptr<ShaderProgram> ResourceManager::createShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path, qtzl::Variant::ShaderProgramType type)
 {
     std::string name = std::filesystem::path(vertex_shader_path).filename().string() + "||" + std::filesystem::path(fragment_shader_path).filename().string();
 
@@ -104,7 +104,7 @@ std::shared_ptr<ShaderProgram> ResourceManager::createShaderProgram(const std::s
     std::string finalVertShaderPath = (vertex_shader_path.starts_with(RES_PATH)) ? vertex_shader_path : RES_PATH + vertex_shader_path;
     std::string finalFragShaderPath = (fragment_shader_path.starts_with(RES_PATH)) ? fragment_shader_path : RES_PATH + fragment_shader_path;
 
-    std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>(name, m_LoadedShaders.at(finalVertShaderPath)->getID(), m_LoadedShaders.at(finalFragShaderPath)->getID());
+    std::shared_ptr<ShaderProgram> shaderProgram = std::make_shared<ShaderProgram>(name, m_LoadedShaders.at(finalVertShaderPath)->getID(), m_LoadedShaders.at(finalFragShaderPath)->getID(), type);
     m_ShaderPrograms.push_back(shaderProgram);
 
     return shaderProgram;
@@ -147,14 +147,14 @@ std::vector<std::shared_ptr<ShaderProgram>> ResourceManager::createPPShaderProgr
 std::shared_ptr<ShaderProgram> ResourceManager::getShaderProgram(const std::string& name)
 {
     // NOTE: i'm not sure if this will work
-    auto result = std::find_if(m_ShaderPrograms.begin(), m_ShaderPrograms.end(), [name](std::shared_ptr<ShaderProgram> shader_program) { return shader_program->getName() == name; });
+    auto result = std::find_if(m_ShaderPrograms.begin(), m_ShaderPrograms.end(), [&name](std::shared_ptr<ShaderProgram> shader_program) { return shader_program->getName() == name; });
     return *result;
 }
 
 std::shared_ptr<ShaderProgram> ResourceManager::getPPShaderProgram(const std::string& name)
 {
     // NOTE: same
-    auto result = std::find_if(m_PPShaderPrograms.begin(), m_PPShaderPrograms.end(), [name](std::shared_ptr<ShaderProgram> shader_program) { return shader_program->getName() == name; });
+    auto result = std::find_if(m_PPShaderPrograms.begin(), m_PPShaderPrograms.end(), [&name](std::shared_ptr<ShaderProgram> shader_program) { return shader_program->getName() == name; });
     return *result;
 }
 
@@ -168,6 +168,66 @@ std::vector<std::shared_ptr<ShaderProgram>> ResourceManager::getPPShaderPrograms
     return m_PPShaderPrograms;
 }
 
+unsigned int ResourceManager::loadCubemap(const std::string& dir_path)
+{
+    std::string finalPath = (dir_path.starts_with(RES_PATH)) ? dir_path : RES_PATH + dir_path;
+    std::vector<std::string> faces;
+
+    // Replace "\" with "/" in the path
+    size_t idx = 0;
+    while (true) {
+        idx = finalPath.find("\\", idx);
+
+        if (idx == std::string::npos)
+            break;
+
+        finalPath.replace(idx, 1, "/");
+
+        idx++;
+    }
+
+    unsigned int i = 0;
+    for (const auto& entry : std::filesystem::directory_iterator(finalPath))
+    {
+        // We load only the first 6 images in the given directory
+        if (i == 6)
+            break;
+
+        faces.push_back(entry.path().string());
+    }
+
+    unsigned int textureID;
+    int width, height, nrChannels;
+
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    stbi_set_flip_vertically_on_load(false);
+
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+
+        if (data)
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        else
+            std::cerr << "CUBEMAP TEXTURE FAILED TO LOAD AT PATH:: " << faces[i] << std::endl;
+
+        stbi_image_free(data);
+    }
+
+    stbi_set_flip_vertically_on_load(true);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    m_Cubemaps.push_back(textureID);
+    return textureID;
+}
+
 void ResourceManager::preloadResources()
 {
     for (const auto& entry : std::filesystem::recursive_directory_iterator(RES_PATH))
@@ -178,7 +238,7 @@ void ResourceManager::preloadResources()
         std::string path = entry.path().string();
         std::string extension = entry.path().extension().string();
 
-        // Replace \ with /
+        // Replace "\" with "/" in the path
         size_t idx = 0;
         while (true) {
             idx = path.find("\\", idx);
@@ -213,7 +273,7 @@ bool ResourceManager::isLoaded(const std::string& file_path)
 {
     std::string path = file_path;
 
-    // Replace \ with /
+    // Replace "\" with "/"
     if (file_path.find("\\") != std::string::npos)
     {
         size_t idx = 0;

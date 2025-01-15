@@ -6,7 +6,12 @@
 class ShaderProgram
 {
 public:
-    ShaderProgram(const std::string& name, unsigned int vertex_shader_id, unsigned int fragment_shader_id);
+    ShaderProgram(
+        const std::string& name,
+        unsigned int vertex_shader_id,
+        unsigned int fragment_shader_id,
+        qtzl::Variant::ShaderProgramType type = qtzl::Variant::ShaderProgramType::DEFAULT_SP
+    );
     ~ShaderProgram();
 
     // A bunch of functions to set shader uniforms
@@ -25,6 +30,7 @@ public:
 
     GLuint getID() const;
     std::string getName() const;
+    qtzl::Variant::ShaderProgramType getType() const;
 
     void activateProgram() const;
     void deleteProgram() const;
@@ -32,6 +38,8 @@ public:
 protected:
     GLuint ID;
     std::string m_Name;
+
+    qtzl::Variant::ShaderProgramType m_Type;
 
     void compileErrors(unsigned int shader_id, const std::string& type) const;
     bool isActive() const;

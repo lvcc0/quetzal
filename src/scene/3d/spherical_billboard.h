@@ -12,5 +12,8 @@ namespace qtzl
 		virtual ~SphericalBillboard() = default;
 
 		void render(std::shared_ptr<ShaderProgram> shader_program) override;
+
+	private:
+		Variant::Type m_Type = Variant::Type::SPHERICAL_BILLBOARD;
 	};
 }

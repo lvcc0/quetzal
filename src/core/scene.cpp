@@ -183,3 +183,14 @@ std::shared_ptr<qtzl::SpotLight3D> Scene::createSpotLight(
 
     return node_sptr;
 }
+
+std::shared_ptr<qtzl::Skybox> Scene::createSkybox(
+    const std::string& name,
+    unsigned int texture
+)
+{
+    std::shared_ptr<qtzl::Skybox> node_sptr = std::make_shared<qtzl::Skybox>(name, texture);
+
+    this->m_Nodes.push_back(node_sptr);
+    return node_sptr;
+}

@@ -16,7 +16,7 @@ GLuint VAO::getID() const
     return this->ID;
 }
 
-void VAO::addBuffer(const VBO& vbo, const VertexBufferLayout& layout) const
+void VAO::addBuffer(const VBO& vbo, const VertexBufferLayout& layout, GLuint stride) const
 {
     this->bind();
     vbo.bind();
@@ -27,7 +27,7 @@ void VAO::addBuffer(const VBO& vbo, const VertexBufferLayout& layout) const
         const auto& element = elements[i];
 
         glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i, element.size, element.type, element.normalized, layout.getStride(), (const void*)element.vertexOffset);
+        glVertexAttribPointer(i, element.size, element.type, element.normalized, (stride) ? stride : layout.getStride(), (const void*)element.vertexOffset);
     }
 
     this->unbind();

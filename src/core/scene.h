@@ -16,9 +16,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "static/resource_manager.h"
+
 #include "core/rendering/post_processing.h"
 #include "core/rendering/camera.h"
 
+#include "scene/3d/skybox.h"
 #include "scene/3d/rigid_body3d.h"
 #include "scene/3d/static_body3d.h"
 
@@ -120,10 +122,16 @@ public:
         float outer_cutoff = 10.0f
     );
 
+    std::shared_ptr<qtzl::Skybox> createSkybox(
+        const std::string& name,
+        unsigned int texture
+    );
+
 private:
     std::vector<std::shared_ptr<qtzl::DirectionalLight3D>> m_DirectionalLights;
     std::vector<std::shared_ptr<qtzl::PointLight3D>> m_PointLights;
     std::vector<std::shared_ptr<qtzl::SpotLight3D>> m_SpotLights;
 
+    // TODO: make 2 maps/vectors of regular and physics nodes?
     std::vector<std::shared_ptr<qtzl::Node>> m_Nodes;
 };

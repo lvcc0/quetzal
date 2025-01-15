@@ -227,7 +227,7 @@ std::shared_ptr<Scene> Engine::createScene(const std::string& name, bool set_cur
     this->scenes.emplace(name, scene);
     
     // if the scene list is empty then we force set the first created one to be selected
-    if (set_current || (!set_current && this->scenes.empty()))
+    if (set_current || this->scenes.empty())
         this->setCurrentScene(name);
 
     return scene;

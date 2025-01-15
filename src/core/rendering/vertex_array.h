@@ -16,7 +16,7 @@ public:
 
     GLuint getID() const;
 
-    void addBuffer(const VBO& vbo, const VertexBufferLayout& layout) const;
+    void addBuffer(const VBO& vbo, const VertexBufferLayout& layout, GLuint stride = 0) const;
     
     void bind() const;
     void unbind() const;

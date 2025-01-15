@@ -7,8 +7,12 @@ int main()
 
     auto first_scene = engine.createScene("first_scene");
 
-    std::shared_ptr<ShaderProgram> default_shader = ResourceManager::createShaderProgram("shaders/default.vert", "shaders/default.frag");
-    Renderer::setCurrentShaderProgram(default_shader);
+    Renderer::setCurrentShaderProgram(ResourceManager::createShaderProgram("shaders/default.vert", "shaders/default.frag"));
+    Renderer::setCurrentShaderProgram(ResourceManager::createShaderProgram("shaders/skybox.vert", "shaders/skybox.frag", qtzl::Variant::ShaderProgramType::SKYBOX_SP));
+
+    unsigned int skybox_texture = ResourceManager::loadCubemap("textures/skybox");
+
+    first_scene->createSkybox("skybox", skybox_texture);
 
     first_scene->createCylindricalBillboard("pepeboard", "textures/pepe.png", glm::vec3(-4.0f, 2.0f, 0.0f));
     first_scene->createSphericalBillboard("containerboard", "textures/container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));

@@ -2,8 +2,8 @@
 
 namespace qtzl
 {
-	Texture::Texture(const std::string& name, const std::string& path, const std::string& type)
-		: Resource(name, path), m_Type(type)
+	Texture::Texture(const std::string& name, const std::string& path, const std::string& texture_type)
+		: Resource(name, path), m_TextureType(texture_type)
 	{
 		glGenTextures(1, &this->ID);
 
@@ -47,6 +47,6 @@ namespace qtzl
 
 	std::string Texture::getType() const
 	{
-		return this->m_Type;
+		return this->m_TextureType;
 	}
 }

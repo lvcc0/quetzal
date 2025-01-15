@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/rendering/vertex_array.h"
-#include "core/rendering/shader_program.h"
 
 #include "scene/3d/node3d.h"
 
@@ -19,6 +18,8 @@ namespace qtzl
         void setGlobalRotationDegrees(const glm::vec3& degrees) override;
 
     protected:
+        Variant::Type m_Type = Variant::Type::VISUAL_NODE3D;
+
         glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
 
         virtual void setupRender() = 0;

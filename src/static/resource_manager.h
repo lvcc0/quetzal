@@ -10,6 +10,8 @@
 #include <map>
 #include <algorithm>
 
+#include "static/variant.h"
+
 #include "scene/resources/mesh.h"
 #include "scene/resources/texture.h"
 #include "scene/resources/shader.h"
@@ -17,6 +19,9 @@
 #include "core/rendering/shader_program.h"
 
 // TODO: consider moving from strings to std::filesystem::path ?
+// TODO: catching exceptions when the resource is not loaded
+// TODO: load cubemap faces from one image
+// TODO: rewrite most of the functions to take references (const& where possible)
 
 class ResourceManager
 {
@@ -43,9 +48,10 @@ public:
     static std::map<const std::string, std::shared_ptr<qtzl::Texture>> getTextures();
     static std::map<const std::string, std::shared_ptr<qtzl::Shader>>  getShaders();
 
+    // The stuff below is not really resources so they don't get preloaded upon preloadResources()
     // Shader program stuff, must be used after loading shaders!
 
-    static std::shared_ptr<ShaderProgram> createShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
+    static std::shared_ptr<ShaderProgram> createShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path, qtzl::Variant::ShaderProgramType type = qtzl::Variant::ShaderProgramType::DEFAULT_SP);
 
     static std::vector<std::shared_ptr<ShaderProgram>> createPPShaderPrograms();
 
@@ -54,6 +60,9 @@ public:
 
     static std::vector<std::shared_ptr<ShaderProgram>> getShaderPrograms();
     static std::vector<std::shared_ptr<ShaderProgram>> getPPShaderPrograms();
+
+    // Loads 6 first textures in a directory (right, left, top, bottom, back, front)
+    static unsigned int loadCubemap(const std::string& dir_path);
 
     // Preload all the resources in the RES_PATH directory
     static void preloadResources();
@@ -77,10 +86,14 @@ private:
     inline static std::map<const std::string, std::shared_ptr<qtzl::Texture>> m_LoadedTextures; // "texture_path", *Texture
     inline static std::map<const std::string, std::shared_ptr<qtzl::Shader>>  m_LoadedShaders;  // "shader_path", *Shader
     
-    // Not exactly resources but ther fit here :)
+    // Not exactly resources but they fit here :)
 
     inline static std::vector<std::shared_ptr<ShaderProgram>> m_ShaderPrograms;
     inline static std::vector<std::shared_ptr<ShaderProgram>> m_PPShaderPrograms;
+
+    inline static std::vector<unsigned int> m_Cubemaps;
+
+    // TODO: rewrite vectors above as maps
 
     // Returns file contents as a string
     static std::string getFileString(const std::string& file_path);

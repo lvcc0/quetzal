@@ -32,7 +32,7 @@ struct LayoutElement
 class VertexBufferLayout
 {
 public:
-    void push(GLuint count, size_t vertex_offset);
+    void push(GLuint size, size_t vertex_offset);
 
     std::vector<LayoutElement> getElements() const;
     GLuint                     getStride() const;

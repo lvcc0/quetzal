@@ -11,6 +11,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "static/variant.h"
+
 #include "core/scene.h"
 #include "core/rendering/shader_program.h"
 
@@ -24,15 +26,17 @@ public:
 
     inline static float m_FOV = 45.0f;
 
+    static glm::mat4 getCurrentProjectionMatrix();
+    static std::map<qtzl::Variant::ShaderProgramType, std::shared_ptr<ShaderProgram>> getCurrentShaderPrograms();
+
+    // Sets current shader program of its type
     static void setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& shader_program);
 
-    static std::shared_ptr<ShaderProgram> getCurrentShaderProgram();
-    static glm::mat4                      getCurrentProjectionMatrix();
-
     // Draw all the stuff on the scene
-    static void render(std::shared_ptr<Scene> scene);
+    static void render(std::shared_ptr<Scene>& scene);
 
 private:
     inline static glm::mat4 m_CurrentProjectionMatrix;
-    inline static std::shared_ptr<ShaderProgram> m_CurrentShaderProgram;
+
+    inline static std::map<qtzl::Variant::ShaderProgramType, std::shared_ptr<ShaderProgram>> m_CurrentShaderPrograms; // ShaderType, *ShaderProgram
 };

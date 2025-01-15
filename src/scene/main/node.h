@@ -7,6 +7,7 @@
 #include <any>
 
 #include "core/rendering/shader_program.h"
+#include "static/variant.h"
 
 namespace qtzl
 {
@@ -24,6 +25,8 @@ namespace qtzl
         std::shared_ptr<Node>                        getParent() const;
         std::map<std::string, std::shared_ptr<Node>> getChildren() const;
 
+        Variant::Type getType() const;
+
         bool isRenderable() const;
 
         void addChild(std::shared_ptr<Node> node);
@@ -35,6 +38,8 @@ namespace qtzl
         std::string m_Name;
         std::shared_ptr<Node> m_Parent;
         std::map<std::string, std::shared_ptr<Node>> m_Children;
+
+        Variant::Type m_Type;
 
         bool m_Renderable = false;
 	};

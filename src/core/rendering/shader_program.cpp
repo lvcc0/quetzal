@@ -1,7 +1,12 @@
 #include "core/rendering/shader_program.h"
 
-ShaderProgram::ShaderProgram(const std::string& name, unsigned int vertex_shader_id, unsigned int fragment_shader_id)
-    : m_Name(name)
+ShaderProgram::ShaderProgram(
+    const std::string& name,
+    unsigned int vertex_shader_id,
+    unsigned int fragment_shader_id,
+    qtzl::Variant::ShaderProgramType type
+)
+    : m_Name(name), m_Type(type)
 {
     this->compileErrors(vertex_shader_id, "");
     this->compileErrors(fragment_shader_id, "");
@@ -76,6 +81,11 @@ GLuint ShaderProgram::getID() const
 std::string ShaderProgram::getName() const
 {
     return this->m_Name;
+}
+
+qtzl::Variant::ShaderProgramType ShaderProgram::getType() const
+{
+    return this->m_Type;
 }
 
 void ShaderProgram::activateProgram() const
