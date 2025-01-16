@@ -3,7 +3,7 @@
 namespace qtzl
 {
 	Resource::Resource(const std::string& name, const std::string& path)
-		: m_Name(name), m_Path(path)
+		: Object(Object::Type::RESOURCE), m_Name(name), m_Path(path)
 	{
 	}
 

@@ -8,7 +8,7 @@ int main()
     auto first_scene = engine.createScene("first_scene");
 
     Renderer::setCurrentShaderProgram(ResourceManager::createShaderProgram("shaders/default.vert", "shaders/default.frag"));
-    Renderer::setCurrentShaderProgram(ResourceManager::createShaderProgram("shaders/skybox.vert", "shaders/skybox.frag", qtzl::Variant::ShaderProgramType::SKYBOX_SP));
+    Renderer::setCurrentShaderProgram(ResourceManager::createShaderProgram("shaders/skybox.vert", "shaders/skybox.frag", ShaderProgram::Type::SKYBOX));
 
     unsigned int skybox_texture = ResourceManager::loadCubemap("textures/skybox");
 
@@ -23,11 +23,12 @@ int main()
     first_scene->createDirectionalLight("dir_light0");
     first_scene->createPointLight("point_light0", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
     first_scene->createSpotLight("spot_light0", glm::vec3(0.0f, 0.0f, -3.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.5f, 1.0f));
-
+    
     // Main loop
     while (engine.isRunning())
     {
         catcube->rotate(glm::vec3(0.0f, 1.0f * engine.getDeltaTime(), 0.0f));
+        catsphere->setScale(glm::vec3(sin(engine.getLastFrame()) + 1.1f));
 
         engine.process();
     }

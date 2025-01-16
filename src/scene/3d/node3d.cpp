@@ -5,7 +5,7 @@ namespace qtzl
     Node3D::Node3D(const std::string& name)
         : Node(name)
     {
-        this->m_Type = Variant::Type::NODE3D;
+        this->m_Type = Object::Type::NODE3D;
     }
 
     void Node3D::setScale(const glm::vec3& scale)

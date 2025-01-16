@@ -58,8 +58,6 @@ namespace qtzl
         std::vector<std::shared_ptr<SubMesh>> getSubMeshes() const;
 
     private:
-        Variant::Type m_Type = Variant::Type::MESH;
-
         std::vector<std::shared_ptr<SubMesh>> m_SubMeshes;
         std::vector<Texture> m_LoadedTextures;
 

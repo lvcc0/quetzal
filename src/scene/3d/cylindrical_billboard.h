@@ -12,8 +12,5 @@ namespace qtzl
         virtual ~CylindricalBillboard() = default;
 
         void render(std::shared_ptr<ShaderProgram> shader_program) override;
-
-    private:
-        Variant::Type m_Type = Variant::Type::CYLINDRICAL_BILLBOARD;
     };
 }

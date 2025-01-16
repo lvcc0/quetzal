@@ -5,6 +5,8 @@ namespace qtzl
     RigidBody3D::RigidBody3D(const std::string& name, std::shared_ptr<Mesh> mesh_sptr)
         : VisualNode3D(name), m_Mesh_sptr(mesh_sptr)
     {
+        this->m_Type = Object::Type::RIGID_BODY3D;
+
         this->setupRender();
     }
 

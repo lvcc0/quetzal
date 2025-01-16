@@ -5,12 +5,12 @@
 #include <string>
 #include <memory>
 
-#include "static/variant.h"
+#include "core/object.h"
 
 namespace qtzl
 {
     // Base class for stuff loaded by user
-    class Resource
+    class Resource : public Object
     {
     public:
         Resource(const std::string& name, const std::string& path);
@@ -25,7 +25,5 @@ namespace qtzl
     protected:
         std::string m_Name;
         std::string m_Path;
-    
-        Variant::Type m_Type = Variant::Type::NODE3D;
     };
 }

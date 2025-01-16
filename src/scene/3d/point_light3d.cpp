@@ -16,6 +16,7 @@ namespace qtzl
         : Light3D(name, color, ambient, diffuse, specular), m_Position(position),
           m_Constant(constant), m_Linear(linear), m_Quadratic(quadratic)
     {
+        this->m_Type = Object::Type::POINT_LIGHT3D;
     }
 
     void PointLight3D::setBillboardEnabled(bool enabled)

@@ -27,9 +27,9 @@ namespace qtzl
         void rotateDegrees(const glm::vec3& vector);
         void rotateDegrees(float degrees, const glm::vec3& vector);
 
-    private:
-        Variant::Type m_Type = Variant::Type::RIGID_BODY3D;
+        // TODO: override setters
 
+    private:
         std::shared_ptr<Mesh> m_Mesh_sptr;
 
         void setupRender() override;

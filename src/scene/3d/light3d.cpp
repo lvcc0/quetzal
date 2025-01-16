@@ -11,6 +11,7 @@ namespace qtzl
     )
         : Node3D(name), m_Color(color), m_Ambient(ambient), m_Diffuse(diffuse), m_Specular(specular)
     {
+        this->m_Type = Object::Type::LIGHT3D;
     }
 
     void Light3D::setEnabled(bool enabled)

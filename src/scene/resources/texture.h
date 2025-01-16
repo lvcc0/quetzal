@@ -20,8 +20,6 @@ namespace qtzl
         std::string getType() const;
 
     private:
-        Variant::Type m_Type = Variant::Type::TEXTURE;
-
         GLuint ID;
         std::string m_TextureType;
     };

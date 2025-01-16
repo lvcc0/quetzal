@@ -18,8 +18,6 @@ namespace qtzl
         GLuint getID() const;
 
     private:
-        Variant::Type m_Type = Variant::Type::SHADER;
-
         GLuint ID;
     };
 }

@@ -12,6 +12,7 @@ namespace qtzl
     )
         : Light3D(name, color, ambient, diffuse, specular), m_Direction(direction)
     {
+        this->m_Type = Object::Type::DIRECTIONAL_LIGHT3D;
     }
 
     void DirectionalLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const

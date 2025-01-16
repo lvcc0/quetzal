@@ -20,6 +20,7 @@ namespace qtzl
           m_Constant(constant), m_Linear(linear), m_Quadratic(quadratic),
           m_InnerCutoff(inner_cutoff), m_OuterCutoff(outer_cutoff)
     {
+        this->m_Type = Object::Type::SPOT_LIGHT3D;
     }
 
     void SpotLight3D::setBillboardEnabled(bool enabled)

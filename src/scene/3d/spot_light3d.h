@@ -34,8 +34,6 @@ namespace qtzl
         void render(std::shared_ptr<ShaderProgram> shader_program) override;
 
     private:
-        Variant::Type m_Type = Variant::Type::SPOT_LIGHT3D;
-
         bool m_BillboardEnabled = true;
 
         glm::vec3 m_Position;

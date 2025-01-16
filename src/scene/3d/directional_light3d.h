@@ -23,8 +23,6 @@ namespace qtzl
         void render(std::shared_ptr<ShaderProgram> shader_program) override;
 
     private:
-        Variant::Type m_Type = Variant::Type::DIRECTIONAL_LIGHT3D;
-
         glm::vec3 m_Direction;
     };
 }

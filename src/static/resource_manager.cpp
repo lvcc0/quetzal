@@ -93,7 +93,7 @@ std::map<const std::string, std::shared_ptr<qtzl::Shader>> ResourceManager::getS
     return m_LoadedShaders;
 }
 
-std::shared_ptr<ShaderProgram> ResourceManager::createShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path, qtzl::Variant::ShaderProgramType type)
+std::shared_ptr<ShaderProgram> ResourceManager::createShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path, ShaderProgram::Type type)
 {
     std::string name = std::filesystem::path(vertex_shader_path).filename().string() + "||" + std::filesystem::path(fragment_shader_path).filename().string();
 

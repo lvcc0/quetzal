@@ -6,11 +6,18 @@
 class ShaderProgram
 {
 public:
+    enum Type
+    {
+        DEFAULT,
+        STENCIL,
+        SKYBOX
+    };
+
     ShaderProgram(
         const std::string& name,
         unsigned int vertex_shader_id,
         unsigned int fragment_shader_id,
-        qtzl::Variant::ShaderProgramType type = qtzl::Variant::ShaderProgramType::DEFAULT_SP
+        Type type = Type::DEFAULT
     );
     ~ShaderProgram();
 
@@ -30,7 +37,7 @@ public:
 
     GLuint getID() const;
     std::string getName() const;
-    qtzl::Variant::ShaderProgramType getType() const;
+    Type getType() const;
 
     void activateProgram() const;
     void deleteProgram() const;
@@ -39,7 +46,7 @@ protected:
     GLuint ID;
     std::string m_Name;
 
-    qtzl::Variant::ShaderProgramType m_Type;
+    Type m_Type;
 
     void compileErrors(unsigned int shader_id, const std::string& type) const;
     bool isActive() const;

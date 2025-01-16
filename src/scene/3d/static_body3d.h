@@ -19,8 +19,6 @@ namespace qtzl
         void render(std::shared_ptr<ShaderProgram> shader_program) override;
 
     private:
-        Variant::Type m_Type = Variant::Type::STATIC_BODY3D;
-
         std::shared_ptr<Mesh> m_Mesh_sptr;
 
         void setupRender() override;

@@ -7,12 +7,12 @@
 #include <any>
 
 #include "core/rendering/shader_program.h"
-#include "static/variant.h"
+#include "core/object.h"
 
 namespace qtzl
 {
     // Base class for every single scene object
-	class Node : public std::enable_shared_from_this<Node>
+	class Node : public Object, public std::enable_shared_from_this<Node>
 	{
     public:
         Node(const std::string& name);
@@ -25,8 +25,6 @@ namespace qtzl
         std::shared_ptr<Node>                        getParent() const;
         std::map<std::string, std::shared_ptr<Node>> getChildren() const;
 
-        Variant::Type getType() const;
-
         bool isRenderable() const;
 
         void addChild(std::shared_ptr<Node> node);
@@ -38,8 +36,6 @@ namespace qtzl
         std::string m_Name;
         std::shared_ptr<Node> m_Parent;
         std::map<std::string, std::shared_ptr<Node>> m_Children;
-
-        Variant::Type m_Type;
 
         bool m_Renderable = false;
 	};

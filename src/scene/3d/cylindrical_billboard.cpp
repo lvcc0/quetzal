@@ -5,6 +5,7 @@ namespace qtzl
 	CylindricalBillboard::CylindricalBillboard(const std::string& name, std::shared_ptr<Texture> texture)
 		: Billboard(name, texture)
 	{
+        this->m_Type = Object::Type::CYLINDRICAL_BILLBOARD;
 	}
 
 	void CylindricalBillboard::render(std::shared_ptr<ShaderProgram> shader_program)

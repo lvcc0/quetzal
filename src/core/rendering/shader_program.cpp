@@ -4,7 +4,7 @@ ShaderProgram::ShaderProgram(
     const std::string& name,
     unsigned int vertex_shader_id,
     unsigned int fragment_shader_id,
-    qtzl::Variant::ShaderProgramType type
+    Type type
 )
     : m_Name(name), m_Type(type)
 {
@@ -83,7 +83,7 @@ std::string ShaderProgram::getName() const
     return this->m_Name;
 }
 
-qtzl::Variant::ShaderProgramType ShaderProgram::getType() const
+ShaderProgram::Type ShaderProgram::getType() const
 {
     return this->m_Type;
 }

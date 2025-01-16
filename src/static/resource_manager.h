@@ -10,7 +10,7 @@
 #include <map>
 #include <algorithm>
 
-#include "static/variant.h"
+//#include "static/variant.h"
 
 #include "scene/resources/mesh.h"
 #include "scene/resources/texture.h"
@@ -51,7 +51,7 @@ public:
     // The stuff below is not really resources so they don't get preloaded upon preloadResources()
     // Shader program stuff, must be used after loading shaders!
 
-    static std::shared_ptr<ShaderProgram> createShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path, qtzl::Variant::ShaderProgramType type = qtzl::Variant::ShaderProgramType::DEFAULT_SP);
+    static std::shared_ptr<ShaderProgram> createShaderProgram(const std::string& vertex_shader_path, const std::string& fragment_shader_path, ShaderProgram::Type type = ShaderProgram::Type::DEFAULT);
 
     static std::vector<std::shared_ptr<ShaderProgram>> createPPShaderPrograms();
 

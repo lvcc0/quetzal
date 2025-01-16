@@ -16,6 +16,8 @@
 #include "static/renderer.h"
 #include "core/scene.h"
 
+// TODO: show actual loaded resource in the resource manager gui
+
 // This is the main part of scene GUI. It contains more than one window
 class GUI
 {

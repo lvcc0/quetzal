@@ -46,11 +46,13 @@ namespace qtzl
         this->m_VAO_uptr->addBuffer(*this->m_VBO_uptr, layout);
     }
 
-    // --- //
+    // --- cool separator --- //
 
     Mesh::Mesh(const std::string& name, const std::string& path)
         : Resource(name, path)
     {
+        this->m_Type = Object::Type::MESH;
+
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path,
             aiProcess_Triangulate |

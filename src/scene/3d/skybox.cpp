@@ -6,7 +6,7 @@ namespace qtzl
         : Node3D(name), m_Texture(texture)
     {
         this->m_Renderable = true;
-        this->m_Type = Variant::Type::SKYBOX;
+        this->m_Type = Object::Type::SKYBOX;
 
         setupRender();
     }

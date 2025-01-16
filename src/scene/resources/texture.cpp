@@ -5,6 +5,8 @@ namespace qtzl
 	Texture::Texture(const std::string& name, const std::string& path, const std::string& texture_type)
 		: Resource(name, path), m_TextureType(texture_type)
 	{
+		this->m_Type = Object::Type::TEXTURE;
+
 		glGenTextures(1, &this->ID);
 
 		int width, height, componentsNum;

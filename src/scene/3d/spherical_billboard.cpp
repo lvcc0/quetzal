@@ -5,6 +5,7 @@ namespace qtzl
 	SphericalBillboard::SphericalBillboard(const std::string& name, std::shared_ptr<Texture> texture)
 		: Billboard(name, texture)
 	{
+        this->m_Type = Object::Type::SPHERICAL_BILLBOARD;
 	}
 
 	void SphericalBillboard::render(std::shared_ptr<ShaderProgram> shader_program)

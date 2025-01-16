@@ -5,7 +5,7 @@ glm::mat4 Renderer::getCurrentProjectionMatrix()
     return m_CurrentProjectionMatrix;
 }
 
-std::map<qtzl::Variant::ShaderProgramType, std::shared_ptr<ShaderProgram>> Renderer::getCurrentShaderPrograms()
+std::map<ShaderProgram::Type, std::shared_ptr<ShaderProgram>> Renderer::getCurrentShaderPrograms()
 {
     return m_CurrentShaderPrograms;
 }
@@ -33,34 +33,34 @@ void Renderer::render(std::shared_ptr<Scene>& scene)
     m_CurrentProjectionMatrix = glm::perspective(glm::radians(m_FOV), (float)scene->m_Camera.m_Width / (float)scene->m_Camera.m_Height, 0.1f, 100.0f);
 
     // kinda lengthy, maybe we'll rewrite it, but i kinda like it
-    m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::DEFAULT_SP)->activateProgram();
+    m_CurrentShaderPrograms.at(ShaderProgram::Type::DEFAULT)->activateProgram();
     
-    m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::DEFAULT_SP)->setVec3("viewPos", scene->m_Camera.m_Position);
-    m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::DEFAULT_SP)->setFloat("material.shininess", 32.0f);
+    m_CurrentShaderPrograms.at(ShaderProgram::Type::DEFAULT)->setVec3("viewPos", scene->m_Camera.m_Position);
+    m_CurrentShaderPrograms.at(ShaderProgram::Type::DEFAULT)->setFloat("material.shininess", 32.0f);
 
-    m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::DEFAULT_SP)->setMat4("projection", m_CurrentProjectionMatrix);
-    m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::DEFAULT_SP)->setMat4("view", scene->m_Camera.getViewMatrix());
+    m_CurrentShaderPrograms.at(ShaderProgram::Type::DEFAULT)->setMat4("projection", m_CurrentProjectionMatrix);
+    m_CurrentShaderPrograms.at(ShaderProgram::Type::DEFAULT)->setMat4("view", scene->m_Camera.getViewMatrix());
 
     // Rendering lights' influence
     if (!scene->getDirectionalLights().empty())
     {
         for (unsigned int i = 0; i < scene->getDirectionalLights().size(); i++)
         {
-            scene->getDirectionalLights()[i]->updateUniforms(m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::DEFAULT_SP), i);
+            scene->getDirectionalLights()[i]->updateUniforms(m_CurrentShaderPrograms.at(ShaderProgram::Type::DEFAULT), i);
         }
     }
     if (!scene->getPointLights().empty())
     {
         for (unsigned int i = 0; i < scene->getPointLights().size(); i++)
         {
-            scene->getPointLights()[i]->updateUniforms(m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::DEFAULT_SP), i);
+            scene->getPointLights()[i]->updateUniforms(m_CurrentShaderPrograms.at(ShaderProgram::Type::DEFAULT), i);
         }
     }
     if (!scene->getSpotLights().empty())
     {
         for (unsigned int i = 0; i < scene->getSpotLights().size(); i++)
         {
-            scene->getSpotLights()[i]->updateUniforms(m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::DEFAULT_SP), i);
+            scene->getSpotLights()[i]->updateUniforms(m_CurrentShaderPrograms.at(ShaderProgram::Type::DEFAULT), i);
         }
     }
 
@@ -69,19 +69,19 @@ void Renderer::render(std::shared_ptr<Scene>& scene)
     {
         if (node->isRenderable())
         {
-            if (node->getType() == qtzl::Variant::Type::SKYBOX && m_CurrentShaderPrograms.contains(qtzl::Variant::ShaderProgramType::SKYBOX_SP))
+            if (node->getType() == qtzl::Object::Type::SKYBOX && m_CurrentShaderPrograms.contains(ShaderProgram::Type::SKYBOX))
             {
-                m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::SKYBOX_SP)->activateProgram();
+                m_CurrentShaderPrograms.at(ShaderProgram::Type::SKYBOX)->activateProgram();
 
-                m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::SKYBOX_SP)->setMat4("projection", m_CurrentProjectionMatrix);
-                m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::SKYBOX_SP)->setMat4("view", glm::mat4(glm::mat3(scene->m_Camera.getViewMatrix())));
+                m_CurrentShaderPrograms.at(ShaderProgram::Type::SKYBOX)->setMat4("projection", m_CurrentProjectionMatrix);
+                m_CurrentShaderPrograms.at(ShaderProgram::Type::SKYBOX)->setMat4("view", glm::mat4(glm::mat3(scene->m_Camera.getViewMatrix())));
 
-                node->render(m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::SKYBOX_SP));
+                node->render(m_CurrentShaderPrograms.at(ShaderProgram::Type::SKYBOX));
 
                 continue;
             }
 
-            node->render(m_CurrentShaderPrograms.at(qtzl::Variant::ShaderProgramType::DEFAULT_SP));
+            node->render(m_CurrentShaderPrograms.at(ShaderProgram::Type::DEFAULT));
         }
     }
 

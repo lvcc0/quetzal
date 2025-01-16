@@ -3,9 +3,8 @@
 namespace qtzl
 {
 	Node::Node(const std::string& name)
-		: m_Name(name)
+		: Object(Object::Type::NODE), m_Name(name)
 	{
-		this->m_Type = Variant::Type::NODE;
 	}
 
 	void Node::setName(const std::string& name)
@@ -31,11 +30,6 @@ namespace qtzl
 	std::map<std::string, std::shared_ptr<Node>> Node::getChildren() const
 	{
 		return this->m_Children;
-	}
-
-	Variant::Type Node::getType() const
-	{
-		return this->m_Type;
 	}
 
 	bool Node::isRenderable() const

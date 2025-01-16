@@ -30,8 +30,6 @@ namespace qtzl
         virtual void updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const = 0;
 
     protected:
-        Variant::Type m_Type = Variant::Type::LIGHT3D;
-
         bool m_Enabled = true;
         
         glm::vec3 m_Color;

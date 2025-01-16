@@ -5,6 +5,8 @@ namespace qtzl
 	Billboard::Billboard(const std::string& name, std::shared_ptr<Texture> texture)
 		: VisualNode3D(name), m_Texture(texture)
 	{
+		this->m_Type = Object::Type::BILLBOARD;
+
 		this->setupRender();
 	}
 

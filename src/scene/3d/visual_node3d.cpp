@@ -5,7 +5,15 @@ namespace qtzl
     VisualNode3D::VisualNode3D(const std::string& name)
         : Node3D(name)
     {
+        this->m_Type = Object::Type::VISUAL_NODE3D;
+
         this->m_Renderable = true;
+    }
+
+    void VisualNode3D::setScale(const glm::vec3& scale)
+    {
+        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, scale / m_Scale); // TODO: fix this stuff
+        this->m_Scale = scale;
     }
 
     void VisualNode3D::setGlobalPosition(const glm::vec3& position)

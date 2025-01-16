@@ -1,4 +1,4 @@
-#include "physics.h"
+#include "static/physics.h"
 
 //bool Physics::checkCollision(std::shared_ptr<Collision> one, std::shared_ptr<Collision> two)
 //{
