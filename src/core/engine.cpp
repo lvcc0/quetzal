@@ -212,7 +212,7 @@ void Engine::process()
         if (winWidth > 0 && winHeight > 0) // we don't wanna render the window if it isn't open
             Renderer::render(this->scenes.at(this->currentScene));
     }
-    
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

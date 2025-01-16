@@ -5,6 +5,9 @@
 #include <string>
 #include <variant>
 
+// thirdparty
+#include <glm/glm.hpp>
+
 namespace qtzl
 {
     // Base class for almost everything in the engine
@@ -39,20 +42,32 @@ namespace qtzl
             SKYBOX
         };
 
+        struct Property
+        {
+            std::variant<int, float, bool, std::string, glm::vec3> value;
+            enum Type { INT, FLOAT, BOOL, STRING, VEC3 } type;
+        };
+
         Object(Type type);
         virtual ~Object() = default;
 
-        void setProperty(const std::string& property_name);
+        void setProperty(const std::string& property_name, int value);
+        void setProperty(const std::string& property_name, float value);
+        void setProperty(const std::string& property_name, bool value);
+        void setProperty(const std::string& property_name, const std::string& value);
+        void setProperty(const std::string& property_name, const glm::vec3& value);
 
-        virtual std::map<std::string, std::variant<int, float, std::string>> getProperties() const;
+        Property getProperty(const std::string& property_name) const;
+        std::map<std::string, Property> getProperties() const;
 
         Type getType() const;
         bool isType(Type type) const;
 
     protected:
         Type m_Type;
+        std::map<std::string, Property> m_Properties;
 
-        // NOTE: i don't really know if this whole std::optional thing fits here
-        std::map<std::string, std::variant<int, float, std::string>> m_Properties;
+        void addProperty(const std::string& property_name, Property& property);
+        void addProperties(std::map<std::string, Property>& properties);
     };
 }

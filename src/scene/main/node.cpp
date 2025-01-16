@@ -5,6 +5,12 @@ namespace qtzl
 	Node::Node(const std::string& name)
 		: Object(Object::Type::NODE), m_Name(name)
 	{
+		std::map<std::string, Property> properties =
+		{
+			{"Name", { this->m_Name, Property::STRING }}
+		};
+
+		this->addProperties(properties);
 	}
 
 	void Node::setName(const std::string& name)

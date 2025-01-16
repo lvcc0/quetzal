@@ -6,6 +6,18 @@ namespace qtzl
         : Node(name)
     {
         this->m_Type = Object::Type::NODE3D;
+
+        std::map<std::string, Property> properties =
+        {
+            {"Global Position", { this->m_GlobalPosition, Property::VEC3 }},
+            {"Global Rotation", { this->m_GlobalRotation, Property::VEC3 }},
+            {"Position", { this->m_Position, Property::VEC3 }},
+            {"Rotation", { this->m_Rotation, Property::VEC3 }},
+            {"Scale", { this->m_Scale, Property::VEC3 }},
+            {"Visible", { this->m_Visible, Property::BOOL }}
+        };
+
+        this->addProperties(properties);
     }
 
     void Node3D::setScale(const glm::vec3& scale)
