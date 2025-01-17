@@ -1,9 +1,9 @@
 #pragma once
 
 // std
+#include <iostream>
 #include <map>
 #include <string>
-#include <variant>
 
 // thirdparty
 #include <glm/glm.hpp>
@@ -42,32 +42,53 @@ namespace qtzl
             SKYBOX
         };
 
-        struct Property
-        {
-            std::variant<int, float, bool, std::string, glm::vec3> value;
-            enum Type { INT, FLOAT, BOOL, STRING, VEC3 } type;
-        };
-
         Object(Type type);
         virtual ~Object() = default;
 
-        void setProperty(const std::string& property_name, int value);
-        void setProperty(const std::string& property_name, float value);
-        void setProperty(const std::string& property_name, bool value);
-        void setProperty(const std::string& property_name, const std::string& value);
-        void setProperty(const std::string& property_name, const glm::vec3& value);
+        // NOTE: gotta rewrite this whole stuff sometime
 
-        Property getProperty(const std::string& property_name) const;
-        std::map<std::string, Property> getProperties() const;
+        // Set property if it exists
+        template <typename T> void set(const std::string& property_name, const T& property);
+        template <> void set<int>(const std::string& property_name, const int& property);
+        template <> void set<float>(const std::string& property_name, const float& property);
+        template <> void set<bool>(const std::string& property_name, const bool& property);
+        template <> void set<std::string>(const std::string& property_name, const std::string& property);
+        template <> void set<glm::vec3>(const std::string& property_name, const glm::vec3& property);
 
+        // Get property
+        template <typename T> T get(const std::string& property_name) const;
+        template <> int         get<int>(const std::string& property_name) const;
+        template <> float       get<float>(const std::string& property_name) const;
+        template <> bool        get<bool>(const std::string& property_name) const;
+        template <> std::string get<std::string>(const std::string& property_name) const;
+        template <> glm::vec3   get<glm::vec3>(const std::string& property_name) const;
+
+        // Get all properties of type
+        template <typename T> std::map<std::string, T> getProperties() const;
+        template <> std::map<std::string, int>         getProperties<int>() const;
+        template <> std::map<std::string, float>       getProperties<float>() const;
+        template <> std::map<std::string, bool>        getProperties<bool>() const;
+        template <> std::map<std::string, std::string> getProperties<std::string>() const;
+        template <> std::map<std::string, glm::vec3>   getProperties<glm::vec3>() const;
+        
         Type getType() const;
         bool isType(Type type) const;
 
     protected:
         Type m_Type;
-        std::map<std::string, Property> m_Properties;
 
-        void addProperty(const std::string& property_name, Property& property);
-        void addProperties(std::map<std::string, Property>& properties);
+        std::map<std::string, int> m_IntProperties;
+        std::map<std::string, float> m_FloatProperties;
+        std::map<std::string, bool> m_BoolProperties;
+        std::map<std::string, std::string> m_StringProperties;
+        std::map<std::string, glm::vec3> m_Vec3Properties;
+
+        // Add property inside the constructor
+        template <typename T> void addProperty(const std::string& property_name, const T& property);
+        template <> void addProperty<int>(const std::string& property_name, const int& property);
+        template <> void addProperty<float>(const std::string& property_name, const float& property);
+        template <> void addProperty<bool>(const std::string& property_name, const bool& property);
+        template <> void addProperty<std::string>(const std::string& property_name, const std::string& property);
+        template <> void addProperty<glm::vec3>(const std::string& property_name, const glm::vec3& property);
     };
 }

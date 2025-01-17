@@ -1,11 +1,5 @@
 #pragma once
 
-// std
-#include <string>
-#include <memory>
-#include <map>
-#include <any>
-
 #include "core/rendering/shader_program.h"
 #include "core/object.h"
 
@@ -18,10 +12,8 @@ namespace qtzl
         Node(const std::string& name);
         virtual ~Node() = default;
 
-        void setName(const std::string& name);
         void setParent(std::shared_ptr<Node> node);
 
-        std::string                                  getName() const;
         std::shared_ptr<Node>                        getParent() const;
         std::map<std::string, std::shared_ptr<Node>> getChildren() const;
 
@@ -33,7 +25,6 @@ namespace qtzl
         virtual void render(std::shared_ptr<ShaderProgram> shader_program) = 0;
 
     protected:
-        std::string m_Name;
         std::shared_ptr<Node> m_Parent;
         std::map<std::string, std::shared_ptr<Node>> m_Children;
 

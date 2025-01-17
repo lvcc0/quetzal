@@ -103,7 +103,7 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
     ImGui::Checkbox("Show node types", &m_NodeMgrShowType);
 
     // Scene nodes list
-    if (ImGui::BeginTable("Nodes", m_NodeMgrShowType ? 2 : 1, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
+    if (ImGui::BeginTable("Nodes", 1 + (int)m_NodeMgrShowType, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
     {
         ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
         if (m_NodeMgrShowType) ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 20.0f);
@@ -118,14 +118,51 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
         ImGui::EndTable();
     }
 
-    // TODO: selected node
-
     // Selected node config
     if (m_CurrentNode_sptr != nullptr)
     {
-        ImGui::SeparatorText(m_CurrentNode_sptr->getName().c_str());
+        ImGui::SeparatorText(m_CurrentNode_sptr->get<std::string>("Name").c_str());
 
-        // TODO: do smth like "std::map<std::string, std::any/std::optional> Node::getData()" to configure here
+        // Int properties
+        for (auto& entry : m_CurrentNode_sptr->getProperties<int>())
+        {
+            ImGui::InputInt(entry.first.c_str(), &entry.second);
+
+            if (ImGui::IsItemDeactivatedAfterEdit())
+                m_CurrentNode_sptr->set<int>(entry.first, entry.second);
+        }
+
+        // Float properties
+        for (auto& entry : m_CurrentNode_sptr->getProperties<float>())
+        {
+
+        }
+
+        // Bool properties
+        for (auto& entry : m_CurrentNode_sptr->getProperties<bool>())
+        {
+
+        }
+
+        // String properties
+        for (auto& entry : m_CurrentNode_sptr->getProperties<std::string>())
+        {
+            char* text = (char*)entry.second.c_str();
+
+            ImGui::InputText(entry.first.c_str(), text, 32);
+
+            if (ImGui::IsItemDeactivatedAfterEdit())
+                m_CurrentNode_sptr->set<std::string>(entry.first, (std::string)text);
+        }
+
+        // Vec3 properties
+        for (auto& entry : m_CurrentNode_sptr->getProperties<glm::vec3>())
+        {
+            float* data = glm::value_ptr(entry.second);
+
+            if (ImGui::DragFloat3(entry.first.c_str(), data))
+                m_CurrentNode_sptr->set<glm::vec3>(entry.first, glm::make_vec3(data));
+        }
     }
 
     ImGui::End();
@@ -180,7 +217,10 @@ void GUI::displayNode(std::shared_ptr<qtzl::Node> node)
 
     if (node->getChildren().size() > 0)
     {
-        bool open = ImGui::TreeNodeEx(node->getName().c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+        bool open = ImGui::TreeNodeEx(node->get<std::string>("Name").c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick);
+        
+        if (ImGui::IsItemClicked())
+            m_CurrentNode_sptr = node;
 
         if (m_NodeMgrShowType)
         {
@@ -201,7 +241,10 @@ void GUI::displayNode(std::shared_ptr<qtzl::Node> node)
     }
     else
     {
-        ImGui::TreeNodeEx(node->getName().c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+        ImGui::TreeNodeEx(node->get<std::string>("Name").c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+
+        if (ImGui::IsItemClicked())
+            m_CurrentNode_sptr = node;
 
         if (m_NodeMgrShowType)
         {

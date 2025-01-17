@@ -171,7 +171,7 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 {
     if (key == GLFW_KEY_P && action == GLFW_PRESS) // debugging purposes
         for (const auto& node : this->scenes.at(this->currentScene)->getNodes())
-            std::cout << node->getName() << ": " << node->getParent() << std::endl;
+            std::cout << node->get<std::string>("Name") << ": " << node->getParent() << std::endl;
 
     if (key == GLFW_KEY_M && action == GLFW_PRESS)
         this->shouldDrawGui = !this->shouldDrawGui;

@@ -3,29 +3,14 @@
 namespace qtzl
 {
 	Node::Node(const std::string& name)
-		: Object(Object::Type::NODE), m_Name(name)
+		: Object(Object::Type::NODE)
 	{
-		std::map<std::string, Property> properties =
-		{
-			{"Name", { this->m_Name, Property::STRING }}
-		};
-
-		this->addProperties(properties);
-	}
-
-	void Node::setName(const std::string& name)
-	{
-		this->m_Name = name;
+		this->addProperty<std::string>("Name", name);
 	}
 
 	void Node::setParent(std::shared_ptr<Node> node)
 	{
 		this->m_Parent = node;
-	}
-
-	std::string Node::getName() const
-	{
-		return this->m_Name;
 	}
 
 	std::shared_ptr<Node> Node::getParent() const
@@ -46,7 +31,7 @@ namespace qtzl
 	void Node::addChild(std::shared_ptr<Node> node)
 	{
 		node->setParent(shared_from_this()); // NOTE: yeah this doesn't seem right
-		this->m_Children.emplace(node->getName(), node);
+		this->m_Children.emplace(node->get<std::string>("Name"), node);
 	}
 
 	void Node::removeChild(const std::string& name)
