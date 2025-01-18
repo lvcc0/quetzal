@@ -13,8 +13,7 @@
 
 namespace qtzl
 {
-    // TODO: make it not abstract, so not rotating "3D sprites" can be made?
-    // Abstract base class for Cylindrical and Spherical billboards
+    // Base class for Cylindrical and Spherical billboards ( NOTE: currently not renderable )
     class Billboard : public VisualNode3D
     {
     public:
@@ -24,13 +23,12 @@ namespace qtzl
         void setTarget(glm::vec3 target);
 
         glm::vec3 getTarget() const;
-        glm::mat4 getModelMatrix() const;
+        glm::mat4 getModelMatrix() const override;
 
         void render(std::shared_ptr<ShaderProgram> shader_program) override;
 
     protected:
         std::shared_ptr<Texture> m_Texture;
-        glm::vec3 m_Target = glm::vec3(0.0f, 0.0f, 1.0f);
 
         glm::vec3 m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
         glm::vec3 m_Right = glm::vec3(1.0f, 0.0f, 0.0f);

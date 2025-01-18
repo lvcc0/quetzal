@@ -10,7 +10,7 @@ namespace qtzl
 
 	void CylindricalBillboard::render(std::shared_ptr<ShaderProgram> shader_program)
 	{
-        glm::vec3 projToTarget = glm::normalize(glm::vec3(this->m_Target.x - this->m_GlobalPosition.x, 0.0f, this->m_Target.z - this->m_GlobalPosition.z)); // projection of vector to target in the XZ plane
+        glm::vec3 projToTarget = glm::normalize(glm::vec3(this->m_Vec3Properties.at("Target").x - this->m_Vec3Properties.at("Global position").x, 0.0f, this->m_Vec3Properties.at("Target").z - this->m_Vec3Properties.at("Global position").z)); // projection of vector to target in the XZ plane
         m_Up = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), projToTarget); // flips the up vector if going the second half of the loop
 
         this->m_VerticalAngle = glm::acos(glm::dot(projToTarget, glm::vec3(0.0f, 0.0f, -1.0f)));
@@ -18,9 +18,9 @@ namespace qtzl
         if (this->m_VerticalAngle < 0.01 || this->m_VerticalAngle > 3.14)
             this->m_Up = glm::vec3(0.0f, 1.0f, 0.0f); // stability reasons
 
-        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_GlobalPosition);
+        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_Vec3Properties.at("Global position"));
+        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(this->m_Vec3Properties.at("Scale").x, this->m_Vec3Properties.at("Scale").y, 1.0f));
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_VerticalAngle, this->m_Up);
-        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(this->m_Scale.x, this->m_Scale.y, 1.0f));
 
         shader_program->activateProgram();
 

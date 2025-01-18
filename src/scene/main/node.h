@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/rendering/shader_program.h"
 #include "core/object.h"
+#include "core/rendering/shader_program.h"
 
 namespace qtzl
 {

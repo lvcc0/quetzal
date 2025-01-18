@@ -7,12 +7,12 @@ namespace qtzl
     {
         this->m_Type = Object::Type::NODE3D;
 
-        this->addProperty<bool>("Visible", true);
-        this->addProperty<glm::vec3>("Global position", glm::vec3(0.0f));
-        this->addProperty<glm::vec3>("Global rotation", glm::vec3(0.0f));
-        this->addProperty<glm::vec3>("Position", glm::vec3(0.0f));
-        this->addProperty<glm::vec3>("Rotation", glm::vec3(0.0f));
-        this->addProperty<glm::vec3>("Scale", glm::vec3(1.0f));
+        this->addProperty("Visible", true);
+        this->addProperty("Global position", glm::vec3(0.0f));
+        this->addProperty("Global rotation", glm::vec3(0.0f));
+        this->addProperty("Position", glm::vec3(0.0f));
+        this->addProperty("Rotation", glm::vec3(0.0f));
+        this->addProperty("Scale", glm::vec3(1.0f));
     }
 
     void Node3D::setScale(const glm::vec3& scale)
@@ -73,7 +73,7 @@ namespace qtzl
 
     void Node3D::setVisible(bool visible)
     {
-        if (this->get<bool>("Visible") == visible)
+        if (this->getBool("Visible") == visible)
             return;
 
         this->set("Visible", visible);
@@ -81,42 +81,42 @@ namespace qtzl
 
     glm::vec3 Node3D::getScale() const
     {
-        return this->get<glm::vec3>("Scale");
+        return this->getVec3("Scale");
     }
 
     glm::vec3 Node3D::getPosition() const
     {
-        return this->get<glm::vec3>("Position");
+        return this->getVec3("Position");
     }
 
     glm::vec3 Node3D::getRotation() const
     {
-        return this->get<glm::vec3>("Rotation");
+        return this->getVec3("Rotation");
     }
 
     glm::vec3 Node3D::getRotationDegrees() const
     {
-        return glm::degrees(this->get<glm::vec3>("Rotation"));
+        return glm::degrees(this->getVec3("Rotation"));
     }
 
     glm::vec3 Node3D::getGlobalPosition() const
     {
-        return this->get<glm::vec3>("Global position");
+        return this->getVec3("Global position");
     }
 
     glm::vec3 Node3D::getGlobalRotation() const
     {
-        return this->get<glm::vec3>("Global rotation");
+        return this->getVec3("Global rotation");
     }
 
     glm::vec3 Node3D::getGlobalRotationDegrees() const
     {
-        return glm::degrees(this->get<glm::vec3>("Global rotation"));
+        return glm::degrees(this->getVec3("Global rotation"));
     }
 
     bool Node3D::isVisible() const
     {
-        return this->get<bool>("Visible");;
+        return this->getBool("Visible");;
     }
 
     void Node3D::show()

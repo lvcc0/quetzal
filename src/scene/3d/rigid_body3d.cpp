@@ -52,7 +52,7 @@ namespace qtzl
     void RigidBody3D::translate(const glm::vec3& vector)
     {
         this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, vector);
-        this->m_GlobalPosition += vector;
+        this->m_Vec3Properties["Global position"] += vector;
     }
 
     void RigidBody3D::rotate(const glm::vec3& vector)
@@ -60,13 +60,13 @@ namespace qtzl
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, vector.x, glm::vec3(1.0f, 0.0f, 0.0f));
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, vector.y, glm::vec3(0.0f, 1.0f, 0.0f));
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, vector.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        this->m_GlobalRotation += vector;
+        this->m_Vec3Properties["Global rotation"] += vector;
     }
 
     void RigidBody3D::rotate(float radians, const glm::vec3& vector)
     {
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, radians, vector);
-        this->m_GlobalRotation += vector * radians;
+        this->m_Vec3Properties["Global rotation"] += vector * radians;
     }
 
     void RigidBody3D::rotateDegrees(const glm::vec3& vector)
@@ -76,7 +76,7 @@ namespace qtzl
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, radians.x, glm::vec3(1.0f, 0.0f, 0.0f));
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, radians.y, glm::vec3(0.0f, 1.0f, 0.0f));
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, radians.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        this->m_GlobalRotation += vector;
+        this->m_Vec3Properties["Global rotation"] += radians;
     }
 
     void RigidBody3D::rotateDegrees(float degrees, const glm::vec3& vector)
@@ -84,13 +84,13 @@ namespace qtzl
         float radians = glm::radians(degrees);
 
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, radians, vector);
-        this->m_GlobalRotation += vector * radians;
+        this->m_Vec3Properties["Global rotation"] += vector * radians;
     }
 
     void RigidBody3D::scale(const glm::vec3& vector)
     {
         this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, vector);
-        this->m_Scale *= vector;
+        this->m_Vec3Properties["Scale"] *= vector;
     }
 
     void RigidBody3D::setupRender()

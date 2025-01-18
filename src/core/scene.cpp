@@ -35,6 +35,16 @@ void Scene::update()
     // Processing nodes' stuff
     for (const auto& node_sptr : m_Nodes)
     {
+        //switch (node_sptr->getType())
+        //{
+        //case qtzl::Object::CYLINDRICAL_BILLBOARD:
+        //    node_sptr->set("Target", m_Camera.m_Position);
+        //    break;
+        //case qtzl::Object::SPHERICAL_BILLBOARD:
+        //    node_sptr->set("Target", m_Camera.m_Position);
+        //    break;
+        //}
+
         // NOTE: is this alright? we'll keep it like this for now ig
         if (typeid(*node_sptr) == typeid(qtzl::CylindricalBillboard))
         {

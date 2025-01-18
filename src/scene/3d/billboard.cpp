@@ -7,26 +7,29 @@ namespace qtzl
 	{
 		this->m_Type = Object::Type::BILLBOARD;
 
+		this->addProperty("Target", glm::vec3(0.0f, 0.0f, 1.0f));
+
 		this->setupRender();
 	}
 
 	void Billboard::setTarget(glm::vec3 target)
 	{
-		this->m_Target = target;
+		this->set("Target", target);
 	}
 
 	glm::vec3 Billboard::getTarget() const
 	{
-		return this->m_Target;
+		return this->getVec3("Target");
 	}
 
 	glm::mat4 Billboard::getModelMatrix() const
 	{
 		glm::mat4 matrix = glm::mat4(1.0f);
-		matrix = glm::translate(matrix, this->m_Position);
+
+		matrix = glm::translate(matrix, this->m_Vec3Properties.at("Global position"));
 		matrix = glm::rotate(matrix, this->m_VerticalAngle, this->m_Up);
 		matrix = glm::rotate(matrix, this->m_HorizontalAngle, this->m_Right);
-		matrix = glm::scale(matrix, glm::vec3(this->m_Scale.x, this->m_Scale.y, 1.0f));
+		matrix = glm::scale(matrix, glm::vec3(this->m_Vec3Properties.at("Scale").x, this->m_Vec3Properties.at("Scale").y, 1.0f));
 
 		return matrix;
 	}

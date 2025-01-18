@@ -41,16 +41,5 @@ namespace qtzl
 
         void show();
         void hide();
-
-    protected:
-        bool m_Visible = true;
-
-        glm::vec3 m_Scale = glm::vec3(1.0f);
-
-        glm::vec3 m_Position = glm::vec3(0.0f);
-        glm::vec3 m_GlobalPosition = glm::vec3(0.0f);
-
-        glm::vec3 m_Rotation = glm::vec3(0.0f);       // in radians
-        glm::vec3 m_GlobalRotation = glm::vec3(0.0f); // in radians
     };
 }

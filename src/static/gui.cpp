@@ -121,47 +121,53 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
     // Selected node config
     if (m_CurrentNode_sptr != nullptr)
     {
-        ImGui::SeparatorText(m_CurrentNode_sptr->get<std::string>("Name").c_str());
+        ImGui::SeparatorText(m_CurrentNode_sptr->getString("Name").c_str());
 
         // Int properties
-        for (auto& entry : m_CurrentNode_sptr->getProperties<int>())
+        for (auto& entry : m_CurrentNode_sptr->getIntProperties())
         {
             ImGui::InputInt(entry.first.c_str(), &entry.second);
 
             if (ImGui::IsItemDeactivatedAfterEdit())
-                m_CurrentNode_sptr->set<int>(entry.first, entry.second);
+                m_CurrentNode_sptr->set(entry.first, entry.second);
         }
 
         // Float properties
-        for (auto& entry : m_CurrentNode_sptr->getProperties<float>())
+        for (auto& entry : m_CurrentNode_sptr->getFloatProperties())
         {
+            ImGui::InputFloat(entry.first.c_str(), &entry.second);
 
+            if (ImGui::IsItemDeactivatedAfterEdit())
+                m_CurrentNode_sptr->set(entry.first, entry.second);
         }
 
         // Bool properties
-        for (auto& entry : m_CurrentNode_sptr->getProperties<bool>())
+        for (auto& entry : m_CurrentNode_sptr->getBoolProperties())
         {
+            ImGui::Checkbox(entry.first.c_str(), &entry.second);
 
+            if (ImGui::IsItemDeactivatedAfterEdit())
+                m_CurrentNode_sptr->set(entry.first, entry.second);
         }
 
         // String properties
-        for (auto& entry : m_CurrentNode_sptr->getProperties<std::string>())
+        for (auto& entry : m_CurrentNode_sptr->getStringProperties())
         {
             char* text = (char*)entry.second.c_str();
 
             ImGui::InputText(entry.first.c_str(), text, 32);
 
             if (ImGui::IsItemDeactivatedAfterEdit())
-                m_CurrentNode_sptr->set<std::string>(entry.first, (std::string)text);
+                m_CurrentNode_sptr->set(entry.first, (std::string)text);
         }
 
         // Vec3 properties
-        for (auto& entry : m_CurrentNode_sptr->getProperties<glm::vec3>())
+        for (auto& entry : m_CurrentNode_sptr->getVec3Properties())
         {
             float* data = glm::value_ptr(entry.second);
 
-            if (ImGui::DragFloat3(entry.first.c_str(), data))
-                m_CurrentNode_sptr->set<glm::vec3>(entry.first, glm::make_vec3(data));
+            if (ImGui::DragFloat3(entry.first.c_str(), data, 0.1f))
+                m_CurrentNode_sptr->set(entry.first, glm::make_vec3(data));
         }
     }
 
@@ -217,7 +223,7 @@ void GUI::displayNode(std::shared_ptr<qtzl::Node> node)
 
     if (node->getChildren().size() > 0)
     {
-        bool open = ImGui::TreeNodeEx(node->get<std::string>("Name").c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick);
+        bool open = ImGui::TreeNodeEx(node->getString("Name").c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick);
         
         if (ImGui::IsItemClicked())
             m_CurrentNode_sptr = node;
@@ -241,7 +247,7 @@ void GUI::displayNode(std::shared_ptr<qtzl::Node> node)
     }
     else
     {
-        ImGui::TreeNodeEx(node->get<std::string>("Name").c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+        ImGui::TreeNodeEx(node->getString("Name").c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
 
         if (ImGui::IsItemClicked())
             m_CurrentNode_sptr = node;

@@ -31,6 +31,8 @@
 #include "scene/3d/point_light3d.h"
 #include "scene/3d/spot_light3d.h"
 
+// TODO: remove some includes
+
 class Scene
 {
 public:
