@@ -86,7 +86,6 @@ void Engine::createWindow()
     glfwSetMouseButtonCallback(window, mouseButtonCallbackWraper);
 }
 
-// Gets called every frame
 void Engine::processInput()
 {
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey( window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
@@ -95,7 +94,19 @@ void Engine::processInput()
         this->scenes.at(this->currentScene)->m_Camera.processInput(this->window, deltaTime);
 }
 
-// Gets called upon window resize
+std::shared_ptr<Scene> Engine::createScene(const std::string& name, bool set_current)
+{
+    std::shared_ptr<Scene> scene = std::make_shared<Scene>(this->winWidth, this->winHeight);
+
+    // if the scene list is empty then we force set the first created one to be selected
+    if (set_current || this->scenes.empty())
+        this->currentScene = name;
+
+    this->scenes.emplace(name, scene);
+
+    return scene;
+}
+
 void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -110,7 +121,6 @@ void Engine::framebufferSizeCallback(GLFWwindow* window, int width, int height)
     }
 }
 
-// Gets called upon key press
 void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -130,11 +140,9 @@ void Engine::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
             Input::release(key);
             break;
         }
-
     }
 }
 
-// Gets called upon mouse click
 void Engine::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
 }
@@ -146,7 +154,7 @@ void Engine::process()
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
-        GUI::render(currentScene, scenes.at(currentScene), this->deltaTime);
+        GUI::render(currentScene, scenes, this->deltaTime);
 
     float curFrame = (float)glfwGetTime();
     this->deltaTime = curFrame - lastFrame;
@@ -159,33 +167,18 @@ void Engine::process()
     {
         this->scenes.at(this->currentScene)->update();
 
-        if (winWidth > 0 && winHeight > 0) // we don't wanna render the window if it isn't open
+        // we don't wanna render the window if it isn't open
+        if (winWidth > 0 && winHeight > 0)
             Renderer::render(this->scenes.at(this->currentScene));
     }
+
+    ImGui::ShowDemoWindow();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(this->window);
     glfwPollEvents();
-}
-
-std::shared_ptr<Scene> Engine::createScene(const std::string& name, bool set_current)
-{
-    std::shared_ptr<Scene> scene = std::make_shared<Scene>(this->winWidth, this->winHeight);
-
-    this->scenes.emplace(name, scene);
-    
-    // if the scene list is empty then we force set the first created one to be selected
-    if (set_current || this->scenes.empty())
-        this->setCurrentScene(name);
-
-    return scene;
-}
-
-void Engine::setCurrentScene(const std::string& name)
-{
-    this->currentScene = name;
 }
 
 static void framebufferSizeCallbackWrapper(GLFWwindow* window, int width, int height)

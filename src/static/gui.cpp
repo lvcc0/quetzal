@@ -20,17 +20,17 @@ void GUI::shutdown()
     ImGui::DestroyContext();
 }
 
-void GUI::render(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time)
+void GUI::render(std::string& scene_name, const std::map<const std::string, std::shared_ptr<Scene>>& scenes, GLfloat delta_time)
 {
-    showSceneConfig(scene_name, scene, delta_time); // scene config is always visible
+    showSceneConfig(scene_name, scenes, delta_time); // scene config is always visible if GUI is enabled
 
     if (m_NodeMgrVisible)
-        showNodeManager(scene_name, scene);
+        showNodeManager(scene_name, scenes.at(scene_name));
     if (m_ResourceMgrVisible)
         showResourceManager();
 }
 
-void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time)
+void GUI::showSceneConfig(std::string& scene_name, const std::map<const std::string, std::shared_ptr<Scene>>& scenes, GLfloat delta_time)
 {
     ImGui::Begin((scene_name + " config").c_str(), 0);
 
@@ -42,25 +42,25 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
 
     ImGui::Separator();
 
-    ImGui::Checkbox("Physics Enabled", &scene->m_IsPhysicsProcessing);
+    ImGui::Checkbox("Physics Enabled", &scenes.at(scene_name)->m_IsPhysicsProcessing);
 
-    if (ImGui::Checkbox("Postprocessing Enabled", &scene->m_IsPostProcessing))
+    if (ImGui::Checkbox("Postprocessing Enabled", &scenes.at(scene_name)->m_IsPostProcessing))
         glEnable(GL_DEPTH_TEST);
 
     // TODO: also do this as a table?
-    if (scene->m_IsPostProcessing)
+    if (scenes.at(scene_name)->m_IsPostProcessing)
     {
         ImGui::Separator();
 
-        std::vector<std::string> enabledShaders = scene->m_PostProcessing.getEnabledPPShaders(); // current screen shader names
+        std::vector<std::string> enabledShaders = scenes.at(scene_name)->m_PostProcessing.getEnabledPPShaders(); // current screen shader names
 
-        for (const auto& name : scene->m_PostProcessing.getPPShaderNames())
+        for (const auto& name : scenes.at(scene_name)->m_PostProcessing.getPPShaderNames())
         {
             auto it = std::find(enabledShaders.begin(), enabledShaders.end(), name);
 
             if (ImGui::Selectable(name.substr(name.find("||") + 2).c_str(), it != enabledShaders.end()))
             {
-                scene->m_PostProcessing.setPPShaderEnabled(name, it == enabledShaders.end());
+                scenes.at(scene_name)->m_PostProcessing.setPPShaderEnabled(name, it == enabledShaders.end());
                 glEnable(GL_DEPTH_TEST); // postprocessing disables depth test after as it's final step, so we need to turn it back on
             }
             ImGui::SameLine(ImGui::GetWindowSize().x - TEXT_BASE_WIDTH * 12.0f); ImGui::Text((it != enabledShaders.end()) ? "enabled" : "disabled");
@@ -70,6 +70,26 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
     }
 
     // TODO: tools to create nodes on the fly
+
+    ImGui::SeparatorText("Scenes");
+
+    if (ImGui::BeginListBox("##scenes", ImVec2(-FLT_MIN, std::min(5, (int)scenes.size()) * ImGui::GetTextLineHeightWithSpacing())))
+    {
+        for (const auto& scene : scenes)
+        {
+            const bool isSelected = (scene.first == scene_name);
+
+            if (ImGui::Selectable(scene.first.c_str(), isSelected))
+            {
+                scene_name = scene.first;
+                m_CurrentNode_sptr.reset();
+            }
+
+            if (isSelected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndListBox();
+    }
 
     ImGui::SeparatorText("Engine");
 
@@ -83,13 +103,13 @@ void GUI::showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> 
 
     // Camera config
     ImGui::DragFloat("Cam FOV", &Renderer::m_FOV, 0.5f, 30.0f, 110.0f, "%.1f");
-    ImGui::DragFloat("Cam speed", &scene->m_Camera.m_Speed, 0.1f, 0.1f, 1000.0f, "%.1f");
-    ImGui::DragFloat("Cam sens", &scene->m_Camera.m_Sensitivity, 0.1f, 0.1f, 1000.0f, "%.2f");
+    ImGui::DragFloat("Cam speed", &scenes.at(scene_name)->m_Camera.m_Speed, 0.1f, 0.1f, 1000.0f, "%.1f");
+    ImGui::DragFloat("Cam sens", &scenes.at(scene_name)->m_Camera.m_Sensitivity, 0.1f, 0.1f, 1000.0f, "%.2f");
 
     ImGui::Separator();
 
-    ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_Position.x, scene->m_Camera.m_Position.y, scene->m_Camera.m_Position.z);
-    ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", scene->m_Camera.m_Orientation.x, scene->m_Camera.m_Orientation.y, scene->m_Camera.m_Orientation.z);
+    ImGui::Text("Cam Position: X %.3f Y %.3f Z %.3f", scenes.at(scene_name)->m_Camera.m_Position.x, scenes.at(scene_name)->m_Camera.m_Position.y, scenes.at(scene_name)->m_Camera.m_Position.z);
+    ImGui::Text("Cam Orientation: X %.3f Y %.3f Z %.3f", scenes.at(scene_name)->m_Camera.m_Orientation.x, scenes.at(scene_name)->m_Camera.m_Orientation.y, scenes.at(scene_name)->m_Camera.m_Orientation.z);
     ImGui::Text("Framebuffer size: %ux%u", m_FramebufferWidth, m_FramebufferHeight);
     ImGui::Text("%.3f ms (%.1f FPS)", delta_time * 1000.0f, 1.0f / delta_time);
 

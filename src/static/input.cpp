@@ -2,53 +2,53 @@
 
 void Input::press(int key)
 {
-	keys[key] = true;
+    m_Keys[key] = true;
 }
 
 void Input::release(int key)
 {
-	keys[key] = false;
+    m_Keys[key] = false;
 }
 
 bool Input::isKeyPressed(int key)
 {
-	return keys[key];
+    return m_Keys[key];
 }
 
 bool Input::isActionPressed(const std::string& action)
 {
-	return keys[actions.at(action)];
+    return m_Keys[m_Actions.at(action)];
 }
 
 void Input::mapAction(const std::string& action, int key)
 {
-	if (actions.find(action) != actions.end())
-	{
-		std::cerr << "action \"" << action << "\" already exists, consider using Input::remapAction" << std::endl;
-		return;
-	}
+    if (m_Actions.find(action) != m_Actions.end())
+    {
+        std::cerr << "action \"" << action << "\" already exists, consider using Input::remapAction" << std::endl;
+        return;
+    }
 
-	actions[action] = key;
+    m_Actions[action] = key;
 }
 
 void Input::remapAction(const std::string& action, int key)
 {
-	if (actions.find(action) == actions.end())
-	{
-		std::cerr << "action \"" << action << "\" does not exist, nothing to remap" << std::endl;
-		return;
-	}
+    if (m_Actions.find(action) == m_Actions.end())
+    {
+        std::cerr << "action \"" << action << "\" does not exist, nothing to remap" << std::endl;
+        return;
+    }
 
-	actions[action] = key;
+    m_Actions[action] = key;
 }
 
 void Input::unmapAction(const std::string& action)
 {
-	if (actions.find(action) == actions.end())
-	{
-		std::cerr << "action \"" << action << "\" does not exist, nothing to unmap" << std::endl;
-		return;
-	}
+    if (m_Actions.find(action) == m_Actions.end())
+    {
+        std::cerr << "action \"" << action << "\" does not exist, nothing to unmap" << std::endl;
+        return;
+    }
 
-	actions.erase(action);
+    m_Actions.erase(action);
 }

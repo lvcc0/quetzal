@@ -31,23 +31,26 @@ public:
     float getDeltaTime() const;
     float getLastFrame() const;
 
-    void createWindow(); // create the glfw window
-    void processInput(); // gets called every frame in the process() function below
+    // Create the glfw window
+    void createWindow();
 
-    // Callbacks
+    // Gets called every frame in the Engine::process function
+    void processInput(); 
 
+    // Create a scene, add it to the scenes map and set currentScene if needed
+    std::shared_ptr<Scene> createScene(const std::string& name, bool set_current = false);
+
+    // Gets called upon window resize
     void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+
+    // Gets called upon key press
     void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+    // Gets called upon mouse click
     void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
     // Main loop function
     void process();
-
-    // Create a scene, add it to the scenes map and set currentScene to it
-    std::shared_ptr<Scene> createScene(const std::string& name, bool set_current = true);
-
-    // Set current scene and TODO: send some stuff to the renderer and such
-    void setCurrentScene(const std::string& name);
 
 private:
     bool shouldDrawGui = true;

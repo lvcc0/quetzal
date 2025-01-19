@@ -6,6 +6,7 @@ int main()
     ResourceManager::preloadResources();
 
     auto first_scene = engine.createScene("first_scene");
+    auto second_scene = engine.createScene("second_scene");
 
     Renderer::setCurrentShaderProgram(ResourceManager::createShaderProgram("shaders/default.vert", "shaders/default.frag"));
     Renderer::setCurrentShaderProgram(ResourceManager::createShaderProgram("shaders/skybox.vert", "shaders/skybox.frag", ShaderProgram::Type::SKYBOX));
@@ -33,21 +34,24 @@ int main()
     // Main loop
     while (engine.isRunning())
     {
-        catsphere_movement = glm::vec3(0.0f);
+        if (engine.currentScene == "first_scene")
+        {
+            catsphere_movement = glm::vec3(0.0f);
 
-        if (Input::isActionPressed("forward"))
-            catsphere_movement.z -= catsphere_velocity;
-        if (Input::isActionPressed("left"))
-            catsphere_movement.x -= catsphere_velocity;
-        if (Input::isActionPressed("back"))
-            catsphere_movement.z += catsphere_velocity;
-        if (Input::isActionPressed("right"))
-            catsphere_movement.x += catsphere_velocity;
+            if (Input::isActionPressed("forward"))
+                catsphere_movement.z -= catsphere_velocity;
+            if (Input::isActionPressed("left"))
+                catsphere_movement.x -= catsphere_velocity;
+            if (Input::isActionPressed("back"))
+                catsphere_movement.z += catsphere_velocity;
+            if (Input::isActionPressed("right"))
+                catsphere_movement.x += catsphere_velocity;
 
-        catsphere->translate(catsphere_movement * engine.getDeltaTime());
+            catsphere->translate(catsphere_movement * engine.getDeltaTime());
 
-        catcube->rotate(glm::vec3(0.0f, 1.0f * engine.getDeltaTime(), 0.0f));
-
+            catcube->rotate(glm::vec3(0.0f, 1.0f * engine.getDeltaTime(), 0.0f));
+        }
+        
         engine.process();
     }
 

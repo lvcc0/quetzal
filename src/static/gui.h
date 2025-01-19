@@ -29,9 +29,9 @@ public:
     static void init(GLFWwindow* window);
     static void shutdown();
 
-    static void render(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time);
+    static void render(std::string& scene_name, const std::map<const std::string, std::shared_ptr<Scene>>& scenes, GLfloat delta_time);
 
-    static void showSceneConfig(const std::string& scene_name, std::shared_ptr<Scene> scene, GLfloat delta_time);
+    static void showSceneConfig(std::string& scene_name, const std::map<const std::string, std::shared_ptr<Scene>>& scenes, GLfloat delta_time);
     static void showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> scene);
     static void showResourceManager();
 
