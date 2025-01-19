@@ -172,8 +172,6 @@ void Engine::process()
             Renderer::render(this->scenes.at(this->currentScene));
     }
 
-    ImGui::ShowDemoWindow();
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

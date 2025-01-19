@@ -6,10 +6,6 @@
 #include <vector>
 #include <map>
 
-// thirdparty
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include "static/resource_manager.h"
 #include "core/rendering/shader_program.h"
 

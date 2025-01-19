@@ -8,6 +8,10 @@
 // thirdparty
 #include <glm/glm.hpp>
 
+// TODO: add node-specific property editing limits
+// TODO: removeProperty
+// TODO: hasProperty
+
 namespace qtzl
 {
     // Base class for almost everything in the engine

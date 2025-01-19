@@ -1,14 +1,9 @@
 #pragma once
 
-// std
-#include <vector>
-
 #include "core/rendering/vertex.h"
-#include "core/rendering/shader_program.h"
 
 #include "scene/3d/visual_node3d.h"
 
-#include "scene/resources/shader.h"
 #include "scene/resources/texture.h"
 
 namespace qtzl

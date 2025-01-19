@@ -3,17 +3,19 @@
 namespace qtzl
 {
     Skybox::Skybox(const std::string& name, unsigned int texture)
-        : Node3D(name), m_Texture(texture)
+        : Node(name), m_Texture(texture)
     {
-        this->m_Renderable = true;
         this->m_Type = Object::Type::SKYBOX;
+        this->m_Renderable = true;
+
+        this->addProperty("Visible", true);
 
         setupRender();
     }
 
     void Skybox::render(std::shared_ptr<ShaderProgram> shader_program)
     {
-        glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+        glDepthFunc(GL_LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, this->m_Texture);

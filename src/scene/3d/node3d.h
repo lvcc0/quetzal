@@ -7,6 +7,7 @@
 #include "scene/main/node.h"
 
 // TODO: make children visibility depend on parent's visibility
+// TODO: fix children moving after parents
 
 namespace qtzl
 {

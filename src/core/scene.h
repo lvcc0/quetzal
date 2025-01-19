@@ -1,26 +1,10 @@
 #pragma once
 
-// std
-#include <iostream>
-#include <vector>
-#include <map>
-#include <utility>
-#include <algorithm>
-
-// thirdparty
-#include <stb_image/stb_image.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include "static/resource_manager.h"
-
 #include "core/rendering/post_processing.h"
 #include "core/rendering/camera.h"
 
 #include "scene/3d/skybox.h"
+
 #include "scene/3d/rigid_body3d.h"
 #include "scene/3d/static_body3d.h"
 
@@ -30,8 +14,6 @@
 #include "scene/3d/directional_light3d.h"
 #include "scene/3d/point_light3d.h"
 #include "scene/3d/spot_light3d.h"
-
-// TODO: remove some includes
 
 class Scene
 {

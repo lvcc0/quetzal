@@ -2,12 +2,12 @@
 
 #include "core/rendering/vertex_array.h"
 
-#include "scene/3d/node3d.h"
+#include "scene/main/node.h"
 
 namespace qtzl
 {
     // A regular skybox, not much can be said
-    class Skybox : public Node3D
+    class Skybox : public Node
     {
     public:
         Skybox(const std::string& name, unsigned int texture);

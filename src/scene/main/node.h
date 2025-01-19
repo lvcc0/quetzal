@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/object.h"
 #include "core/rendering/shader_program.h"
 
 namespace qtzl

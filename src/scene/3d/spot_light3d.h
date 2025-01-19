@@ -10,12 +10,12 @@ namespace qtzl
     public:
         SpotLight3D(
             const std::string& name,
-            glm::vec3 position = glm::vec3(0.0f),
-            glm::vec3 direction = glm::vec3(0.0f),
-            glm::vec3 color = glm::vec3(1.0f),
-            glm::vec3 ambient = glm::vec3(0.5f),
-            glm::vec3 diffuse = glm::vec3(0.5f),
-            glm::vec3 specular = glm::vec3(0.5f),
+            const glm::vec3& position = glm::vec3(0.0f),
+            const glm::vec3& direction = glm::vec3(0.0f),
+            const glm::vec3& color = glm::vec3(1.0f),
+            const glm::vec3& ambient = glm::vec3(0.5f),
+            const glm::vec3& diffuse = glm::vec3(0.5f),
+            const glm::vec3& specular = glm::vec3(0.5f),
             float constant = 1.0f,
             float linear = 0.09f,
             float quadratic = 0.032f,
@@ -24,26 +24,9 @@ namespace qtzl
         );
         virtual ~SpotLight3D() = default;
 
-        void setBillboardEnabled(bool enabled);
-
-        void enableBillboard();
-        void disableBillboard();
+        void set(const std::string& property_name, const glm::vec3& property) override;
 
         void updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const override;
-
         void render(std::shared_ptr<ShaderProgram> shader_program) override;
-
-    private:
-        bool m_BillboardEnabled = true;
-
-        glm::vec3 m_Position;
-        glm::vec3 m_Direction;
-
-        float m_Constant;
-        float m_Linear;
-        float m_Quadratic;
-
-        float m_InnerCutoff;
-        float m_OuterCutoff;
     };
 }

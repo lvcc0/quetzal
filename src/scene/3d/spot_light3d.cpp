@@ -4,62 +4,64 @@ namespace qtzl
 {
     SpotLight3D::SpotLight3D(
         const std::string& name,
-        glm::vec3 position,
-        glm::vec3 direction,
-        glm::vec3 color,
-        glm::vec3 ambient,
-        glm::vec3 diffuse,
-        glm::vec3 specular,
+        const glm::vec3& position,
+        const glm::vec3& direction,
+        const glm::vec3& color,
+        const glm::vec3& ambient,
+        const glm::vec3& diffuse,
+        const glm::vec3& specular,
         float constant,
         float linear,
         float quadratic,
         float inner_cutoff,
         float outer_cutoff
     )
-        : Light3D(name, color, ambient, diffuse, specular), m_Position(position), m_Direction(direction),
-          m_Constant(constant), m_Linear(linear), m_Quadratic(quadratic),
-          m_InnerCutoff(inner_cutoff), m_OuterCutoff(outer_cutoff)
+        : Light3D(name, color, ambient, diffuse, specular)
     {
         this->m_Type = Object::Type::SPOT_LIGHT3D;
+
+        this->addProperty("Global position", position);
+        this->addProperty("Direction", direction);
+        this->addProperty("Constant", constant);
+        this->addProperty("Linear", linear);
+        this->addProperty("Quadratic", quadratic);
+        this->addProperty("Inner cutoff", inner_cutoff);
+        this->addProperty("Outer cutoff", outer_cutoff);
     }
 
-    void SpotLight3D::setBillboardEnabled(bool enabled)
+    void SpotLight3D::set(const std::string& property_name, const glm::vec3& property)
     {
-        if (this->m_BillboardEnabled == enabled)
-            return;
+        this->m_Vec3Properties[property_name] = property;
 
-        this->m_BillboardEnabled = enabled;
-    }
-
-    void SpotLight3D::enableBillboard()
-    {
-        this->setBillboardEnabled(true);
-    }
-
-    void SpotLight3D::disableBillboard()
-    {
-        this->setBillboardEnabled(false);
+        // Move children
+        if (property_name == "Global position")
+        {
+            for (auto& entry : this->m_Children)
+            {
+                entry.second->set("Global position", property + entry.second->getVec3("Global position"));
+            }
+        }
     }
 
     void SpotLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const
     {
         std::string name = "spotLights[" + std::to_string(index) + "]";
 
-        shader_program->setVec3(name + ".position", m_Position);
-        shader_program->setVec3(name + ".direction", m_Direction);
+        shader_program->setVec3(name + ".position", this->getVec3("Global position"));
+        shader_program->setVec3(name + ".direction", this->getVec3("Direction"));
 
-        shader_program->setVec3(name + ".ambient", m_Ambient);
-        shader_program->setVec3(name + ".diffuse", m_Diffuse);
-        shader_program->setVec3(name + ".specular", m_Specular);
+        shader_program->setVec3(name + ".ambient", this->getVec3("Ambient"));
+        shader_program->setVec3(name + ".diffuse", this->getVec3("Diffuse"));
+        shader_program->setVec3(name + ".specular", this->getVec3("Specular"));
 
-        shader_program->setFloat(name + ".constant", m_Constant);
-        shader_program->setFloat(name + ".linear", m_Linear);
-        shader_program->setFloat(name + ".quadratic", m_Quadratic);
+        shader_program->setFloat(name + ".constant", this->getFloat("Constant"));
+        shader_program->setFloat(name + ".linear", this->getFloat("Linear"));
+        shader_program->setFloat(name + ".quadratic", this->getFloat("Quadratic"));
 
-        shader_program->setFloat(name + ".innerCutoff", glm::cos(glm::radians(m_InnerCutoff)));
-        shader_program->setFloat(name + ".outerCutoff", glm::cos(glm::radians(m_OuterCutoff)));
+        shader_program->setFloat(name + ".innerCutoff", glm::cos(glm::radians(this->getFloat("Inner cutoff"))));
+        shader_program->setFloat(name + ".outerCutoff", glm::cos(glm::radians(this->getFloat("Outer cutoff"))));
 
-        shader_program->setVec3(name + ".color", m_Enabled ? m_Color : glm::vec3(0.0f));
+        shader_program->setVec3(name + ".color", this->getBool("Enabled") ? this->getVec3("Color") : glm::vec3(0.0f));
     }
 
     void SpotLight3D::render(std::shared_ptr<ShaderProgram> shader_program)

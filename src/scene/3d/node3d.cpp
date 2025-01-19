@@ -39,11 +39,9 @@ namespace qtzl
     {
         this->set("Global position", position);
 
-        // TODO: moving children with new properties stuff
         for (auto& entry : this->m_Children)
         {
-            if (std::shared_ptr<qtzl::Node3D> casted_sptr = std::dynamic_pointer_cast<qtzl::Node3D>(entry.second))
-                casted_sptr->setGlobalPosition(position + casted_sptr->getPosition());
+            entry.second->set("Global position", position + entry.second->getVec3("Global position"));
         }
     }
 
@@ -51,11 +49,9 @@ namespace qtzl
     {
         this->set("Global rotation", radians);
 
-        // TODO: same
         for (auto& entry : this->m_Children)
         {
-            if (std::shared_ptr<qtzl::Node3D> casted_sptr = std::dynamic_pointer_cast<qtzl::Node3D>(entry.second))
-                casted_sptr->setGlobalPosition(radians + casted_sptr->getRotation());
+            entry.second->set("Global rotation", radians + entry.second->getVec3("Global rotation"));
         }
     }
 
@@ -63,11 +59,9 @@ namespace qtzl
     {
         this->set("Global rotation", glm::radians(degrees));
 
-        // TODO: same
         for (auto& entry : this->m_Children)
         {
-            if (std::shared_ptr<qtzl::Node3D> casted_sptr = std::dynamic_pointer_cast<qtzl::Node3D>(entry.second))
-                casted_sptr->setGlobalPosition(glm::radians(degrees) + casted_sptr->getRotation());
+            entry.second->set("Global rotation", glm::radians(degrees) + entry.second->getVec3("Global rotation"));
         }
     }
 

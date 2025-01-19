@@ -1,12 +1,9 @@
 #pragma once
 
 // std
-#include <vector>
 #include <filesystem>
 
 // thirdparty
-#include <glad/glad.h>
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

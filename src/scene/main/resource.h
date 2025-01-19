@@ -1,10 +1,5 @@
 #pragma once
 
-// std
-#include <iostream>
-#include <string>
-#include <memory>
-
 #include "core/object.h"
 
 namespace qtzl

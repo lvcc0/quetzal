@@ -1,7 +1,6 @@
 #pragma once
 
 // thirdparty
-#include <glad/glad.h>
 #include <vector>
 
 #include "core/rendering/vertex.h"

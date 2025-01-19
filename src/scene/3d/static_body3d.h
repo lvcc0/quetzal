@@ -1,11 +1,8 @@
 #pragma once
 
-#include "core/rendering/shader_program.h"
-
 #include "scene/3d/visual_node3d.h"
 
 #include "scene/resources/mesh.h"
-#include "scene/resources/shader.h"
 
 namespace qtzl
 {
