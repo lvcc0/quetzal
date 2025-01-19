@@ -10,8 +10,6 @@
 #include <map>
 #include <algorithm>
 
-//#include "static/variant.h"
-
 #include "scene/resources/mesh.h"
 #include "scene/resources/texture.h"
 #include "scene/resources/shader.h"
@@ -22,6 +20,7 @@
 // TODO: catching exceptions when the resource is not loaded
 // TODO: load cubemap faces from one image
 // TODO: rewrite most of the functions to take references (const& where possible)
+// TODO: move resource loading to here, not their constructors
 
 class ResourceManager
 {

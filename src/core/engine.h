@@ -1,7 +1,8 @@
 #pragma once
 
-#include "static/renderer.h"
 #include "static/gui.h"
+#include "static/input.h"
+#include "static/renderer.h"
 
 #include "core/scene.h"
 
@@ -33,10 +34,8 @@ public:
     void createWindow(); // create the glfw window
     void processInput(); // gets called every frame in the process() function below
 
-    // Picking an object
-    void pickObject(); // TODO
-
     // Callbacks
+
     void framebufferSizeCallback(GLFWwindow* window, int width, int height);
     void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
@@ -61,6 +60,7 @@ private:
 };
 
 // Callback static wrappers (because glfw doesn't know objects)
+
 static void framebufferSizeCallbackWrapper(GLFWwindow* window, int width, int height);
 static void keyCallbackWrapper(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void mouseButtonCallbackWraper(GLFWwindow* window, int key, int action, int mods);

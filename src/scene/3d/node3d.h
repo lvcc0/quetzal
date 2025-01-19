@@ -6,6 +6,8 @@
 
 #include "scene/main/node.h"
 
+// TODO: make children visibility depend on parent's visibility
+
 namespace qtzl
 {
     // Base class for every 3D node

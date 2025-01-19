@@ -35,26 +35,14 @@ void Scene::update()
     // Processing nodes' stuff
     for (const auto& node_sptr : m_Nodes)
     {
-        //switch (node_sptr->getType())
-        //{
-        //case qtzl::Object::CYLINDRICAL_BILLBOARD:
-        //    node_sptr->set("Target", m_Camera.m_Position);
-        //    break;
-        //case qtzl::Object::SPHERICAL_BILLBOARD:
-        //    node_sptr->set("Target", m_Camera.m_Position);
-        //    break;
-        //}
-
-        // NOTE: is this alright? we'll keep it like this for now ig
-        if (typeid(*node_sptr) == typeid(qtzl::CylindricalBillboard))
+        switch (node_sptr->getType())
         {
-            std::shared_ptr<qtzl::CylindricalBillboard> casted_sptr = std::dynamic_pointer_cast<qtzl::CylindricalBillboard>(node_sptr);
-            casted_sptr->setTarget(m_Camera.m_Position);
-        }
-        else if (typeid(*node_sptr) == typeid(qtzl::SphericalBillboard))
-        {
-            std::shared_ptr<qtzl::SphericalBillboard> casted_sptr = std::dynamic_pointer_cast<qtzl::SphericalBillboard>(node_sptr);
-            casted_sptr->setTarget(m_Camera.m_Position);
+        case qtzl::Object::CYLINDRICAL_BILLBOARD:
+            node_sptr->set("Target", m_Camera.m_Position);
+            break;
+        case qtzl::Object::SPHERICAL_BILLBOARD:
+            node_sptr->set("Target", m_Camera.m_Position);
+            break;
         }
     }
 }

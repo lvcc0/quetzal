@@ -17,7 +17,6 @@
 class Renderer
 {
 public:
-    // Delete all constructors
     Renderer() = delete;
     Renderer(const Renderer&) = delete;
     Renderer(Renderer&&) = delete;
