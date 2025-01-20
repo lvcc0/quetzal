@@ -6,21 +6,31 @@ namespace qtzl
 		: Billboard(name, texture)
 	{
         this->m_Type = Object::Type::CYLINDRICAL_BILLBOARD;
+
+        this->setPropertyEditable("Target", false);
+        this->setPropertyEditable("Global rotation", false);
+        this->setPropertyEditable("Rotation", false);
 	}
 
 	void CylindricalBillboard::render(std::shared_ptr<ShaderProgram> shader_program)
-	{
-        glm::vec3 projToTarget = glm::normalize(glm::vec3(this->m_Vec3Properties.at("Target").x - this->m_Vec3Properties.at("Global position").x, 0.0f, this->m_Vec3Properties.at("Target").z - this->m_Vec3Properties.at("Global position").z)); // projection of vector to target in the XZ plane
+    {
+        // projection of vector to target in the XZ plane
+        glm::vec3 projToTarget = glm::normalize(glm::vec3(
+            this->m_Vec3Properties.at("Target").value.x - this->m_Vec3Properties.at("Global position").value.x,
+            0.0f,
+            this->m_Vec3Properties.at("Target").value.z - this->m_Vec3Properties.at("Global position").value.z)
+        );
+
         m_Up = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), projToTarget); // flips the up vector if going the second half of the loop
 
         this->m_VerticalAngle = glm::acos(glm::dot(projToTarget, glm::vec3(0.0f, 0.0f, -1.0f)));
         
-        if (this->m_VerticalAngle < 0.01 || this->m_VerticalAngle > 3.14)
+        if (this->m_VerticalAngle < 0.01 || m_VerticalAngle > 3.14)
             this->m_Up = glm::vec3(0.0f, 1.0f, 0.0f); // stability reasons
 
-        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_Vec3Properties.at("Global position"));
-        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(this->m_Vec3Properties.at("Scale").x, this->m_Vec3Properties.at("Scale").y, 1.0f));
-        this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_VerticalAngle, this->m_Up);
+        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_Vec3Properties.at("Global position").value);
+        this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, m_VerticalAngle, this->m_Up);
+        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(this->m_Vec3Properties.at("Scale").value.x, this->m_Vec3Properties.at("Scale").value.y, 1.0f));
 
         shader_program->activateProgram();
 
@@ -33,6 +43,8 @@ namespace qtzl
         shader_program->setMat4("inversed", glm::inverse(this->m_ModelMatrix));
 
         this->m_ModelMatrix = glm::mat4(1.0f);
+
+        // NOTE: only rotate the billboard, don't 1.0f it after, just rotate it backwards
 
         this->m_VAO_uptr->bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);

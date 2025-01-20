@@ -4,6 +4,8 @@
 
 #include "scene/3d/node3d.h"
 
+// TODO: rotating children
+
 namespace qtzl
 {
     // Base class for every 3D node that can be drawn on the scene
@@ -13,7 +15,7 @@ namespace qtzl
         VisualNode3D(const std::string& name);
         virtual ~VisualNode3D() = default;
 
-        void set(const std::string& property_name, const glm::vec3& property) override;
+        void set(const std::string& property_name, const glm::vec3& value) override;
 
         void setScale(const glm::vec3& scale) override;
 

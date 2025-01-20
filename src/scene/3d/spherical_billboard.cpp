@@ -6,19 +6,30 @@ namespace qtzl
 		: Billboard(name, texture)
 	{
         this->m_Type = Object::Type::SPHERICAL_BILLBOARD;
+
+        this->setPropertyEditable("Target", false);
+        this->setPropertyEditable("Global rotation", false);
+        this->setPropertyEditable("Rotation", false);
 	}
 
 	void SphericalBillboard::render(std::shared_ptr<ShaderProgram> shader_program)
 	{
-        glm::vec3 vectorToTarget = glm::normalize(this->m_Vec3Properties.at("Target") - this->m_Vec3Properties.at("Global position")); // vector to the target
+        glm::vec3 vectorToTarget = glm::normalize(this->m_Vec3Properties.at("Target").value - this->m_Vec3Properties.at("Global position").value); // vector to the target
 
         // Projection of vector to target in different planes
-        glm::vec3 targetYZ = glm::normalize(glm::vec3(0.0f, this->m_Vec3Properties.at("Target").y - this->m_Vec3Properties.at("Global position").y, this->m_Vec3Properties.at("Target").z - this->m_Vec3Properties.at("Global position").z)); // for X axis
-        glm::vec3 targetXZ = glm::normalize(glm::vec3(this->m_Vec3Properties.at("Target").x - this->m_Vec3Properties.at("Global position").x, 0.0f, this->m_Vec3Properties.at("Target").z - this->m_Vec3Properties.at("Global position").z)); // for Y axis
-        
-        // NOTE: currently unused
-        // glm::vec3 targetXY = glm::normalize(glm::vec3(this->m_Target.x - this->m_GlobalPosition.x, this->m_Target.y - this->m_GlobalPosition.y, 0.0f)); // for Z axis
 
+        glm::vec3 targetYZ = glm::normalize(glm::vec3(
+            0.0f,
+            this->m_Vec3Properties.at("Target").value.y - this->m_Vec3Properties.at("Global position").value.y,
+            this->m_Vec3Properties.at("Target").value.z - this->m_Vec3Properties.at("Global position").value.z)
+        ); // for X axis
+
+        glm::vec3 targetXZ = glm::normalize(glm::vec3(
+            this->m_Vec3Properties.at("Target").value.x - this->m_Vec3Properties.at("Global position").value.x,
+            0.0f,
+            this->m_Vec3Properties.at("Target").value.z - this->m_Vec3Properties.at("Global position").value.z)
+        ); // for Y axis
+        
         this->m_Up = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), targetXZ); // flips the up vector if going the second half of the loop, so it's either {0.0f, 1.0f, 0.0f} or {0.0f, -1.0f, 0.0f}
         this->m_Right = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), targetYZ); // flips the right vector if target is under the billboard, so it's either {1.0f, 0.0f, 0.0f} or {-1.0f, 0.0f, 0.0f}
 
@@ -30,10 +41,10 @@ namespace qtzl
         if (!(this->m_HorizontalAngle > 0 || this->m_HorizontalAngle < 3.15))
             this->m_HorizontalAngle = 0.0; // stability reasons
 
-        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_Vec3Properties.at("Global position"));
-        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(this->m_Vec3Properties.at("Scale").x, this->m_Vec3Properties.at("Scale").y, 1.0f));
+        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_Vec3Properties.at("Global position").value);
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_VerticalAngle, this->m_Up);
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_HorizontalAngle, this->m_Right);
+        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(this->m_Vec3Properties.at("Scale").value.x, this->m_Vec3Properties.at("Scale").value.y, 1.0f));
 
         shader_program->activateProgram();
 

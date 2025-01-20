@@ -26,10 +26,10 @@ namespace qtzl
 	{
 		glm::mat4 matrix = glm::mat4(1.0f);
 
-		matrix = glm::translate(matrix, this->m_Vec3Properties.at("Global position"));
+		matrix = glm::translate(matrix, this->m_Vec3Properties.at("Global position").value);
 		matrix = glm::rotate(matrix, this->m_VerticalAngle, this->m_Up);
 		matrix = glm::rotate(matrix, this->m_HorizontalAngle, this->m_Right);
-		matrix = glm::scale(matrix, glm::vec3(this->m_Vec3Properties.at("Scale").x, this->m_Vec3Properties.at("Scale").y, 1.0f));
+		matrix = glm::scale(matrix, glm::vec3(this->m_Vec3Properties.at("Scale").value.x, this->m_Vec3Properties.at("Scale").value.y, 1.0f));
 
 		return matrix;
 	}

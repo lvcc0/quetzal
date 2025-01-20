@@ -7,94 +7,216 @@ namespace qtzl
     {
     }
 
-    void Object::set(const std::string& property_name, int property)
+    void Object::set(const std::string& property_name, int value)
     {
-        if (this->m_IntProperties.find(property_name) == this->m_IntProperties.end())
+        if (!this->m_IntProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
             return;
+        }
 
-        this->m_IntProperties[property_name] = property;
+        if (this->m_Limits.contains(property_name))
+        {
+            this->m_IntProperties[property_name].value = std::min(std::max(value, (int)this->m_Limits.at(property_name).x), (int)this->m_Limits.at(property_name).y);
+            return;
+        }
+
+        this->m_IntProperties[property_name].value = value;
     }
 
-    void Object::set(const std::string& property_name, float property)
+    void Object::set(const std::string& property_name, float value)
     {
-        if (this->m_FloatProperties.find(property_name) == this->m_FloatProperties.end())
+        if (!this->m_FloatProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
             return;
+        }
 
-        this->m_FloatProperties[property_name] = property;
+        if (this->m_Limits.contains(property_name))
+        {
+            this->m_FloatProperties[property_name].value = std::min(std::max(value, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+            return;
+        }
+
+        this->m_FloatProperties[property_name].value = value;
     }
 
-    void Object::set(const std::string& property_name, bool property)
+    void Object::set(const std::string& property_name, bool value)
     {
-        if (this->m_BoolProperties.find(property_name) == this->m_BoolProperties.end())
+        if (!this->m_BoolProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
             return;
+        }
 
-        this->m_BoolProperties[property_name] = property;
+        this->m_BoolProperties[property_name].value = value;
     }
 
-    void Object::set(const std::string& property_name, const std::string& property)
+    void Object::set(const std::string& property_name, const std::string& value)
     {
-        if (this->m_StringProperties.find(property_name) == this->m_StringProperties.end())
+        if (!this->m_StringProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
             return;
+        }
 
-        this->m_StringProperties[property_name] = property;
+        this->m_StringProperties[property_name].value = value;
     }
 
-    void Object::set(const std::string& property_name, const glm::vec3& property)
+    void Object::set(const std::string& property_name, const glm::vec3& value)
     {
-        if (this->m_Vec3Properties.find(property_name) == this->m_Vec3Properties.end())
+        if (!this->m_Vec3Properties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
             return;
+        }
 
-        this->m_Vec3Properties[property_name] = property;
+        if (this->m_Limits.contains(property_name))
+        {
+            this->m_Vec3Properties[property_name].value.x = std::min(std::max(value.x, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.y = std::min(std::max(value.y, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.z = std::min(std::max(value.z, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+            return;
+        }
+
+        this->m_Vec3Properties[property_name].value = value;
     }
 
     int Object::getInt(const std::string& property_name) const
     {
-        return this->m_IntProperties.at(property_name);
+        if (!this->m_IntProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::getInt: no such property \"" << property_name << "\"." << std::endl;
+            return 0;
+        }
+
+        return this->m_IntProperties.at(property_name).value;
     }
 
     float Object::getFloat(const std::string& property_name) const
     {
-        return this->m_FloatProperties.at(property_name);
+        if (!this->m_FloatProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::getFloat: no such property \"" << property_name << "\"." << std::endl;
+            return 0.0f;
+        }
+
+        return this->m_FloatProperties.at(property_name).value;
     }
 
     bool Object::getBool(const std::string& property_name) const
     {
-        return this->m_BoolProperties.at(property_name);
+        if (!this->m_BoolProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::getBool: no such property \"" << property_name << "\"." << std::endl;
+            return false;
+        }
+
+        return this->m_BoolProperties.at(property_name).value;
     }
 
     std::string Object::getString(const std::string& property_name) const
     {
-        return this->m_StringProperties.at(property_name);
+        if (!this->m_StringProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::getString: no such property \"" << property_name << "\"." << std::endl;
+            return "";
+        }
+
+        return this->m_StringProperties.at(property_name).value;
     }
 
     glm::vec3 Object::getVec3(const std::string& property_name) const
     {
-        return this->m_Vec3Properties.at(property_name);
+        if (!this->m_Vec3Properties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::getVec3: no such property \"" << property_name << "\"." << std::endl;
+            return glm::vec3(0.0f);
+        }
+
+        return this->m_Vec3Properties.at(property_name).value;
     }
 
-    std::map<std::string, int> Object::getIntProperties() const
+    std::map<std::string, Object::Property<int>> Object::getIntProperties() const
     {
         return this->m_IntProperties;
     }
 
-    std::map<std::string, float> Object::getFloatProperties() const
+    std::map<std::string, Object::Property<float>> Object::getFloatProperties() const
     {
         return this->m_FloatProperties;
     }
 
-    std::map<std::string, bool> Object::getBoolProperties() const
+    std::map<std::string, Object::Property<bool>> Object::getBoolProperties() const
     {
         return this->m_BoolProperties;
     }
 
-    std::map<std::string, std::string> Object::getStringProperties() const
+    std::map<std::string, Object::Property<std::string>> Object::getStringProperties() const
     {
         return this->m_StringProperties;
     }
 
-    std::map<std::string, glm::vec3> Object::getVec3Properties() const
+    std::map<std::string, Object::Property<glm::vec3>> Object::getVec3Properties() const
     {
         return this->m_Vec3Properties;
+    }
+
+    bool Object::has(const std::string& property_name) const
+    {
+        // i think it's better to do it this way instead of "return <...> || <...> || ..."
+
+        if (this->m_IntProperties.contains(property_name))
+            return true;
+
+        if (this->m_FloatProperties.contains(property_name))
+            return true;
+
+        if (this->m_BoolProperties.contains(property_name))
+            return true;
+
+        if (this->m_StringProperties.contains(property_name))
+            return true;
+
+        if (this->m_Vec3Properties.contains(property_name))
+            return true;
+
+        return false;
+    }
+
+    void Object::remove(const std::string& property_name)
+    {
+        // wow such code
+
+        if (this->m_IntProperties.contains(property_name))
+        {
+            this->m_IntProperties.erase(property_name);
+            return;
+        }
+
+        if (this->m_FloatProperties.contains(property_name))
+        {
+            this->m_FloatProperties.erase(property_name);
+            return;
+        }
+
+        if (this->m_BoolProperties.contains(property_name))
+        {
+            this->m_BoolProperties.erase(property_name);
+            return;
+        }
+
+        if (this->m_StringProperties.contains(property_name))
+        {
+            this->m_StringProperties.erase(property_name);
+            return;
+        }
+
+        if (this->m_Vec3Properties.contains(property_name))
+        {
+            this->m_Vec3Properties.erase(property_name);
+            return;
+        }
     }
 
     Object::Type Object::getType() const
@@ -107,28 +229,106 @@ namespace qtzl
         return this->m_Type == type;
     }
 
-    void Object::addProperty(const std::string& property_name, const int& property)
+    void Object::addProperty(const std::string& property_name, int value, bool editable)
     {
+        Property<int> property{ value, editable };
+
         this->m_IntProperties.emplace(property_name, property);
     }
 
-    void Object::addProperty(const std::string& property_name, const float& property)
+    void Object::addProperty(const std::string& property_name, float value, bool editable)
     {
+        Property<float> property{ value, editable };
+
         this->m_FloatProperties.emplace(property_name, property);
     }
 
-    void Object::addProperty(const std::string& property_name, const bool& property)
+    void Object::addProperty(const std::string& property_name, bool value, bool editable)
     {
+        Property<bool> property{ value, editable };
+
         this->m_BoolProperties.emplace(property_name, property);
     }
 
-    void Object::addProperty(const std::string& property_name, const std::string& property)
+    void Object::addProperty(const std::string& property_name, const std::string& value, bool editable)
     {
+        Property<std::string> property{ value, editable };
+
         this->m_StringProperties.emplace(property_name, property);
     }
 
-    void Object::addProperty(const std::string& property_name, const glm::vec3& property)
+    void Object::addProperty(const std::string& property_name, const glm::vec3& value, bool editable)
     {
+        Property<glm::vec3> property{ value, editable };
+
         this->m_Vec3Properties.emplace(property_name, property);
+    }
+
+    void Object::setPropertyLimits(const std::string& property_name, float lower_limit, float upper_limit)
+    {
+        if (this->m_StringProperties.contains(property_name) || this->m_BoolProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::setPropertyLimits: you can't set limits for a string or bool property." << std::endl;
+            return;
+        }
+
+        this->m_Limits[property_name] = glm::vec2(lower_limit, upper_limit);
+    }
+
+    void Object::setPropertyLimits(const std::string& property_name, const glm::vec2& limits)
+    {
+        if (this->m_StringProperties.contains(property_name) || this->m_BoolProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::setPropertyLimits: you can't set limits for a string or bool property." << std::endl;
+            return;
+        }
+
+        this->m_Limits[property_name] = limits;
+    }
+
+    void Object::setPropertySpeed(const std::string& property_name, float speed)
+    {
+        if (this->m_StringProperties.contains(property_name) || this->m_BoolProperties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Object::setPropertySpeed: you can't set speed for a string or bool property." << std::endl;
+            return;
+        }
+
+        this->m_Speeds[property_name] = speed;
+    }
+
+    void Object::setPropertyEditable(const std::string& property_name, bool editable)
+    {
+        // wow much efficient
+
+        if (this->m_IntProperties.contains(property_name))
+        {
+            this->m_IntProperties.at(property_name).editable = editable;
+            return;
+        }
+
+        if (this->m_FloatProperties.contains(property_name))
+        {
+            this->m_FloatProperties.at(property_name).editable = editable;
+            return;
+        }
+
+        if (this->m_BoolProperties.contains(property_name))
+        {
+            this->m_BoolProperties.at(property_name).editable = editable;
+            return;
+        }
+
+        if (this->m_StringProperties.contains(property_name))
+        {
+            this->m_StringProperties.at(property_name).editable = editable;
+            return;
+        }
+
+        if (this->m_Vec3Properties.contains(property_name))
+        {
+            this->m_Vec3Properties.at(property_name).editable = editable;
+            return;
+        }
     }
 }

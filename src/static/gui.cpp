@@ -146,48 +146,78 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
         // Int properties
         for (auto& entry : m_CurrentNode_sptr->getIntProperties())
         {
-            ImGui::InputInt(entry.first.c_str(), &entry.second);
+            if (!entry.second.editable)
+                ImGui::BeginDisabled();
+
+            ImGui::InputInt(entry.first.c_str(), &entry.second.value);
 
             if (ImGui::IsItemDeactivatedAfterEdit())
-                m_CurrentNode_sptr->set(entry.first, entry.second);
+                m_CurrentNode_sptr->set(entry.first, entry.second.value);
+
+            if (!entry.second.editable)
+                ImGui::EndDisabled();
         }
 
         // Float properties
         for (auto& entry : m_CurrentNode_sptr->getFloatProperties())
         {
-            ImGui::InputFloat(entry.first.c_str(), &entry.second);
+            if (!entry.second.editable)
+                ImGui::BeginDisabled();
+
+            ImGui::InputFloat(entry.first.c_str(), &entry.second.value);
 
             if (ImGui::IsItemDeactivatedAfterEdit())
-                m_CurrentNode_sptr->set(entry.first, entry.second);
+                m_CurrentNode_sptr->set(entry.first, entry.second.value);
+
+            if (!entry.second.editable)
+                ImGui::EndDisabled();
         }
 
         // Bool properties
         for (auto& entry : m_CurrentNode_sptr->getBoolProperties())
         {
-            ImGui::Checkbox(entry.first.c_str(), &entry.second);
+            if (!entry.second.editable)
+                ImGui::BeginDisabled();
+
+            ImGui::Checkbox(entry.first.c_str(), &entry.second.value);
 
             if (ImGui::IsItemDeactivatedAfterEdit())
-                m_CurrentNode_sptr->set(entry.first, entry.second);
+                m_CurrentNode_sptr->set(entry.first, entry.second.value);
+
+            if (!entry.second.editable)
+                ImGui::EndDisabled();
         }
 
         // String properties
         for (auto& entry : m_CurrentNode_sptr->getStringProperties())
         {
-            char* text = (char*)entry.second.c_str();
+            if (!entry.second.editable)
+                ImGui::BeginDisabled();
+
+            char* text = (char*)entry.second.value.c_str();
 
             ImGui::InputText(entry.first.c_str(), text, 32);
 
             if (ImGui::IsItemDeactivatedAfterEdit())
                 m_CurrentNode_sptr->set(entry.first, (std::string)text);
+
+            if (!entry.second.editable)
+                ImGui::EndDisabled();
         }
 
         // Vec3 properties
         for (auto& entry : m_CurrentNode_sptr->getVec3Properties())
         {
-            float* data = glm::value_ptr(entry.second);
+            if (!entry.second.editable)
+                ImGui::BeginDisabled();
+
+            float* data = glm::value_ptr(entry.second.value);
 
             if (ImGui::DragFloat3(entry.first.c_str(), data, 0.1f))
                 m_CurrentNode_sptr->set(entry.first, glm::make_vec3(data));
+
+            if (!entry.second.editable)
+                ImGui::EndDisabled();
         }
     }
 

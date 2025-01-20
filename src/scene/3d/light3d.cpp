@@ -14,7 +14,9 @@ namespace qtzl
         this->m_Type = Object::Type::LIGHT3D;
 
         this->addProperty("Enabled", true);
+
         this->addProperty("Color", color);
+
         this->addProperty("Ambient", ambient);
         this->addProperty("Diffuse", diffuse);
         this->addProperty("Specular", specular);

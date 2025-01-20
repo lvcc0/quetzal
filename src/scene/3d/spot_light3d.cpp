@@ -22,24 +22,41 @@ namespace qtzl
 
         this->addProperty("Global position", position);
         this->addProperty("Direction", direction);
+
         this->addProperty("Constant", constant);
         this->addProperty("Linear", linear);
         this->addProperty("Quadratic", quadratic);
+
         this->addProperty("Inner cutoff", inner_cutoff);
         this->addProperty("Outer cutoff", outer_cutoff);
     }
 
-    void SpotLight3D::set(const std::string& property_name, const glm::vec3& property)
+    void SpotLight3D::set(const std::string& property_name, const glm::vec3& value)
     {
-        this->m_Vec3Properties[property_name] = property;
+        if (!this->m_Vec3Properties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::SpotLight3D::set: no such property \"" << property_name << "\"." << std::endl;
+            return;
+        }
 
         // Move children
         if (property_name == "Global position")
         {
             for (auto& entry : this->m_Children)
             {
-                entry.second->set("Global position", property + entry.second->getVec3("Global position"));
+                entry.second->set("Global position", value + entry.second->getVec3("Global position") - this->getVec3("Global position"));
             }
+        }
+
+        if (this->m_Limits.contains(property_name))
+        {
+            this->m_Vec3Properties[property_name].value.x = std::min(std::max(value.x, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.y = std::min(std::max(value.y, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.z = std::min(std::max(value.z, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+        }
+        else
+        {
+            this->m_Vec3Properties[property_name].value = value;
         }
     }
 

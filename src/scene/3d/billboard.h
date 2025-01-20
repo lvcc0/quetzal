@@ -31,6 +31,7 @@ namespace qtzl
         float m_HorizontalAngle = 0.0f; // in radians!
         float m_VerticalAngle = 0.0f; // in radians!
 
+        // TODO: make em depend on the texture's resolution
         const std::vector<Vertex> m_Vertices =
         {
             Vertex(glm::vec3(0.5f,  0.5f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)),  // upper right
