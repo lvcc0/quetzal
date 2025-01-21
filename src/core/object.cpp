@@ -200,41 +200,6 @@ namespace qtzl
         return false;
     }
 
-    void Object::remove(const std::string& property_name)
-    {
-        // wow such code
-
-        if (this->m_IntProperties.contains(property_name))
-        {
-            this->m_IntProperties.erase(property_name);
-            return;
-        }
-
-        if (this->m_FloatProperties.contains(property_name))
-        {
-            this->m_FloatProperties.erase(property_name);
-            return;
-        }
-
-        if (this->m_BoolProperties.contains(property_name))
-        {
-            this->m_BoolProperties.erase(property_name);
-            return;
-        }
-
-        if (this->m_StringProperties.contains(property_name))
-        {
-            this->m_StringProperties.erase(property_name);
-            return;
-        }
-
-        if (this->m_Vec3Properties.contains(property_name))
-        {
-            this->m_Vec3Properties.erase(property_name);
-            return;
-        }
-    }
-
     Object::Type Object::getType() const
     {
         return this->m_Type;
@@ -278,6 +243,41 @@ namespace qtzl
         Property<glm::vec3> property{ value, editable };
 
         this->m_Vec3Properties.emplace(property_name, property);
+    }
+
+    void Object::removeProperty(const std::string& property_name)
+    {
+        // wow such code
+
+        if (this->m_IntProperties.contains(property_name))
+        {
+            this->m_IntProperties.erase(property_name);
+            return;
+        }
+
+        if (this->m_FloatProperties.contains(property_name))
+        {
+            this->m_FloatProperties.erase(property_name);
+            return;
+        }
+
+        if (this->m_BoolProperties.contains(property_name))
+        {
+            this->m_BoolProperties.erase(property_name);
+            return;
+        }
+
+        if (this->m_StringProperties.contains(property_name))
+        {
+            this->m_StringProperties.erase(property_name);
+            return;
+        }
+
+        if (this->m_Vec3Properties.contains(property_name))
+        {
+            this->m_Vec3Properties.erase(property_name);
+            return;
+        }
     }
 
     void Object::setPropertyEditingLimits(const std::string& property_name, float lower_limit, float upper_limit)

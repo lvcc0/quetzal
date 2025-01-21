@@ -6,7 +6,6 @@ namespace qtzl
         : Node3D(name)
     {
         this->m_Type = Object::Type::VISUAL_NODE3D;
-        this->m_Renderable = true;
     }
 
     void VisualNode3D::set(const std::string& property_name, const glm::vec3& value)
@@ -70,26 +69,6 @@ namespace qtzl
         {
             this->m_Vec3Properties[property_name].value = value;
         }
-    }
-
-    void VisualNode3D::setScale(const glm::vec3& scale)
-    {
-        this->set("Scale", scale);
-    }
-
-    void VisualNode3D::setGlobalPosition(const glm::vec3& position)
-    {
-        this->set("Global position", position);
-    }
-
-    void VisualNode3D::setGlobalRotation(const glm::vec3& radians)
-    {
-        this->set("Global rotation", radians);
-    }
-
-    void VisualNode3D::setGlobalRotationDegrees(const glm::vec3& degrees)
-    {
-        this->set("Global rotation", glm::radians(degrees));
     }
 
     glm::mat4 VisualNode3D::getModelMatrix() const

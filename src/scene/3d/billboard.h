@@ -1,7 +1,5 @@
 #pragma once
 
-#include "core/rendering/vertex.h"
-
 #include "scene/3d/visual_node3d.h"
 
 #include "scene/resources/texture.h"
@@ -15,6 +13,8 @@ namespace qtzl
         Billboard(const std::string& name, std::shared_ptr<Texture> texture);
         virtual ~Billboard() = default;
         
+        void set(const std::string& property_name, const glm::vec3& value) override;
+
         void setTarget(glm::vec3 target);
 
         glm::vec3 getTarget() const;
@@ -34,12 +34,12 @@ namespace qtzl
         // TODO: make em depend on the texture's resolution
         const std::vector<Vertex> m_Vertices =
         {
-            Vertex(glm::vec3(0.5f,  0.5f, 0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)),  // upper right
-            Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),  // lower right
-            Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // upper left
-            Vertex(glm::vec3(0.5f, -0.5f, 0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)),  // lower right
-            Vertex(glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f, 0.0f, -1.0f)), // lower left
-            Vertex(glm::vec3(-0.5f,  0.5f, 0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f))  // upper left
+            Vertex(glm::vec3( 0.5f,  0.5f,  0.0f), glm::vec2(0.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)),  // upper right
+            Vertex(glm::vec3( 0.5f, -0.5f,  0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),  // lower right
+            Vertex(glm::vec3(-0.5f,  0.5f,  0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // upper left
+            Vertex(glm::vec3( 0.5f, -0.5f,  0.0f), glm::vec2(0.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),  // lower right
+            Vertex(glm::vec3(-0.5f, -0.5f,  0.0f), glm::vec2(1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)), // lower left
+            Vertex(glm::vec3(-0.5f,  0.5f,  0.0f), glm::vec2(1.0f,  1.0f), glm::vec3(0.0f,  0.0f, -1.0f))  // upper left
         };
 
         std::unique_ptr<VAO> m_VAO_uptr = nullptr;

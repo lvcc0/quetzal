@@ -65,9 +65,9 @@ void Renderer::render(std::shared_ptr<Scene>& scene)
     }
 
     // Rendering renderable nodes
-    for (const auto& node : scene->getNodes())
+    for (const auto& node : scene->getVisualNodes())
     {
-        if (node->isRenderable() && node->getBool("Visible"))
+        if (node->getBool("Visible"))
         {
             if (node->getType() == qtzl::Object::SKYBOX && m_CurrentShaderPrograms.contains(ShaderProgram::SKYBOX))
             {

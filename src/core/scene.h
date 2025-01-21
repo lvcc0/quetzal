@@ -15,6 +15,9 @@
 #include "scene/3d/point_light3d.h"
 #include "scene/3d/spot_light3d.h"
 
+// temp
+#include "scene/3d/physics_node3d.h"
+
 class Scene
 {
 public:
@@ -28,10 +31,12 @@ public:
     bool m_IsPhysicsProcessing = true;
 
     std::vector<std::shared_ptr<qtzl::DirectionalLight3D>> getDirectionalLights() const;
-    std::vector<std::shared_ptr<qtzl::PointLight3D>> getPointLights() const;
-    std::vector<std::shared_ptr<qtzl::SpotLight3D>> getSpotLights() const;
+    std::vector<std::shared_ptr<qtzl::PointLight3D>>       getPointLights() const;
+    std::vector<std::shared_ptr<qtzl::SpotLight3D>>        getSpotLights() const;
 
-    std::vector<std::shared_ptr<qtzl::Node>> getNodes() const;
+    std::vector<std::shared_ptr<qtzl::Node>>          getNodes() const;
+    std::vector<std::shared_ptr<qtzl::VisualNode3D>>  getVisualNodes() const;
+    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> getPhysicsNodes() const;
 
     // Gets called every frame in the engine class
     void update();
@@ -54,7 +59,9 @@ public:
         glm::vec3 scale = glm::vec3(1.0f)
     );
     
-    std::shared_ptr<qtzl::Billboard> createBillboard();
+    std::shared_ptr<qtzl::Billboard> createBillboard(
+        // TODO :D
+    );
 
     std::shared_ptr<qtzl::CylindricalBillboard> createCylindricalBillboard(
         const std::string& name,
@@ -112,10 +119,11 @@ public:
     );
 
 private:
-    std::vector<std::shared_ptr<qtzl::DirectionalLight3D>> m_DirectionalLights;
-    std::vector<std::shared_ptr<qtzl::PointLight3D>> m_PointLights;
-    std::vector<std::shared_ptr<qtzl::SpotLight3D>> m_SpotLights;
+    std::vector<std::shared_ptr<qtzl::DirectionalLight3D>> m_DirectionalLights; // NOTE: 3d
+    std::vector<std::shared_ptr<qtzl::PointLight3D>>       m_PointLights; // NOTE: 3d
+    std::vector<std::shared_ptr<qtzl::SpotLight3D>>        m_SpotLights; // NOTE: 3d
 
-    // TODO: make 2 maps/vectors of regular and physics nodes?
-    std::vector<std::shared_ptr<qtzl::Node>> m_Nodes;
+    std::vector<std::shared_ptr<qtzl::Node>>          m_Nodes; // all scene nodes
+    std::vector<std::shared_ptr<qtzl::VisualNode3D>>  m_VisualNodes; // all visible scene nodes NOTE: 3d
+    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> m_PhysicsNodes; // all scene nodes that can be affected by physics NOTE: 3d
 };

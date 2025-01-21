@@ -17,13 +17,9 @@ namespace qtzl
 
         void set(const std::string& property_name, const glm::vec3& value) override;
 
-        void setScale(const glm::vec3& scale) override;
-
-        void setGlobalPosition(const glm::vec3& position) override;
-        void setGlobalRotation(const glm::vec3& radians) override;
-        void setGlobalRotationDegrees(const glm::vec3& degrees) override;
-
         virtual glm::mat4 getModelMatrix() const;
+
+        virtual void render(std::shared_ptr<ShaderProgram> shader_program) = 0;
 
     protected:
         glm::mat4 m_ModelMatrix = glm::mat4(1.0f);

@@ -3,14 +3,17 @@
 namespace qtzl
 {
     Skybox::Skybox(const std::string& name, unsigned int texture)
-        : Node(name), m_Texture(texture)
+        : VisualNode3D(name), m_Texture(texture)
     {
         this->m_Type = Object::Type::SKYBOX;
-        this->m_Renderable = true;
 
-        this->addProperty("Visible", true);
+        this->removeProperty("Global position");
+        this->removeProperty("Global rotation");
+        this->removeProperty("Position");
+        this->removeProperty("Rotation");
+        this->removeProperty("Scale");
 
-        setupRender();
+        this->setupRender();
     }
 
     void Skybox::render(std::shared_ptr<ShaderProgram> shader_program)

@@ -2,12 +2,12 @@
 
 #include "core/rendering/vertex_array.h"
 
-#include "scene/main/node.h"
+#include "scene/3d/visual_node3d.h"
 
 namespace qtzl
 {
     // A regular skybox, not much can be said
-    class Skybox : public Node
+    class Skybox : public VisualNode3D
     {
     public:
         Skybox(const std::string& name, unsigned int texture);
@@ -66,6 +66,6 @@ namespace qtzl
         std::unique_ptr<VAO> m_VAO_uptr = nullptr;
         std::unique_ptr<VBO> m_VBO_uptr = nullptr;
 
-        void setupRender();
+        void setupRender() override;
     };
 }

@@ -23,11 +23,6 @@ namespace qtzl
 		return this->m_Children;
 	}
 
-	bool Node::isRenderable() const
-	{
-		return this->m_Renderable;
-	}
-
 	void Node::addChild(std::shared_ptr<Node> node)
 	{
 		node->setParent(shared_from_this()); // NOTE: yeah this doesn't seem right

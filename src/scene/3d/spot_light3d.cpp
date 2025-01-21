@@ -80,8 +80,4 @@ namespace qtzl
 
         shader_program->setVec3(name + ".color", this->getBool("Enabled") ? this->getVec3("Color") : glm::vec3(0.0f));
     }
-
-    void SpotLight3D::render(std::shared_ptr<ShaderProgram> shader_program)
-    {
-    }
 }

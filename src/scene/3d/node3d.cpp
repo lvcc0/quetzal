@@ -17,7 +17,7 @@ namespace qtzl
 
     void Node3D::setScale(const glm::vec3& scale)
     {
-        this->set("scale", scale);
+        this->set("Scale", scale);
     }
 
     void Node3D::setPosition(const glm::vec3& position)

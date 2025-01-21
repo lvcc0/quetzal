@@ -85,9 +85,6 @@ namespace qtzl
 
         // Check if property exists
         bool has(const std::string& property_name) const;
-        
-        // Remove the property if it exists
-        void remove(const std::string& property_name);
 
         Type getType() const;
         bool isType(Type type) const;
@@ -113,6 +110,8 @@ namespace qtzl
         void addProperty(const std::string& property_name, const std::string& value, bool editable = true);
         void addProperty(const std::string& property_name, const glm::vec3& value, bool editable = true);
     
+        void removeProperty(const std::string& property_name);
+
         // Set upper and lower limits for int, float or vec3 property (e.g. for editing via GUI)
         void setPropertyEditingLimits(const std::string& property_name, const glm::vec2& limits);
         void setPropertyEditingLimits(const std::string& property_name, float lower_limit, float upper_limit);

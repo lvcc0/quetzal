@@ -18,17 +18,11 @@ namespace qtzl
         std::shared_ptr<Node>                        getParent() const;
         std::map<std::string, std::shared_ptr<Node>> getChildren() const;
 
-        bool isRenderable() const;
-
         void addChild(std::shared_ptr<Node> node);
         void removeChild(const std::string& name);
-
-        virtual void render(std::shared_ptr<ShaderProgram> shader_program) = 0;
 
     protected:
         std::shared_ptr<Node> m_Parent;
         std::map<std::string, std::shared_ptr<Node>> m_Children;
-
-        bool m_Renderable = false;
 	};
 }
