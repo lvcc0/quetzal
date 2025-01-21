@@ -15,9 +15,9 @@ namespace qtzl
             return;
         }
 
-        if (this->m_Limits.contains(property_name))
+        if (this->m_EditingLimits.contains(property_name))
         {
-            this->m_IntProperties[property_name].value = std::min(std::max(value, (int)this->m_Limits.at(property_name).x), (int)this->m_Limits.at(property_name).y);
+            this->m_IntProperties[property_name].value = std::min(std::max(value, (int)this->m_EditingLimits.at(property_name).x), (int)this->m_EditingLimits.at(property_name).y);
             return;
         }
 
@@ -32,9 +32,9 @@ namespace qtzl
             return;
         }
 
-        if (this->m_Limits.contains(property_name))
+        if (this->m_EditingLimits.contains(property_name))
         {
-            this->m_FloatProperties[property_name].value = std::min(std::max(value, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+            this->m_FloatProperties[property_name].value = std::min(std::max(value, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
             return;
         }
 
@@ -71,11 +71,11 @@ namespace qtzl
             return;
         }
 
-        if (this->m_Limits.contains(property_name))
+        if (this->m_EditingLimits.contains(property_name))
         {
-            this->m_Vec3Properties[property_name].value.x = std::min(std::max(value.x, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
-            this->m_Vec3Properties[property_name].value.y = std::min(std::max(value.y, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
-            this->m_Vec3Properties[property_name].value.z = std::min(std::max(value.z, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.x = std::min(std::max(value.x, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.y = std::min(std::max(value.y, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.z = std::min(std::max(value.z, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
             return;
         }
 
@@ -160,6 +160,22 @@ namespace qtzl
     std::map<std::string, Object::Property<glm::vec3>> Object::getVec3Properties() const
     {
         return this->m_Vec3Properties;
+    }
+
+    glm::vec2 Object::getEditingLimits(const std::string& property_name) const
+    {
+        if (!this->m_EditingLimits.contains(property_name))
+            return glm::vec2(0.0f);
+
+        return this->m_EditingLimits.at(property_name);
+    }
+
+    float Object::getEditingSpeed(const std::string& property_name) const
+    {
+        if (!this->m_EditingSpeeds.contains(property_name))
+            return 0.1f;
+
+        return this->m_EditingSpeeds.at(property_name);
     }
 
     bool Object::has(const std::string& property_name) const
@@ -264,7 +280,7 @@ namespace qtzl
         this->m_Vec3Properties.emplace(property_name, property);
     }
 
-    void Object::setPropertyLimits(const std::string& property_name, float lower_limit, float upper_limit)
+    void Object::setPropertyEditingLimits(const std::string& property_name, float lower_limit, float upper_limit)
     {
         if (this->m_StringProperties.contains(property_name) || this->m_BoolProperties.contains(property_name))
         {
@@ -272,10 +288,10 @@ namespace qtzl
             return;
         }
 
-        this->m_Limits[property_name] = glm::vec2(lower_limit, upper_limit);
+        this->m_EditingLimits[property_name] = glm::vec2(lower_limit, upper_limit);
     }
 
-    void Object::setPropertyLimits(const std::string& property_name, const glm::vec2& limits)
+    void Object::setPropertyEditingLimits(const std::string& property_name, const glm::vec2& limits)
     {
         if (this->m_StringProperties.contains(property_name) || this->m_BoolProperties.contains(property_name))
         {
@@ -283,10 +299,10 @@ namespace qtzl
             return;
         }
 
-        this->m_Limits[property_name] = limits;
+        this->m_EditingLimits[property_name] = limits;
     }
 
-    void Object::setPropertySpeed(const std::string& property_name, float speed)
+    void Object::setPropertyEditingSpeed(const std::string& property_name, float speed)
     {
         if (this->m_StringProperties.contains(property_name) || this->m_BoolProperties.contains(property_name))
         {
@@ -294,7 +310,7 @@ namespace qtzl
             return;
         }
 
-        this->m_Speeds[property_name] = speed;
+        this->m_EditingSpeeds[property_name] = speed;
     }
 
     void Object::setPropertyEditable(const std::string& property_name, bool editable)

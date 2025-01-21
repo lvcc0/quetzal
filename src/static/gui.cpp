@@ -149,7 +149,13 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
             if (!entry.second.editable)
                 ImGui::BeginDisabled();
 
-            ImGui::InputInt(entry.first.c_str(), &entry.second.value);
+            ImGui::DragInt(
+                entry.first.c_str(),
+                &entry.second.value,
+                m_CurrentNode_sptr->getEditingSpeed(entry.first),
+                m_CurrentNode_sptr->getEditingLimits(entry.first).x,
+                m_CurrentNode_sptr->getEditingLimits(entry.first).y
+            );
 
             if (ImGui::IsItemDeactivatedAfterEdit())
                 m_CurrentNode_sptr->set(entry.first, entry.second.value);
@@ -164,7 +170,13 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
             if (!entry.second.editable)
                 ImGui::BeginDisabled();
 
-            ImGui::InputFloat(entry.first.c_str(), &entry.second.value);
+            ImGui::DragFloat(
+                entry.first.c_str(),
+                &entry.second.value,
+                m_CurrentNode_sptr->getEditingSpeed(entry.first),
+                m_CurrentNode_sptr->getEditingLimits(entry.first).x,
+                m_CurrentNode_sptr->getEditingLimits(entry.first).y
+            );
 
             if (ImGui::IsItemDeactivatedAfterEdit())
                 m_CurrentNode_sptr->set(entry.first, entry.second.value);
@@ -213,7 +225,7 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
 
             float* data = glm::value_ptr(entry.second.value);
 
-            if (ImGui::DragFloat3(entry.first.c_str(), data, 0.1f))
+            if (ImGui::DragFloat3(entry.first.c_str(), data, m_CurrentNode_sptr->getEditingSpeed(entry.first), m_CurrentNode_sptr->getEditingLimits(entry.first).x, m_CurrentNode_sptr->getEditingLimits(entry.first).y))
                 m_CurrentNode_sptr->set(entry.first, glm::make_vec3(data));
 
             if (!entry.second.editable)

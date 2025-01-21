@@ -20,5 +20,8 @@ namespace qtzl
         this->addProperty("Ambient", ambient);
         this->addProperty("Diffuse", diffuse);
         this->addProperty("Specular", specular);
+
+        this->setPropertyEditingLimits("Color", 0.0f, 1.0f);
+        this->setPropertyEditingSpeed("Color", 0.01f);
     }
 }

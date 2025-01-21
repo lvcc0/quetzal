@@ -4,6 +4,8 @@
 
 #include "scene/main/node.h"
 
+// TODO: limit and set speed for some other light properties
+
 namespace qtzl
 {
     // Abstract base class for 3d lights

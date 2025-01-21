@@ -2,6 +2,8 @@
 
 #include "core/rendering/shader_program.h"
 
+// TODO: change map key on set("Name")
+
 namespace qtzl
 {
     // Base class for every single scene object

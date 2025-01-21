@@ -41,11 +41,11 @@ namespace qtzl
             }
         }
 
-        if (this->m_Limits.contains(property_name))
+        if (this->m_EditingLimits.contains(property_name))
         {
-            this->m_Vec3Properties[property_name].value.x = std::min(std::max(value.x, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
-            this->m_Vec3Properties[property_name].value.y = std::min(std::max(value.y, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
-            this->m_Vec3Properties[property_name].value.z = std::min(std::max(value.z, this->m_Limits.at(property_name).x), this->m_Limits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.x = std::min(std::max(value.x, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.y = std::min(std::max(value.y, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value.z = std::min(std::max(value.z, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
         }
         else
         {

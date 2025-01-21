@@ -77,6 +77,12 @@ namespace qtzl
         std::map<std::string, Property<std::string>> getStringProperties() const;
         std::map<std::string, Property<glm::vec3>>   getVec3Properties() const;
 
+        // Get editing limits of the property
+        glm::vec2 getEditingLimits(const std::string& property_name) const;
+
+        // Get editing speed of the property
+        float getEditingSpeed(const std::string& property_name) const;
+
         // Check if property exists
         bool has(const std::string& property_name) const;
         
@@ -95,8 +101,8 @@ namespace qtzl
         std::map<std::string, Property<std::string>> m_StringProperties;
         std::map<std::string, Property<glm::vec3>> m_Vec3Properties;
 
-        std::map<std::string, glm::vec2> m_Limits;
-        std::map<std::string, float> m_Speeds;
+        std::map<std::string, glm::vec2> m_EditingLimits;
+        std::map<std::string, float> m_EditingSpeeds;
 
         // Add property inside the derived class constructor
         // Please do not create properties with same names in different maps
@@ -108,11 +114,11 @@ namespace qtzl
         void addProperty(const std::string& property_name, const glm::vec3& value, bool editable = true);
     
         // Set upper and lower limits for int, float or vec3 property (e.g. for editing via GUI)
-        void setPropertyLimits(const std::string& property_name, const glm::vec2& limits);
-        void setPropertyLimits(const std::string& property_name, float lower_limit, float upper_limit);
+        void setPropertyEditingLimits(const std::string& property_name, const glm::vec2& limits);
+        void setPropertyEditingLimits(const std::string& property_name, float lower_limit, float upper_limit);
         
         // Set the property value editing speed which will be used in GUI editing
-        void setPropertySpeed(const std::string& property_name, float speed);
+        void setPropertyEditingSpeed(const std::string& property_name, float speed);
 
         // Change object's editing capabilities
         void setPropertyEditable(const std::string& property_name, bool editable);
