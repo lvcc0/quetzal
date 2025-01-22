@@ -128,6 +128,26 @@ std::shared_ptr<qtzl::SphericalBillboard> Scene::createSphericalBillboard(
     return node_sptr;
 }
 
+std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(const std::string& name, glm::vec3 pos)
+{
+    auto node_sptr = std::make_shared<qtzl::BoxCollision>(name, pos);
+    this->m_Nodes.push_back(node_sptr);
+    this->m_PhysicsNodes.push_back(node_sptr);
+    this->m_VisualNodes.push_back(node_sptr->getVisiblePart());
+
+    return node_sptr;
+}
+
+std::shared_ptr<qtzl::SphereCollision> Scene::createSphereCollision(const std::string& name, glm::vec3 pos)
+{
+    auto node_sptr = std::make_shared<qtzl::SphereCollision>(name, pos);
+    this->m_Nodes.push_back(node_sptr);
+    this->m_PhysicsNodes.push_back(node_sptr);
+    this->m_VisualNodes.push_back(node_sptr->getVisiblePart());
+
+    return node_sptr;
+}
+
 std::shared_ptr<qtzl::DirectionalLight3D> Scene::createDirectionalLight(
     const std::string& name,
     glm::vec3 direction,

@@ -15,7 +15,7 @@ namespace qtzl
         VisualNode3D(const std::string& name);
         virtual ~VisualNode3D() = default;
 
-        void set(const std::string& property_name, const glm::vec3& value) override;
+        virtual void set(const std::string& property_name, const glm::vec3& value) override;
 
         virtual glm::mat4 getModelMatrix() const;
 

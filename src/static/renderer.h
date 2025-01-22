@@ -26,7 +26,7 @@ public:
     static std::map<ShaderProgram::Type, std::shared_ptr<ShaderProgram>> getCurrentShaderPrograms();
 
     // Sets current shader program of its type
-    static void setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& shader_program);
+    static void setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>&& shader_program);
 
     // Draw all the stuff on the scene
     static void render(std::shared_ptr<Scene>& scene);

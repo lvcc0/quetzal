@@ -10,7 +10,7 @@ std::map<ShaderProgram::Type, std::shared_ptr<ShaderProgram>> Renderer::getCurre
     return m_CurrentShaderPrograms;
 }
 
-void Renderer::setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& shader_program)
+void Renderer::setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>&& shader_program)
 {
     if (std::find(ResourceManager::getShaderPrograms().begin(), ResourceManager::getShaderPrograms().end(), shader_program) == ResourceManager::getShaderPrograms().end())
     {
