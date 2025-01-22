@@ -73,7 +73,7 @@ void Engine::createWindow()
 
     if (this->window == NULL)
     {
-        std::cout << "can't create GLFW window" << std::endl;
+        std::cerr << "ERROR::Engine::createWindow: can't create GLFW window" << std::endl;
         glfwTerminate();
         return;
     }

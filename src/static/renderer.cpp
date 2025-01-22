@@ -23,14 +23,14 @@ void Renderer::setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& sha
 
 void Renderer::render(std::shared_ptr<Scene>& scene)
 {
-    glClearColor(0.207f, 0.207f, 0.207f, 1.0f);                                 // setting bg color
+    glClearColor(0.2f, 0.2f, 0.7f, 1.0f); // setting bg color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clearing stuff in the default framebuffer
     glStencilMask(0x00); // turn off writing to the stencil buffer
 
     if (scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
         scene->m_PostProcessing.deactivate();
 
-    m_CurrentProjectionMatrix = glm::perspective(glm::radians(m_FOV), (float)scene->m_Camera.m_Width / (float)scene->m_Camera.m_Height, 0.1f, 100.0f);
+    m_CurrentProjectionMatrix = glm::perspective(glm::radians(scene->m_Camera.m_FOV), (float)scene->m_Camera.m_Width / (float)scene->m_Camera.m_Height, 0.1f, 100.0f);
 
     // kinda lengthy, maybe we'll rewrite it, but i kinda like it
     m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT)->activateProgram();

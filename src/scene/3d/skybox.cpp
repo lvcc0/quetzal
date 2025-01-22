@@ -16,7 +16,7 @@ namespace qtzl
         this->setupRender();
     }
 
-    void Skybox::render(std::shared_ptr<ShaderProgram> shader_program)
+    void Skybox::render(const std::shared_ptr<ShaderProgram>& shader_program)
     {
         glDepthFunc(GL_LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
         

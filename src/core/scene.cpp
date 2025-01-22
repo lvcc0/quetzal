@@ -38,7 +38,7 @@ std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> Scene::getPhysicsNodes() const
 void Scene::update()
 {
     // Processing all nodes
-    for (const auto& node_sptr : m_Nodes)
+    for (const auto& node_sptr : this->m_Nodes)
     {
         switch (node_sptr->getType())
         {

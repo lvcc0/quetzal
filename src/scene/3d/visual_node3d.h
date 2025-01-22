@@ -19,7 +19,7 @@ namespace qtzl
 
         virtual glm::mat4 getModelMatrix() const;
 
-        virtual void render(std::shared_ptr<ShaderProgram> shader_program) = 0;
+        virtual void render(const std::shared_ptr<ShaderProgram>& shader_program) = 0;
 
     protected:
         glm::mat4 m_ModelMatrix = glm::mat4(1.0f);

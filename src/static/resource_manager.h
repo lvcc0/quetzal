@@ -16,7 +16,7 @@
 
 #include "core/rendering/shader_program.h"
 
-// TODO: consider moving from strings to std::filesystem::path ?
+// TODO: (?) consider moving from strings to std::filesystem::path
 // TODO: catching exceptions when the resource is not loaded
 // TODO: load cubemap faces from one image
 // TODO: rewrite most of the functions to take references (const& where possible)
@@ -43,9 +43,9 @@ public:
 
     // Return maps
 
-    static std::map<const std::string, std::shared_ptr<qtzl::Mesh>>    getMeshes();
-    static std::map<const std::string, std::shared_ptr<qtzl::Texture>> getTextures();
-    static std::map<const std::string, std::shared_ptr<qtzl::Shader>>  getShaders();
+    static std::map<std::string, std::shared_ptr<qtzl::Mesh>>    getMeshes();
+    static std::map<std::string, std::shared_ptr<qtzl::Texture>> getTextures();
+    static std::map<std::string, std::shared_ptr<qtzl::Shader>>  getShaders();
 
     // The stuff below is not really resources so they don't get preloaded upon preloadResources()
     // Shader program stuff, must be used after loading shaders!
@@ -81,9 +81,9 @@ private:
 
     // Maps of loaded resources
 
-    inline static std::map<const std::string, std::shared_ptr<qtzl::Mesh>>    m_LoadedMeshes;   // "mesh_path", *Mesh
-    inline static std::map<const std::string, std::shared_ptr<qtzl::Texture>> m_LoadedTextures; // "texture_path", *Texture
-    inline static std::map<const std::string, std::shared_ptr<qtzl::Shader>>  m_LoadedShaders;  // "shader_path", *Shader
+    inline static std::map<std::string, std::shared_ptr<qtzl::Mesh>>    m_LoadedMeshes;   // "mesh_path", *Mesh
+    inline static std::map<std::string, std::shared_ptr<qtzl::Texture>> m_LoadedTextures; // "texture_path", *Texture
+    inline static std::map<std::string, std::shared_ptr<qtzl::Shader>>  m_LoadedShaders;  // "shader_path", *Shader
     
     // Not exactly resources but they fit here :)
 
@@ -91,8 +91,6 @@ private:
     inline static std::vector<std::shared_ptr<ShaderProgram>> m_PPShaderPrograms;
 
     inline static std::vector<unsigned int> m_Cubemaps;
-
-    // TODO: rewrite vectors above as maps
 
     // Returns file contents as a string
     static std::string getFileString(const std::string& file_path);

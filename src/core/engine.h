@@ -23,7 +23,7 @@ public:
 
     GLFWwindow* window;
 
-    std::map<const std::string, std::shared_ptr<Scene>> scenes;
+    std::map<std::string, std::shared_ptr<Scene>> scenes;
     std::string currentScene;
 
     bool isRunning() const;

@@ -12,9 +12,9 @@
 class Camera
 {
 public:
-    Camera(int width, int height, glm::vec3 position = glm::vec3(0.0f));
+    Camera(int width, int height);
 
-    glm::vec3 m_Position;
+    glm::vec3 m_Position = glm::vec3(0.0f);
     glm::vec3 m_Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -23,6 +23,7 @@ public:
     int m_Width;
     int m_Height;
 
+    float m_FOV = 45.0f;
     float m_Speed = 3.0f;
     float m_Sensitivity = 100.0f;
 

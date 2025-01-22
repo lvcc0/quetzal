@@ -20,7 +20,7 @@ void GUI::shutdown()
     ImGui::DestroyContext();
 }
 
-void GUI::render(std::string& scene_name, const std::map<const std::string, std::shared_ptr<Scene>>& scenes, GLfloat delta_time)
+void GUI::render(std::string& scene_name, const std::map<std::string, std::shared_ptr<Scene>>& scenes, GLfloat delta_time)
 {
     showSceneConfig(scene_name, scenes, delta_time); // scene config is always visible if GUI is enabled
 
@@ -30,7 +30,7 @@ void GUI::render(std::string& scene_name, const std::map<const std::string, std:
         showResourceManager();
 }
 
-void GUI::showSceneConfig(std::string& scene_name, const std::map<const std::string, std::shared_ptr<Scene>>& scenes, GLfloat delta_time)
+void GUI::showSceneConfig(std::string& scene_name, const std::map<std::string, std::shared_ptr<Scene>>& scenes, GLfloat delta_time)
 {
     ImGui::Begin((scene_name + " config").c_str(), 0);
 
@@ -102,7 +102,7 @@ void GUI::showSceneConfig(std::string& scene_name, const std::map<const std::str
     }
 
     // Camera config
-    ImGui::DragFloat("Cam FOV", &Renderer::m_FOV, 0.5f, 30.0f, 110.0f, "%.1f");
+    ImGui::DragFloat("Cam FOV", &scenes.at(scene_name)->m_Camera.m_FOV, 0.5f, 30.0f, 110.0f, "%.1f");
     ImGui::DragFloat("Cam speed", &scenes.at(scene_name)->m_Camera.m_Speed, 0.1f, 0.1f, 1000.0f, "%.1f");
     ImGui::DragFloat("Cam sens", &scenes.at(scene_name)->m_Camera.m_Sensitivity, 0.1f, 0.1f, 1000.0f, "%.2f");
 

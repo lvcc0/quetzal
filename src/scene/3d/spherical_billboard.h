@@ -13,6 +13,6 @@ namespace qtzl
 		SphericalBillboard(const std::string& name, std::shared_ptr<Texture> texture);
 		virtual ~SphericalBillboard() = default;
 
-		void render(std::shared_ptr<ShaderProgram> shader_program) override;
+		void render(const std::shared_ptr<ShaderProgram>& shader_program) override;
 	};
 }

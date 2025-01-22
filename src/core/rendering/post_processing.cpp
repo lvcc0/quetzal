@@ -101,7 +101,7 @@ void PostProcessing::deactivate() const
     // Bind the custom framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, this->m_FirstFBO);
     // Specify the color of the background
-    glClearColor(0.207f, 0.207f, 0.207f, 1.0f);
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     // Clear the back buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     // Enable depth testing since it's disabled when drawing the framebuffer rectangle
@@ -225,7 +225,7 @@ void PostProcessing::setupFramebuffer(GLuint& FBO, GLuint& colorAttachment, GLui
 
     // Check if the framebuffer we created is actually complete now
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "ERROR::FRAMEBUFFER WASN'T COMPLETED::ID " << FBO << std::endl;
+        std::cerr << "ERROR::PostProcessing::SetupFrameBuffer: framebuffer with id " << FBO << "was not completed." << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

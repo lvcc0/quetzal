@@ -12,7 +12,7 @@ namespace qtzl
         this->setPropertyEditable("Rotation", false);
 	}
 
-	void SphericalBillboard::render(std::shared_ptr<ShaderProgram> shader_program)
+	void SphericalBillboard::render(const std::shared_ptr<ShaderProgram>& shader_program)
 	{
         glm::vec3 vectorToTarget = glm::normalize(this->m_Vec3Properties.at("Target").value - this->m_Vec3Properties.at("Global position").value); // vector to the target
 

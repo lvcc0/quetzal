@@ -20,8 +20,6 @@ public:
     Renderer(const Renderer&) = delete;
     Renderer(Renderer&&) = delete;
 
-    inline static float m_FOV = 45.0f;
-
     static glm::mat4 getCurrentProjectionMatrix();
     static std::map<ShaderProgram::Type, std::shared_ptr<ShaderProgram>> getCurrentShaderPrograms();
 

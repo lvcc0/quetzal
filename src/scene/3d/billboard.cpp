@@ -64,7 +64,7 @@ namespace qtzl
 		return matrix;
 	}
 
-	void Billboard::render(std::shared_ptr<ShaderProgram> shader_program)
+	void Billboard::render(const std::shared_ptr<ShaderProgram>& shader_program)
 	{
 		// TODO
 	}

@@ -10,7 +10,7 @@ namespace qtzl
         this->setupRender();
     }
 
-    void StaticBody3D::render(std::shared_ptr<ShaderProgram> shader_program)
+    void StaticBody3D::render(const std::shared_ptr<ShaderProgram>& shader_program)
     {
         for (const auto& submesh : this->m_Mesh_sptr->getSubMeshes())
         {

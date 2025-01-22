@@ -12,7 +12,7 @@ namespace qtzl
         this->setPropertyEditable("Rotation", false);
 	}
 
-	void CylindricalBillboard::render(std::shared_ptr<ShaderProgram> shader_program)
+	void CylindricalBillboard::render(const std::shared_ptr<ShaderProgram>& shader_program)
     {
         // projection of vector to target in the XZ plane
         glm::vec3 projToTarget = glm::normalize(glm::vec3(

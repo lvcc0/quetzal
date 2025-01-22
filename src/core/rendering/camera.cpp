@@ -1,7 +1,7 @@
 #include "core/rendering/camera.h"
 
-Camera::Camera(int width, int height, glm::vec3 position)
-    : m_Width(width), m_Height(height), m_Position(position)
+Camera::Camera(int width, int height)
+    : m_Width(width), m_Height(height)
 {
 }
 
