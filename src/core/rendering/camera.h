@@ -19,6 +19,7 @@ public:
     glm::vec3 m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
     bool m_FirstClick = true;
+    bool m_Locked = false;
 
     int m_Width;
     int m_Height;

@@ -2,17 +2,16 @@
 
 namespace qtzl
 {
-	CylindricalBillboard::CylindricalBillboard(const std::string& name, std::shared_ptr<Texture> texture)
-		: Billboard(name, texture)
-	{
+    CylindricalBillboard::CylindricalBillboard(const std::string& name, std::shared_ptr<Texture> texture)
+        : Billboard(name, texture)
+    {
         this->m_Type = Object::Type::CYLINDRICAL_BILLBOARD;
 
-        this->setPropertyEditable("Target", false);
         this->setPropertyEditable("Global rotation", false);
         this->setPropertyEditable("Rotation", false);
-	}
+    }
 
-	void CylindricalBillboard::render(const std::shared_ptr<ShaderProgram>& shader_program)
+    void CylindricalBillboard::render(const std::shared_ptr<ShaderProgram>& shader_program)
     {
         // projection of vector to target in the XZ plane
         glm::vec3 projToTarget = glm::normalize(glm::vec3(
@@ -49,5 +48,5 @@ namespace qtzl
         this->m_VAO_uptr->bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);
         this->m_VAO_uptr->unbind();
-	}
+    }
 }

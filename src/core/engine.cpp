@@ -90,7 +90,7 @@ void Engine::processInput()
 {
     glPolygonMode(GL_FRONT_AND_BACK, (glfwGetKey( window, GLFW_KEY_E) == GLFW_PRESS) ? GL_LINE : GL_FILL);
 
-    if (!this->scenes.empty() && this->scenes.count(this->currentScene))
+    if (!this->scenes.empty() && this->scenes.count(this->currentScene) && !this->scenes.at(this->currentScene)->m_Camera.m_Locked)
         this->scenes.at(this->currentScene)->m_Camera.processInput(this->window, deltaTime);
 }
 

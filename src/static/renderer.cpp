@@ -23,7 +23,7 @@ void Renderer::setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>& sha
 
 void Renderer::render(std::shared_ptr<Scene>& scene)
 {
-    glClearColor(0.2f, 0.2f, 0.7f, 1.0f); // setting bg color
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // setting bg color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clearing stuff in the default framebuffer
     glStencilMask(0x00); // turn off writing to the stencil buffer
 

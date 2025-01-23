@@ -102,6 +102,7 @@ void GUI::showSceneConfig(std::string& scene_name, const std::map<std::string, s
     }
 
     // Camera config
+    ImGui::Checkbox("Cam locked", &scenes.at(scene_name)->m_Camera.m_Locked);
     ImGui::DragFloat("Cam FOV", &scenes.at(scene_name)->m_Camera.m_FOV, 0.5f, 30.0f, 110.0f, "%.1f");
     ImGui::DragFloat("Cam speed", &scenes.at(scene_name)->m_Camera.m_Speed, 0.1f, 0.1f, 1000.0f, "%.1f");
     ImGui::DragFloat("Cam sens", &scenes.at(scene_name)->m_Camera.m_Sensitivity, 0.1f, 0.1f, 1000.0f, "%.2f");

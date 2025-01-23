@@ -2,8 +2,6 @@
 
 #include "scene/3d/billboard.h"
 
-// TODO: fix the math with rotation and scaling
-
 namespace qtzl
 {
     // A flat plane rotating around Y-axis relatively to the camera

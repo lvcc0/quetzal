@@ -18,10 +18,13 @@ namespace qtzl
         this->m_Type = Object::Type::POINT_LIGHT3D;
 
         this->addProperty("Global position", position);
-
         this->addProperty("Constant", constant);
         this->addProperty("Linear", linear);
         this->addProperty("Quadratic", quadratic);
+
+        this->setPropertyEditingSpeed("Constant", 0.01f);
+        this->setPropertyEditingSpeed("Linear", 0.01f);
+        this->setPropertyEditingSpeed("Quadratic", 0.01f);
     }
 
     void PointLight3D::set(const std::string& property_name, const glm::vec3& value)

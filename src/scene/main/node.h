@@ -7,8 +7,8 @@
 namespace qtzl
 {
     // Base class for every single scene object
-	class Node : public Object, public std::enable_shared_from_this<Node>
-	{
+    class Node : public Object, public std::enable_shared_from_this<Node>
+    {
     public:
         Node(const std::string& name);
         virtual ~Node() = default;
@@ -24,5 +24,5 @@ namespace qtzl
     protected:
         std::shared_ptr<Node> m_Parent;
         std::map<std::string, std::shared_ptr<Node>> m_Children;
-	};
+    };
 }

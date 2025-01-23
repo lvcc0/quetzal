@@ -2,18 +2,17 @@
 
 namespace qtzl
 {
-	SphericalBillboard::SphericalBillboard(const std::string& name, std::shared_ptr<Texture> texture)
-		: Billboard(name, texture)
-	{
+    SphericalBillboard::SphericalBillboard(const std::string& name, std::shared_ptr<Texture> texture)
+        : Billboard(name, texture)
+    {
         this->m_Type = Object::Type::SPHERICAL_BILLBOARD;
 
-        this->setPropertyEditable("Target", false);
         this->setPropertyEditable("Global rotation", false);
         this->setPropertyEditable("Rotation", false);
-	}
+    }
 
-	void SphericalBillboard::render(const std::shared_ptr<ShaderProgram>& shader_program)
-	{
+    void SphericalBillboard::render(const std::shared_ptr<ShaderProgram>& shader_program)
+    {
         glm::vec3 vectorToTarget = glm::normalize(this->m_Vec3Properties.at("Target").value - this->m_Vec3Properties.at("Global position").value); // vector to the target
 
         // Projection of vector to target in different planes
@@ -62,5 +61,5 @@ namespace qtzl
         this->m_VAO_uptr->bind();
         glDrawArrays(GL_TRIANGLES, 0, 6);
         this->m_VAO_uptr->unbind();
-	}
+    }
 }
