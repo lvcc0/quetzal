@@ -13,6 +13,7 @@ namespace qtzl {
 	{
 		return m_VisiblePart;
 	}
+
 	void PhysicsNode3D::setGlobalPosition(const glm::vec3& position)
 	{
 		this->set("Global position", position);
@@ -55,8 +56,18 @@ namespace qtzl {
 	}
 	void PhysicsNode3D::set(const std::string& property_name, const glm::vec3& value)
 	{
-		Node::set(property_name, value);
+		Object::set(property_name, value);
 		if (m_VisiblePart != nullptr)
+		{
 			m_VisiblePart->set(property_name, value);
+		}
+	}
+	void PhysicsNode3D::set(const std::string& property_name, bool value)
+	{
+		Object::set(property_name, value);
+		if (m_VisiblePart != nullptr)
+		{
+			m_VisiblePart->Object::set(property_name, value);
+		}
 	}
 }

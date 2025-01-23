@@ -69,6 +69,7 @@ void qtzl::Physics::physicsLoop(std::shared_ptr<Scene>& scene)
 
     while (it1 != phys_nodes.end())
     {
+        it2 = phys_nodes.begin();
         while (it2 != phys_nodes.end())
         {
             if (it1 == it2)
@@ -83,6 +84,7 @@ void qtzl::Physics::physicsLoop(std::shared_ptr<Scene>& scene)
             }
             it2++;
         }
+        phys_nodes.erase(it1);
         it1++;
     }
 }
