@@ -5,17 +5,16 @@ bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std
     switch (first->getType())
     {
     case (Object::Type::BOX_COLLISION):
-    {
         switch (second->getType())
         {
         case (Object::Type::BOX_COLLISION): // BOX - BOX collision
         {
-            
             bool collisionX = first->getVec3("Global position").x + first->getVec3("Size").x >= second->getVec3("Global position").x && second->getVec3("Global position").x + second->getVec3("Size").x >= first->getVec3("Global position").x;
             bool collisionY = first->getVec3("Global position").y + first->getVec3("Size").y >= second->getVec3("Global position").y && second->getVec3("Global position").y + second->getVec3("Size").y >= first->getVec3("Global position").y;
             bool collisionZ = first->getVec3("Global position").z + first->getVec3("Size").z >= second->getVec3("Global position").z && second->getVec3("Global position").z + second->getVec3("Size").z >= first->getVec3("Global position").z;
 
             return collisionX && collisionY && collisionZ;
+            break;
         }
         case (Object::Type::SPHERE_COLLISION): // BOX - SPHERE collision
         {
@@ -28,11 +27,11 @@ bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std
             glm::vec3 shapesDifference = boxCenter + clampedDifference - sphereCenter; // difference between sphere center and closest point on the box
 
             return glm::length(shapesDifference) < second->getFloat("Radius");
+            break;
         }
-        } // switch (second->m_Type)
-    }
+        } // switch (second->getType())
+        break;
     case (Object::Type::SPHERE_COLLISION):
-    {
         switch (second->getType())
         {
         case (Object::Type::BOX_COLLISION): // SPHERE - BOX collision
@@ -46,17 +45,19 @@ bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std
             glm::vec3 shapesDifference = boxCenter + clampedDifference - sphereCenter; // difference between sphere center and closest point on the box
 
             return glm::length(shapesDifference) < first->getFloat("Radius");
+            break;
         }
         case (Object::Type::SPHERE_COLLISION): // SPHERE - SPHERE collision
         {
             // if the distance between centers of spheres is less than the sum of their radi, then the spheres collided
             return glm::length((first->getVec3("Global position") + first->getFloat("Radius")) - (second->getVec3("Global position") + second->getFloat("Radius"))) < first->getFloat("Radius") + second->getFloat("Radius");
+            break;
         }
-        } // switch (second->m_Type)
-    }
+        } // switch (second->getType())
+        break;
     } // switch (first->m_Type)
 
-    std::cerr << "ERROR IN PHYSICS::CHECK_COLLISION::ERROR COLLISION TYPE " << std::endl;
+    std::cerr << "ERROR::Physics::checkPhysicsNode3D: wrong collision type" << std::endl;
 
     return false; // just in case something goes wrong
 }
