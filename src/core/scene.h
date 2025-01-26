@@ -46,17 +46,17 @@ public:
     std::shared_ptr<qtzl::StaticBody3D> createStaticBody(
         const std::string& name,
         const std::string& mesh_path,
-        glm::vec3 position = glm::vec3(0.0f),
-        glm::vec3 rotation = glm::vec3(0.0f),
-        glm::vec3 scale = glm::vec3(1.0f)
+        const glm::vec3& position = glm::vec3(0.0f),
+        const glm::vec3& rotation = glm::vec3(0.0f),
+        const glm::vec3& scale = glm::vec3(1.0f)
     );
 
     std::shared_ptr<qtzl::RigidBody3D> createRigidBody(
         const std::string& name,
         const std::string& mesh_path,
-        glm::vec3 position = glm::vec3(0.0f),
-        glm::vec3 rotation = glm::vec3(0.0f),
-        glm::vec3 scale = glm::vec3(1.0f)
+        const glm::vec3& position = glm::vec3(0.0f),
+        const glm::vec3& rotation = glm::vec3(0.0f),
+        const glm::vec3& scale = glm::vec3(1.0f)
     );
     
     std::shared_ptr<qtzl::Billboard> createBillboard(
@@ -66,45 +66,45 @@ public:
     std::shared_ptr<qtzl::CylindricalBillboard> createCylindricalBillboard(
         const std::string& name,
         const std::string& texture_path,
-        glm::vec3 position = glm::vec3(0.0f),
-        glm::vec2 size = glm::vec2(1.0f)
+        const glm::vec3& position = glm::vec3(0.0f),
+        const glm::vec2& size = glm::vec2(1.0f)
     );
 
     std::shared_ptr<qtzl::SphericalBillboard> createSphericalBillboard(
         const std::string& name,
         const std::string& texture_path,
-        glm::vec3 position = glm::vec3(0.0f),
-        glm::vec2 size = glm::vec2(1.0f)
+        const glm::vec3& position = glm::vec3(0.0f),
+        const glm::vec2& size = glm::vec2(1.0f)
     );
 
     std::shared_ptr<qtzl::BoxCollision> createBoxCollision(
         const std::string& name,
-        glm::vec3 pos, 
-        glm::vec3 size
+        const glm::vec3& position = glm::vec3(0.0f),
+        const glm::vec3& size = glm::vec3(1.0f)
     );
 
     std::shared_ptr<qtzl::SphereCollision> createSphereCollision(
         const std::string& name,
-        glm::vec3 pos, 
-        float radius
+        const glm::vec3& position = glm::vec3(0.0f),
+        float radius = 1.0f
     );
 
     std::shared_ptr<qtzl::DirectionalLight3D> createDirectionalLight(
         const std::string& name,
-        glm::vec3 direction = glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::vec3 color = glm::vec3(1.0f),
-        glm::vec3 ambient = glm::vec3(0.5f),
-        glm::vec3 diffuse = glm::vec3(0.5f),
-        glm::vec3 specular = glm::vec3(0.5f)
+        const glm::vec3& direction = glm::vec3(0.0f, -1.0f, 0.0f),
+        const glm::vec3& color = glm::vec3(1.0f),
+        const glm::vec3& ambient = glm::vec3(0.5f),
+        const glm::vec3& diffuse = glm::vec3(0.5f),
+        const glm::vec3& specular = glm::vec3(0.5f)
     );
 
     std::shared_ptr<qtzl::PointLight3D> createPointLight(
         const std::string& name,
-        glm::vec3 position = glm::vec3(0.0f),
-        glm::vec3 color = glm::vec3(1.0f),
-        glm::vec3 ambient = glm::vec3(0.5f),
-        glm::vec3 diffuse = glm::vec3(0.5f),
-        glm::vec3 specular = glm::vec3(0.5f),
+        const glm::vec3& position = glm::vec3(0.0f),
+        const glm::vec3& color = glm::vec3(1.0f),
+        const glm::vec3& ambient = glm::vec3(0.5f),
+        const glm::vec3& diffuse = glm::vec3(0.5f),
+        const glm::vec3& specular = glm::vec3(0.5f),
         float constant = 1.0f,
         float linear = 0.09f,
         float quadratic = 0.032f
@@ -112,12 +112,12 @@ public:
 
     std::shared_ptr<qtzl::SpotLight3D> createSpotLight(
         const std::string& name,
-        glm::vec3 position = glm::vec3(0.0f),
-        glm::vec3 direction = glm::vec3(0.0f),
-        glm::vec3 color = glm::vec3(1.0f),
-        glm::vec3 ambient = glm::vec3(0.5f),
-        glm::vec3 diffuse = glm::vec3(0.5f),
-        glm::vec3 specular = glm::vec3(0.5f),
+        const glm::vec3& position = glm::vec3(0.0f),
+        const glm::vec3& direction = glm::vec3(0.0f),
+        const glm::vec3& color = glm::vec3(1.0f),
+        const glm::vec3& ambient = glm::vec3(0.5f),
+        const glm::vec3& diffuse = glm::vec3(0.5f),
+        const glm::vec3& specular = glm::vec3(0.5f),
         float constant = 1.0f,
         float linear = 0.09f,
         float quadratic = 0.032f,

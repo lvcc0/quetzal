@@ -170,8 +170,10 @@ void Engine::process()
         // we don't wanna render the window if it isn't open
         if (winWidth > 0 && winHeight > 0)
             Renderer::render(this->scenes.at(this->currentScene));
+
+        // process physics stuff if it's enabled
         if (this->scenes.at(currentScene)->m_IsPhysicsProcessing)
-            qtzl::Physics::physicsLoop(this->scenes.at(this->currentScene));
+            Physics::process(this->scenes.at(this->currentScene));
     }
 
     ImGui::Render();

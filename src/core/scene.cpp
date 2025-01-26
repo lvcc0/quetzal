@@ -55,9 +55,9 @@ void Scene::update()
 std::shared_ptr<qtzl::RigidBody3D> Scene::createRigidBody(
     const std::string& name,
     const std::string& mesh_path,
-    glm::vec3 position,
-    glm::vec3 rotation,
-    glm::vec3 scale
+    const glm::vec3& position,
+    const glm::vec3& rotation,
+    const glm::vec3& scale
 )
 {
     std::shared_ptr<qtzl::RigidBody3D> node_sptr = std::make_shared<qtzl::RigidBody3D>(name, ResourceManager::getMesh(mesh_path));
@@ -75,9 +75,9 @@ std::shared_ptr<qtzl::RigidBody3D> Scene::createRigidBody(
 std::shared_ptr<qtzl::StaticBody3D> Scene::createStaticBody(
     const std::string& name,
     const std::string& mesh_path,
-    glm::vec3 position,
-    glm::vec3 rotation,
-    glm::vec3 scale
+    const glm::vec3& position,
+    const glm::vec3& rotation,
+    const glm::vec3& scale
 )
 {
     std::shared_ptr<qtzl::StaticBody3D> node_sptr = std::make_shared<qtzl::StaticBody3D>(name, ResourceManager::getMesh(mesh_path));
@@ -95,8 +95,8 @@ std::shared_ptr<qtzl::StaticBody3D> Scene::createStaticBody(
 std::shared_ptr<qtzl::CylindricalBillboard> Scene::createCylindricalBillboard(
     const std::string& name,
     const std::string& texture_path,
-    glm::vec3 position,
-    glm::vec2 size
+    const glm::vec3& position,
+    const glm::vec2& size
 )
 {
     std::shared_ptr<qtzl::CylindricalBillboard> node_sptr = std::make_shared<qtzl::CylindricalBillboard>(name, ResourceManager::getTexture(texture_path));
@@ -113,8 +113,8 @@ std::shared_ptr<qtzl::CylindricalBillboard> Scene::createCylindricalBillboard(
 std::shared_ptr<qtzl::SphericalBillboard> Scene::createSphericalBillboard(
     const std::string& name,
     const std::string& texture_path,
-    glm::vec3 position,
-    glm::vec2 size
+    const glm::vec3& position,
+    const glm::vec2& size
 )
 {
     std::shared_ptr<qtzl::SphericalBillboard> node_sptr = std::make_shared<qtzl::SphericalBillboard>(name, ResourceManager::getTexture(texture_path));
@@ -128,9 +128,17 @@ std::shared_ptr<qtzl::SphericalBillboard> Scene::createSphericalBillboard(
     return node_sptr;
 }
 
-std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(const std::string& name, glm::vec3 pos, glm::vec3 size)
+std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(
+    const std::string& name,
+    const glm::vec3& position,
+    const glm::vec3& size
+)
 {
-    auto node_sptr = std::make_shared<qtzl::BoxCollision>(name, pos, size);
+    std::shared_ptr<qtzl::BoxCollision> node_sptr = std::make_shared<qtzl::BoxCollision>(name);
+
+    node_sptr->setGlobalPosition(position);
+    node_sptr->setSize(size);
+
     this->m_Nodes.push_back(node_sptr);
     this->m_PhysicsNodes.push_back(node_sptr);
     this->m_VisualNodes.push_back(node_sptr->getVisiblePart());
@@ -138,9 +146,17 @@ std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(const std::string&
     return node_sptr;
 }
 
-std::shared_ptr<qtzl::SphereCollision> Scene::createSphereCollision(const std::string& name, glm::vec3 pos, float radius)
+std::shared_ptr<qtzl::SphereCollision> Scene::createSphereCollision(
+    const std::string& name,
+    const glm::vec3& position,
+    float radius
+)
 {
-    auto node_sptr = std::make_shared<qtzl::SphereCollision>(name, pos, radius);
+    std::shared_ptr<qtzl::SphereCollision> node_sptr = std::make_shared<qtzl::SphereCollision>(name);
+
+    node_sptr->setGlobalPosition(position);
+    node_sptr->setRadius(radius);
+
     this->m_Nodes.push_back(node_sptr);
     this->m_PhysicsNodes.push_back(node_sptr);
     this->m_VisualNodes.push_back(node_sptr->getVisiblePart());
@@ -150,11 +166,11 @@ std::shared_ptr<qtzl::SphereCollision> Scene::createSphereCollision(const std::s
 
 std::shared_ptr<qtzl::DirectionalLight3D> Scene::createDirectionalLight(
     const std::string& name,
-    glm::vec3 direction,
-    glm::vec3 color,
-    glm::vec3 ambient,
-    glm::vec3 diffuse,
-    glm::vec3 specular
+    const glm::vec3& direction,
+    const glm::vec3& color,
+    const glm::vec3& ambient,
+    const glm::vec3& diffuse,
+    const glm::vec3& specular
 )
 {
     std::shared_ptr<qtzl::DirectionalLight3D> node_sptr = std::make_shared<qtzl::DirectionalLight3D>(name, direction, color, ambient, diffuse, specular);
@@ -167,11 +183,11 @@ std::shared_ptr<qtzl::DirectionalLight3D> Scene::createDirectionalLight(
 
 std::shared_ptr<qtzl::PointLight3D> Scene::createPointLight(
     const std::string& name,
-    glm::vec3 position,
-    glm::vec3 color,
-    glm::vec3 ambient,
-    glm::vec3 diffuse,
-    glm::vec3 specular,
+    const glm::vec3& position,
+    const glm::vec3& color,
+    const glm::vec3& ambient,
+    const glm::vec3& diffuse,
+    const glm::vec3& specular,
     float constant,
     float linear,
     float quadratic
@@ -190,12 +206,12 @@ std::shared_ptr<qtzl::PointLight3D> Scene::createPointLight(
 
 std::shared_ptr<qtzl::SpotLight3D> Scene::createSpotLight(
     const std::string& name,
-    glm::vec3 position,
-    glm::vec3 direction,
-    glm::vec3 color,
-    glm::vec3 ambient,
-    glm::vec3 diffuse,
-    glm::vec3 specular,
+    const glm::vec3& position,
+    const glm::vec3& direction,
+    const glm::vec3& color,
+    const glm::vec3& ambient,
+    const glm::vec3& diffuse,
+    const glm::vec3& specular,
     float constant,
     float linear,
     float quadratic,

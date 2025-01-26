@@ -1,13 +1,48 @@
 #include "static/physics.h"
 
-bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std::shared_ptr<PhysicsNode3D> second)
+void Physics::process(std::shared_ptr<Scene>& scene)
+{
+    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> physicsNodes = scene->getPhysicsNodes();
+
+    // don't process if there is nothing to process
+    if (physicsNodes.size() <= 1)
+        return;
+
+    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>>::iterator it1 = physicsNodes.begin();
+    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>>::iterator it2 = physicsNodes.begin();
+
+    while (it1 != physicsNodes.end())
+    {
+        it2 = physicsNodes.begin();
+
+        while (it2 != physicsNodes.end())
+        {
+            if (it1 == it2)
+            {
+                it2++;
+                continue;
+            }
+            if (areColliding(*it1, *it2))
+            {
+                // TODO: Do smth
+            }
+            it2++;
+        }
+
+        physicsNodes.erase(it1);
+        it1++;
+    }
+}
+
+bool Physics::areColliding(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shared_ptr<qtzl::PhysicsNode3D> second)
 {
     switch (first->getType())
     {
-    case (Object::Type::BOX_COLLISION):
+    case (qtzl::Object::Type::BOX_COLLISION):
+    {
         switch (second->getType())
         {
-        case (Object::Type::BOX_COLLISION): // BOX - BOX collision
+        case (qtzl::Object::Type::BOX_COLLISION): // BOX - BOX collision
         {
             bool collisionX = first->getVec3("Global position").x + first->getVec3("Size").x >= second->getVec3("Global position").x && second->getVec3("Global position").x + second->getVec3("Size").x >= first->getVec3("Global position").x;
             bool collisionY = first->getVec3("Global position").y + first->getVec3("Size").y >= second->getVec3("Global position").y && second->getVec3("Global position").y + second->getVec3("Size").y >= first->getVec3("Global position").y;
@@ -16,7 +51,7 @@ bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std
             return collisionX && collisionY && collisionZ;
             break;
         }
-        case (Object::Type::SPHERE_COLLISION): // BOX - SPHERE collision
+        case (qtzl::Object::Type::SPHERE_COLLISION): // BOX - SPHERE collision
         {
             glm::vec3 sphereCenter(second->getVec3("Global position") + second->getFloat("Radius"));
 
@@ -31,10 +66,12 @@ bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std
         }
         } // switch (second->getType())
         break;
-    case (Object::Type::SPHERE_COLLISION):
+    }
+    case (qtzl::Object::Type::SPHERE_COLLISION):
+    {
         switch (second->getType())
         {
-        case (Object::Type::BOX_COLLISION): // SPHERE - BOX collision
+        case (qtzl::Object::Type::BOX_COLLISION): // SPHERE - BOX collision
         {
             glm::vec3 sphereCenter(first->getVec3("Global position") + first->getFloat("Radius"));
 
@@ -47,7 +84,7 @@ bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std
             return glm::length(shapesDifference) < first->getFloat("Radius");
             break;
         }
-        case (Object::Type::SPHERE_COLLISION): // SPHERE - SPHERE collision
+        case (qtzl::Object::Type::SPHERE_COLLISION): // SPHERE - SPHERE collision
         {
             // if the distance between centers of spheres is less than the sum of their radi, then the spheres collided
             return glm::length((first->getVec3("Global position") + first->getFloat("Radius")) - (second->getVec3("Global position") + second->getFloat("Radius"))) < first->getFloat("Radius") + second->getFloat("Radius");
@@ -55,6 +92,7 @@ bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std
         }
         } // switch (second->getType())
         break;
+    }
     } // switch (first->m_Type)
 
     std::cerr << "ERROR::Physics::checkPhysicsNode3D: wrong collision type" << std::endl;
@@ -62,33 +100,24 @@ bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std
     return false; // just in case something goes wrong
 }
 
-void qtzl::Physics::physicsLoop(std::shared_ptr<Scene>& scene)
+std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> Physics::getCollisions(std::shared_ptr<Scene>& scene, std::shared_ptr<qtzl::PhysicsNode3D> node)
 {
-    auto phys_nodes = scene->getPhysicsNodes();
-    if (phys_nodes.size() > 1)
-    {
-        std::vector<std::shared_ptr<PhysicsNode3D>>::iterator it1 = phys_nodes.begin();
-        std::vector<std::shared_ptr<PhysicsNode3D>>::iterator it2 = phys_nodes.begin();
+    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> physicsNodes = scene->getPhysicsNodes();
 
-        while (it1 != phys_nodes.end())
+    // don't process if there is nothing to process
+    if (physicsNodes.size() <= 1)
+        return {};
+
+    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> collisionPositive;
+    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>>::iterator it = physicsNodes.begin();
+
+    while (it != physicsNodes.end())
+    {
+        if (areColliding(node, *it))
         {
-            it2 = phys_nodes.begin();
-            while (it2 != phys_nodes.end())
-            {
-                if (it1 == it2)
-                {
-                    it2++;
-                    continue;
-                }
-                if (checkPhysicsNode3D(*it1, *it2))
-                {
-                    // TODO: Do smth
-                    std::cout << "Colliding\n";
-                }
-                it2++;
-            }
-            phys_nodes.erase(it1);
-            it1++;
+            collisionPositive.push_back(*it);
         }
     }
+
+    return collisionPositive;
 }
