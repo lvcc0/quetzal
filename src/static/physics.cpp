@@ -64,27 +64,30 @@ bool qtzl::Physics::checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std
 void qtzl::Physics::physicsLoop(std::shared_ptr<Scene>& scene)
 {
     auto phys_nodes = scene->getPhysicsNodes();
-    std::vector<std::shared_ptr<PhysicsNode3D>>::iterator it1 = phys_nodes.begin();
-    std::vector<std::shared_ptr<PhysicsNode3D>>::iterator it2 = phys_nodes.begin();
-
-    while (it1 != phys_nodes.end())
+    if (phys_nodes.size() > 1)
     {
-        it2 = phys_nodes.begin();
-        while (it2 != phys_nodes.end())
+        std::vector<std::shared_ptr<PhysicsNode3D>>::iterator it1 = phys_nodes.begin();
+        std::vector<std::shared_ptr<PhysicsNode3D>>::iterator it2 = phys_nodes.begin();
+
+        while (it1 != phys_nodes.end())
         {
-            if (it1 == it2)
+            it2 = phys_nodes.begin();
+            while (it2 != phys_nodes.end())
             {
+                if (it1 == it2)
+                {
+                    it2++;
+                    continue;
+                }
+                if (checkPhysicsNode3D(*it1, *it2))
+                {
+                    // TODO: Do smth
+                    std::cout << "Colliding\n";
+                }
                 it2++;
-                continue;
             }
-            if (checkPhysicsNode3D(*it1, *it2))
-            {
-                // TODO: Do smth
-                std::cout << "Colliding\n";
-            }
-            it2++;
+            phys_nodes.erase(it1);
+            it1++;
         }
-        phys_nodes.erase(it1);
-        it1++;
     }
 }

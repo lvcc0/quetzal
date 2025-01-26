@@ -128,9 +128,9 @@ std::shared_ptr<qtzl::SphericalBillboard> Scene::createSphericalBillboard(
     return node_sptr;
 }
 
-std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(const std::string& name, glm::vec3 pos)
+std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(const std::string& name, glm::vec3 pos, glm::vec3 size)
 {
-    auto node_sptr = std::make_shared<qtzl::BoxCollision>(name, pos);
+    auto node_sptr = std::make_shared<qtzl::BoxCollision>(name, pos, size);
     this->m_Nodes.push_back(node_sptr);
     this->m_PhysicsNodes.push_back(node_sptr);
     this->m_VisualNodes.push_back(node_sptr->getVisiblePart());
@@ -138,9 +138,9 @@ std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(const std::string&
     return node_sptr;
 }
 
-std::shared_ptr<qtzl::SphereCollision> Scene::createSphereCollision(const std::string& name, glm::vec3 pos)
+std::shared_ptr<qtzl::SphereCollision> Scene::createSphereCollision(const std::string& name, glm::vec3 pos, float radius)
 {
-    auto node_sptr = std::make_shared<qtzl::SphereCollision>(name, pos);
+    auto node_sptr = std::make_shared<qtzl::SphereCollision>(name, pos, radius);
     this->m_Nodes.push_back(node_sptr);
     this->m_PhysicsNodes.push_back(node_sptr);
     this->m_VisualNodes.push_back(node_sptr->getVisiblePart());

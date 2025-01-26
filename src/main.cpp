@@ -19,8 +19,8 @@ int main()
     auto catcube = first_scene->createRigidBody("catcube", "objects/catcube/catcube.obj");
     auto catsphere = first_scene->createRigidBody("catsphere", "objects/catsphere/catsphere.obj", glm::vec3(-5.0f, 0.0f, 0.0f));
 
-    catcube->addChild(first_scene->createBoxCollision("catcube_collision", catcube->getGlobalPosition()));
-    catsphere->addChild(first_scene->createBoxCollision("catsphere_collision", catsphere->getGlobalPosition()));
+    catcube->addChild(first_scene->createBoxCollision("catcube_collision", catcube->getGlobalPosition(), glm::vec3(2.0f)));
+    catsphere->addChild(first_scene->createBoxCollision("catsphere_collision", catsphere->getGlobalPosition(), glm::vec3(2.0f)));
 
     first_scene->createDirectionalLight("dir_light0");
     first_scene->createPointLight("point_light0", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));

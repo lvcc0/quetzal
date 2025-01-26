@@ -80,12 +80,14 @@ public:
 
     std::shared_ptr<qtzl::BoxCollision> createBoxCollision(
         const std::string& name,
-        glm::vec3 pos
+        glm::vec3 pos, 
+        glm::vec3 size
     );
 
     std::shared_ptr<qtzl::SphereCollision> createSphereCollision(
         const std::string& name,
-        glm::vec3 pos
+        glm::vec3 pos, 
+        float radius
     );
 
     std::shared_ptr<qtzl::DirectionalLight3D> createDirectionalLight(
