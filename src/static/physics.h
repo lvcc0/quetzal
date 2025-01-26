@@ -1,12 +1,17 @@
 #pragma once
 
-class Physics
-{
-public:
-    // Delete all constructors
-    Physics() = delete;
-    Physics(const Physics&) = delete;
-    Physics(Physics&&) = delete;
+#include "core/scene.h"
 
-    // TODO: the rest lol
-};
+namespace qtzl
+{
+    class Physics
+    {
+    public:
+        Physics() = delete;
+        Physics(const Physics&) = delete;
+        Physics(Physics&&) = delete;
+
+        static bool checkPhysicsNode3D(std::shared_ptr<PhysicsNode3D> first, std::shared_ptr<PhysicsNode3D> second);
+        static void physicsLoop(std::shared_ptr<Scene>& scene);
+    };
+}

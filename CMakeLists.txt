@@ -66,7 +66,7 @@ else()
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0) 
 endif()
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${QTZL_SOURCE})
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${QTZL_SOURCE} "src/scene/3d/box_collision.h" "src/scene/3d/box_collision.cpp" "src/scene/3d/sphere_collision.h" "src/scene/3d/sphere_collision.cpp")
 
 if(MSVC AND PRODUCTION_BUILD)
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)

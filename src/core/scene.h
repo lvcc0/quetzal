@@ -16,7 +16,8 @@
 #include "scene/3d/spot_light3d.h"
 
 // temp
-#include "scene/3d/physics_node3d.h"
+#include "scene/3d/box_collision.h"
+#include "scene/3d/sphere_collision.h"
 
 class Scene
 {
@@ -74,6 +75,18 @@ public:
         const std::string& texture_path,
         glm::vec3 position = glm::vec3(0.0f),
         glm::vec2 size = glm::vec2(1.0f)
+    );
+
+    std::shared_ptr<qtzl::BoxCollision> createBoxCollision(
+        const std::string& name,
+        glm::vec3 pos, 
+        glm::vec3 size
+    );
+
+    std::shared_ptr<qtzl::SphereCollision> createSphereCollision(
+        const std::string& name,
+        glm::vec3 pos, 
+        float radius
     );
 
     std::shared_ptr<qtzl::DirectionalLight3D> createDirectionalLight(

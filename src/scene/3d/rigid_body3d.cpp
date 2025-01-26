@@ -51,8 +51,7 @@ namespace qtzl
 
     void RigidBody3D::translate(const glm::vec3& vector)
     {
-        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, vector);
-        this->m_Vec3Properties["Global position"].value += vector;
+        set("Global position", m_Vec3Properties["Global position"].value + vector);
     }
 
     void RigidBody3D::rotate(const glm::vec3& vector)
@@ -72,11 +71,7 @@ namespace qtzl
     void RigidBody3D::rotateDegrees(const glm::vec3& vector)
     {
         glm::vec3 radians = glm::radians(vector);
-
-        this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, radians.x, glm::vec3(1.0f, 0.0f, 0.0f));
-        this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, radians.y, glm::vec3(0.0f, 1.0f, 0.0f));
-        this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, radians.z, glm::vec3(0.0f, 0.0f, 1.0f));
-        this->m_Vec3Properties["Global rotation"].value += radians;
+        set("Global rotation", m_Vec3Properties["Global rotation"].value + vector);
     }
 
     void RigidBody3D::rotateDegrees(float degrees, const glm::vec3& vector)

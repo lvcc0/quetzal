@@ -47,6 +47,9 @@ namespace qtzl
                 DIRECTIONAL_LIGHT3D,
                 POINT_LIGHT3D,
                 SPOT_LIGHT3D,
+            PHYSICS_NODE3D,
+                BOX_COLLISION,
+                SPHERE_COLLISION,
             SKYBOX
         };
 

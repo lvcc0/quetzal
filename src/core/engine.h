@@ -3,6 +3,7 @@
 #include "static/gui.h"
 #include "static/input.h"
 #include "static/renderer.h"
+#include "static/physics.h"
 
 #include "core/scene.h"
 

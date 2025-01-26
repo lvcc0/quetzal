@@ -24,6 +24,13 @@ namespace qtzl
                 entry.second->set("Global position", value + entry.second->getVec3("Global position") - this->getVec3("Global position"));
             }
         }
+        else if(property_name == "Global rotation")
+        {
+            for (auto& entry : this->m_Children)
+            {
+                entry.second->set("Global rotation", value + entry.second->getVec3("Global rotation") - this->getVec3("Global rotation"));
+            }
+        }
 
         // translate -> rotate -> scale
 
