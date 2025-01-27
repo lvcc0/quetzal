@@ -1,9 +1,12 @@
 #pragma once
 
+// std
+#include <tuple>
+
 #include "core/scene.h"
 
 // TODO: function that predicts a collision with given velocity
-// NOTE: current collision takes wrong coordinates
+// NOTE: some of current collisions take wrong coordinates
 
 class Physics
 {
@@ -12,12 +15,20 @@ public:
     Physics(const Physics&) = delete;
     Physics(Physics&&) = delete;
 
-    // Gets called every frame in the engine class
-    static void process(std::shared_ptr<Scene>& scene);
+    enum Direction
+    {
+        RIGHT, // +X
+        LEFT,  // -X
+        UP,    // +Y
+        DOWN,  // -Y
+        FRONT, // +Z
+        BACK   // -Z
+    };
 
     // Check if two nodes are colliding
-    static bool areColliding(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shared_ptr<qtzl::PhysicsNode3D> second);
+    static std::tuple<bool, Direction, glm::vec3> areColliding(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shared_ptr<qtzl::PhysicsNode3D> second);
 
-    // Get all the nodes given node is colliding with
-    static std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> getCollisions(std::shared_ptr<Scene>& scene, std::shared_ptr<qtzl::PhysicsNode3D> node);
+private:
+    // Returns snapped ro axis collision direction
+    static Direction getCollisionDirection(const glm::vec3& target);
 };

@@ -1,40 +1,6 @@
 #include "static/physics.h"
 
-void Physics::process(std::shared_ptr<Scene>& scene)
-{
-    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> physicsNodes = scene->getPhysicsNodes();
-
-    // don't process if there is nothing to process
-    if (physicsNodes.size() <= 1)
-        return;
-
-    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>>::iterator it1 = physicsNodes.begin();
-    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>>::iterator it2 = physicsNodes.begin();
-
-    while (it1 != physicsNodes.end())
-    {
-        it2 = physicsNodes.begin();
-
-        while (it2 != physicsNodes.end())
-        {
-            if (it1 == it2)
-            {
-                it2++;
-                continue;
-            }
-            if (areColliding(*it1, *it2))
-            {
-                // TODO: Do smth
-            }
-            it2++;
-        }
-
-        physicsNodes.erase(it1);
-        it1++;
-    }
-}
-
-bool Physics::areColliding(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shared_ptr<qtzl::PhysicsNode3D> second)
+std::tuple<bool, Physics::Direction, glm::vec3> Physics::areColliding(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shared_ptr<qtzl::PhysicsNode3D> second)
 {
     switch (first->getType())
     {
@@ -44,12 +10,11 @@ bool Physics::areColliding(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shar
         {
         case (qtzl::Object::Type::BOX_COLLISION): // BOX - BOX collision
         {
-            bool collisionX = first->getVec3("Global position").x + first->getVec3("Size").x >= second->getVec3("Global position").x && second->getVec3("Global position").x + second->getVec3("Size").x >= first->getVec3("Global position").x;
-            bool collisionY = first->getVec3("Global position").y + first->getVec3("Size").y >= second->getVec3("Global position").y && second->getVec3("Global position").y + second->getVec3("Size").y >= first->getVec3("Global position").y;
-            bool collisionZ = first->getVec3("Global position").z + first->getVec3("Size").z >= second->getVec3("Global position").z && second->getVec3("Global position").z + second->getVec3("Size").z >= first->getVec3("Global position").z;
+            bool collisionX = first->getVec3("Global position").x + first->getVec3("Size").x / 2 >= second->getVec3("Global position").x - second->getVec3("Size").x / 2 && second->getVec3("Global position").x + second->getVec3("Size").x / 2 >= first->getVec3("Global position").x - first->getVec3("Size").x;
+            bool collisionY = first->getVec3("Global position").y + first->getVec3("Size").y / 2 >= second->getVec3("Global position").y - second->getVec3("Size").y / 2 && second->getVec3("Global position").y + second->getVec3("Size").y / 2 >= first->getVec3("Global position").y - first->getVec3("Size").y;
+            bool collisionZ = first->getVec3("Global position").z + first->getVec3("Size").z / 2 >= second->getVec3("Global position").z - second->getVec3("Size").z / 2 && second->getVec3("Global position").z + second->getVec3("Size").z / 2 >= first->getVec3("Global position").z - first->getVec3("Size").z;
 
-            return collisionX && collisionY && collisionZ;
-            break;
+            return std::make_tuple(collisionX && collisionY && collisionZ, getCollisionDirection(first->getVec3("Global position") - second->getVec3("Global position")), first->getVec3("Global position") - second->getVec3("Global position"));
         }
         case (qtzl::Object::Type::SPHERE_COLLISION): // BOX - SPHERE collision
         {
@@ -61,8 +26,10 @@ bool Physics::areColliding(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shar
             glm::vec3 clampedDifference = glm::clamp(sphereCenter - boxCenter, -boxHalfExtents, boxHalfExtents); // clamped difference between centers
             glm::vec3 shapesDifference = boxCenter + clampedDifference - sphereCenter; // difference between sphere center and closest point on the box
 
-            return glm::length(shapesDifference) < second->getFloat("Radius");
-            break;
+            if (glm::length(shapesDifference) < second->getFloat("Radius"))
+                return std::make_tuple(true, getCollisionDirection(shapesDifference), shapesDifference);
+            else
+                return std::make_tuple(false, RIGHT, glm::vec3(0.0f));
         }
         } // switch (second->getType())
         break;
@@ -81,43 +48,56 @@ bool Physics::areColliding(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shar
             glm::vec3 clampedDifference = glm::clamp(sphereCenter - boxCenter, -boxHalfExtents, boxHalfExtents); // clamped difference between centers
             glm::vec3 shapesDifference = boxCenter + clampedDifference - sphereCenter; // difference between sphere center and closest point on the box
 
-            return glm::length(shapesDifference) < first->getFloat("Radius");
-            break;
+            if (glm::length(shapesDifference) < second->getFloat("Radius"))
+                return std::make_tuple(true, getCollisionDirection(shapesDifference), shapesDifference);
+            else
+                return std::make_tuple(false, RIGHT, glm::vec3(0.0f));
         }
         case (qtzl::Object::Type::SPHERE_COLLISION): // SPHERE - SPHERE collision
         {
-            // if the distance between centers of spheres is less than the sum of their radi, then the spheres collided
-            return glm::length((first->getVec3("Global position") + first->getFloat("Radius")) - (second->getVec3("Global position") + second->getFloat("Radius"))) < first->getFloat("Radius") + second->getFloat("Radius");
-            break;
+            // if the distance between centers of spheres is less than the sum of their radii, then the spheres collided
+
+            glm::vec3 difference = (first->getVec3("Global position") + first->getFloat("Radius")) - (second->getVec3("Global position") + second->getFloat("Radius"));
+
+            if (glm::length(difference) < first->getFloat("Radius") + second->getFloat("Radius"))
+                return std::make_tuple(true, getCollisionDirection(difference), difference);
+            else
+                return std::make_tuple(false, RIGHT, glm::vec3(0.0f));
         }
         } // switch (second->getType())
-        break;
     }
     } // switch (first->m_Type)
 
     std::cerr << "ERROR::Physics::checkPhysicsNode3D: wrong collision type" << std::endl;
 
-    return false; // just in case something goes wrong
+    return std::make_tuple(false, UP, glm::vec3(0.0f)); // just in case something goes wrong
 }
 
-std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> Physics::getCollisions(std::shared_ptr<Scene>& scene, std::shared_ptr<qtzl::PhysicsNode3D> node)
+Physics::Direction Physics::getCollisionDirection(const glm::vec3& target)
 {
-    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> physicsNodes = scene->getPhysicsNodes();
-
-    // don't process if there is nothing to process
-    if (physicsNodes.size() <= 1)
-        return {};
-
-    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> collisionPositive;
-    std::vector<std::shared_ptr<qtzl::PhysicsNode3D>>::iterator it = physicsNodes.begin();
-
-    while (it != physicsNodes.end())
+    glm::vec3 compass[] =
     {
-        if (areColliding(node, *it))
+        {  1.0f,  0.0f,  0.0f }, // +X
+        { -1.0f,  0.0f,  0.0f }, // -X
+        {  0.0f,  1.0f,  0.0f }, // +Y
+        {  0.0f, -1.0f,  0.0f }, // -Y
+        {  0.0f,  0.0f,  1.0f }, // +Z
+        {  0.0f,  0.0f, -1.0f }  // -Z
+    };
+
+    float max = 0.0f;
+    unsigned int bestMatch = -1;
+
+    for (unsigned int i = 0; i < 6; i++)
+    {
+        float dotProduct = glm::dot(glm::normalize(target), compass[i]);
+
+        if (dotProduct > max)
         {
-            collisionPositive.push_back(*it);
+            max = dotProduct;
+            bestMatch = i;
         }
     }
 
-    return collisionPositive;
+    return (Direction)bestMatch;
 }

@@ -28,7 +28,6 @@ public:
     PostProcessing m_PostProcessing;
 
     bool m_IsPostProcessing = false;
-    bool m_IsPhysicsProcessing = true;
 
     std::vector<std::shared_ptr<qtzl::DirectionalLight3D>> getDirectionalLights() const;
     std::vector<std::shared_ptr<qtzl::PointLight3D>>       getPointLights() const;

@@ -22,6 +22,7 @@ int main()
     first_scene->createSphericalBillboard("containerboard", "textures/container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));
 
     auto catcube = first_scene->createRigidBody("catcube", "objects/catcube/catcube.obj");
+    auto secondcatcube = first_scene->createRigidBody("secondcatcube", "objects/catcube/catcube.obj");
     auto catsphere = first_scene->createRigidBody("catsphere", "objects/catsphere/catsphere.obj", glm::vec3(-5.0f, 0.0f, 0.0f));
 
     catcube->addChild(first_scene->createBoxCollision("catcube_collision", catcube->getGlobalPosition(), glm::vec3(2.0f)));
@@ -83,8 +84,10 @@ int main()
         {
             movement = glm::vec3(0.0f);
 
-            if (Physics::areColliding(player_collision, floor_collision))
-                y_momentum = 0.0f;
+            //if (Physics::areColliding(player_collision, floor_collision))
+            //    y_momentum = 0.0f;
+
+            //auto collision = Physics::areColliding(player_collision, floor_collision);
 
             // gravity stuff
             movement.y -= y_momentum;

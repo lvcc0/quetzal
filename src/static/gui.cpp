@@ -42,8 +42,6 @@ void GUI::showSceneConfig(std::string& scene_name, const std::map<std::string, s
 
     ImGui::Separator();
 
-    ImGui::Checkbox("Physics Enabled", &scenes.at(scene_name)->m_IsPhysicsProcessing);
-
     if (ImGui::Checkbox("Postprocessing Enabled", &scenes.at(scene_name)->m_IsPostProcessing))
         glEnable(GL_DEPTH_TEST);
 
