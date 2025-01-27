@@ -6,6 +6,7 @@
 #include <map>
 
 // TODO: create separate keyboard.h file with Key class so key modulation and some more stuff can be made
+// TODO: map several keys to one action
 
 class Input
 {

@@ -22,7 +22,8 @@ public:
         UP,    // +Y
         DOWN,  // -Y
         FRONT, // +Z
-        BACK   // -Z
+        BACK,  // -Z
+        NIL
     };
 
     // Check if two nodes are colliding
