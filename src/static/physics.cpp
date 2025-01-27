@@ -10,13 +10,16 @@ std::tuple<bool, Physics::Direction, glm::vec3> Physics::areColliding(std::share
         {
         case (qtzl::Object::Type::BOX_COLLISION): // BOX - BOX collision
         {
-            bool collisionX = first->getVec3("Global position").x + first->getVec3("Size").x / 2 >= second->getVec3("Global position").x - second->getVec3("Size").x / 2 && second->getVec3("Global position").x + second->getVec3("Size").x / 2 >= first->getVec3("Global position").x - first->getVec3("Size").x;
-            bool collisionY = first->getVec3("Global position").y + first->getVec3("Size").y / 2 >= second->getVec3("Global position").y - second->getVec3("Size").y / 2 && second->getVec3("Global position").y + second->getVec3("Size").y / 2 >= first->getVec3("Global position").y - first->getVec3("Size").y;
-            bool collisionZ = first->getVec3("Global position").z + first->getVec3("Size").z / 2 >= second->getVec3("Global position").z - second->getVec3("Size").z / 2 && second->getVec3("Global position").z + second->getVec3("Size").z / 2 >= first->getVec3("Global position").z - first->getVec3("Size").z;
+            bool collisionX = first->getVec3("Global position").x + first->getVec3("Size").x / 2.0f >= second->getVec3("Global position").x - second->getVec3("Size").x / 2.0f && second->getVec3("Global position").x + second->getVec3("Size").x / 2.0f >= first->getVec3("Global position").x - first->getVec3("Size").x / 2.0f;
+            bool collisionY = first->getVec3("Global position").y + first->getVec3("Size").y / 2.0f >= second->getVec3("Global position").y - second->getVec3("Size").y / 2.0f && second->getVec3("Global position").y + second->getVec3("Size").y / 2.0f >= first->getVec3("Global position").y - first->getVec3("Size").y / 2.0f;
+            bool collisionZ = first->getVec3("Global position").z + first->getVec3("Size").z / 2.0f >= second->getVec3("Global position").z - second->getVec3("Size").z / 2.0f && second->getVec3("Global position").z + second->getVec3("Size").z / 2.0f >= first->getVec3("Global position").z - first->getVec3("Size").z / 2.0f;
 
-            return std::make_tuple(collisionX && collisionY && collisionZ, getCollisionDirection(first->getVec3("Global position") - second->getVec3("Global position")), first->getVec3("Global position") - second->getVec3("Global position"));
+            glm::vec3 clampedDifference = glm::clamp(first->getVec3("Global position") - second->getVec3("Global position"), -second->getVec3("Size") / 2.0f, second->getVec3("Size") / 2.0f);
+            glm::vec3 shapesDifference = second->getVec3("Global position") + clampedDifference - first->getVec3("Global position");
+
+            return std::make_tuple(collisionX && collisionY && collisionZ, getCollisionDirection(shapesDifference), shapesDifference);
         }
-        case (qtzl::Object::Type::SPHERE_COLLISION): // BOX - SPHERE collision
+        case (qtzl::Object::Type::SPHERE_COLLISION): // BOX - SPHERE collision NOTE: needs testing
         {
             glm::vec3 sphereCenter(second->getVec3("Global position") + second->getFloat("Radius"));
 
@@ -38,7 +41,7 @@ std::tuple<bool, Physics::Direction, glm::vec3> Physics::areColliding(std::share
     {
         switch (second->getType())
         {
-        case (qtzl::Object::Type::BOX_COLLISION): // SPHERE - BOX collision
+        case (qtzl::Object::Type::BOX_COLLISION): // SPHERE - BOX collision NOTE: needs testing
         {
             glm::vec3 sphereCenter(first->getVec3("Global position") + first->getFloat("Radius"));
 
@@ -53,7 +56,7 @@ std::tuple<bool, Physics::Direction, glm::vec3> Physics::areColliding(std::share
             else
                 return std::make_tuple(false, RIGHT, glm::vec3(0.0f));
         }
-        case (qtzl::Object::Type::SPHERE_COLLISION): // SPHERE - SPHERE collision
+        case (qtzl::Object::Type::SPHERE_COLLISION): // SPHERE - SPHERE collision NOTE: needs testing
         {
             // if the distance between centers of spheres is less than the sum of their radii, then the spheres collided
 

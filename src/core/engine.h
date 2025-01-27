@@ -36,18 +36,22 @@ public:
     void createWindow();
 
     // Gets called every frame in the Engine::process function
+    // NOTE: should be private
     void processInput(); 
 
     // Create a scene, add it to the scenes map and set currentScene if needed
     std::shared_ptr<Scene> createScene(const std::string& name, bool set_current = false);
 
     // Gets called upon window resize
+    // NOTE: should be private
     void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
     // Gets called upon key press
+    // NOTE: should be private
     void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     // Gets called upon mouse click
+    // NOTE: should be private
     void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
     // Main loop function

@@ -1,7 +1,60 @@
 #include "core/engine.h"
 
 // TODO: separate scene scripts to separate files or smth
-// TODO: fix all the stuff below
+
+// yeah it is supposed to be here
+static void doCollisions(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shared_ptr<qtzl::PhysicsNode3D> second, glm::vec3& movement)
+{
+    auto collision = Physics::areColliding(first, second);
+
+    if (std::get<0>(collision)) // collision detected
+    {
+        Physics::Direction direction = std::get<1>(collision);
+        glm::vec3 difference = std::get<2>(collision);
+
+        auto first_parent = first->getParent();
+
+        switch (direction)
+        {
+        case Physics::Direction::RIGHT:
+        {
+            movement.x = glm::min(movement.x, 0.0f);
+            first_parent->set("Global position", first_parent->getVec3("Global position") - glm::vec3(first->getVec3("Size").x / 2.0f - std::abs(difference.x), 0.0f, 0.0f));
+            break;
+        }
+        case Physics::Direction::LEFT:
+        {
+            movement.x = glm::max(movement.x, 0.0f);
+            first_parent->set("Global position", first_parent->getVec3("Global position") + glm::vec3(first->getVec3("Size").x / 2.0f - std::abs(difference.x), 0.0f, 0.0f));
+            break;
+        }
+        case Physics::Direction::UP:
+        {
+            movement.y = glm::min(movement.y, 0.0f);
+            first_parent->set("Global position", first_parent->getVec3("Global position") - glm::vec3(0.0f, first->getVec3("Size").y / 2.0f - std::abs(difference.y), 0.0f));
+            break;
+        }
+        case Physics::Direction::DOWN:
+        {
+            movement.y = glm::max(movement.y, 0.0f);
+            first_parent->set("Global position", first_parent->getVec3("Global position") + glm::vec3(0.0f, first->getVec3("Size").y / 2.0f - std::abs(difference.y), 0.0f));
+            break;
+        }
+        case Physics::Direction::FRONT:
+        {
+            movement.z = glm::min(movement.z, 0.0f);
+            first_parent->set("Global position", first_parent->getVec3("Global position") - glm::vec3(0.0f, 0.0f, first->getVec3("Size").z / 2.0f - std::abs(difference.z)));
+            break;
+        }
+        case Physics::Direction::BACK:
+        {
+            movement.z = glm::max(movement.z, 0.0f);
+            first_parent->set("Global position", first_parent->getVec3("Global position") + glm::vec3(0.0f, 0.0f, first->getVec3("Size").z / 2.0f - std::abs(difference.z)));
+            break;
+        }
+        } // switch (direction)    
+    }
+}
 
 int main()
 {
@@ -22,11 +75,13 @@ int main()
     first_scene->createSphericalBillboard("containerboard", "textures/container.png", glm::vec3(3.0f, 3.0f, -3.0f), glm::vec2(2.0f));
 
     auto catcube = first_scene->createRigidBody("catcube", "objects/catcube/catcube.obj");
-    auto secondcatcube = first_scene->createRigidBody("secondcatcube", "objects/catcube/catcube.obj");
-    auto catsphere = first_scene->createRigidBody("catsphere", "objects/catsphere/catsphere.obj", glm::vec3(-5.0f, 0.0f, 0.0f));
+    auto second_catcube = first_scene->createRigidBody("second_catcube", "objects/catcube/catcube.obj", glm::vec3(-3.0f, 0.0f, 0.0f));
 
-    catcube->addChild(first_scene->createBoxCollision("catcube_collision", catcube->getGlobalPosition(), glm::vec3(2.0f)));
-    catsphere->addChild(first_scene->createBoxCollision("catsphere_collision", catsphere->getGlobalPosition(), glm::vec3(2.0f)));
+    auto catcube_collision = first_scene->createBoxCollision("catcube_collision", catcube->getGlobalPosition(), glm::vec3(1.0f));
+    auto second_catcube_collision = first_scene->createBoxCollision("catsphere_collision", second_catcube->getGlobalPosition(), glm::vec3(1.0f));
+
+    catcube->addChild(catcube_collision);
+    second_catcube->addChild(second_catcube_collision);
 
     first_scene->createDirectionalLight("dir_light0");
     first_scene->createPointLight("point_light0", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
@@ -37,28 +92,8 @@ int main()
     Input::mapAction("back", GLFW_KEY_J);
     Input::mapAction("right", GLFW_KEY_K);
 
-    float catsphere_velocity = 5.0f;
-    glm::vec3 catsphere_movement;
-
-    // --- //
-
-    // --- second_scene stuff --- //
-
-    second_scene->createSkybox("skybox", ResourceManager::loadCubemap("textures/skybox"));
-
-    auto floor = second_scene->createStaticBody("floor", "objects/catcube/catcube.obj", glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(10.0f, 0.5f, 2.0f));
-    auto floor_collision = second_scene->createBoxCollision("floor_collision", floor->getGlobalPosition(), floor->getScale());
-    floor->addChild(floor_collision);
-
-    auto player_cube = second_scene->createRigidBody("player_cube", "objects/catcube/catcube.obj", glm::vec3(0.0f, 2.0f, 0.0f));
-    auto player_collision = second_scene->createBoxCollision("player_collision", player_cube->getGlobalPosition(), player_cube->getScale());
-    player_cube->addChild(player_collision);
-
-    float velocity = 2.0f;
-    float gravity_acceleraion = 0.4f;
-    float y_momentum = 0.0f;
-
-    glm::vec3 movement;
+    float catcube_velocity = 5.0f;
+    glm::vec3 catcube_movement;
 
     // --- //
 
@@ -67,39 +102,20 @@ int main()
     {
         if (engine.currentScene == "first_scene")
         {
-            catsphere_movement = glm::vec3(0.0f);
+            catcube_movement = glm::vec3(0.0f);
 
             if (Input::isActionPressed("forward"))
-                catsphere_movement.z -= catsphere_velocity;
+                catcube_movement.z -= catcube_velocity;
             if (Input::isActionPressed("left"))
-                catsphere_movement.x -= catsphere_velocity;
+                catcube_movement.x -= catcube_velocity;
             if (Input::isActionPressed("back"))
-                catsphere_movement.z += catsphere_velocity;
+                catcube_movement.z += catcube_velocity;
             if (Input::isActionPressed("right"))
-                catsphere_movement.x += catsphere_velocity;
+                catcube_movement.x += catcube_velocity;
 
-            catsphere->translate(catsphere_movement * engine.getDeltaTime());
-        }
-        else if (engine.currentScene == "second_scene")
-        {
-            movement = glm::vec3(0.0f);
+            doCollisions(catcube_collision, second_catcube_collision, catcube_movement);
 
-            //if (Physics::areColliding(player_collision, floor_collision))
-            //    y_momentum = 0.0f;
-
-            //auto collision = Physics::areColliding(player_collision, floor_collision);
-
-            // gravity stuff
-            movement.y -= y_momentum;
-            y_momentum += gravity_acceleraion;
-            if (y_momentum > 10.0f) y_momentum = 10.0f;
-
-            if (Input::isActionPressed("left"))
-                movement.x -= velocity;
-            if (Input::isActionPressed("right"))
-                movement.x += velocity;
-
-            player_cube->translate(movement * engine.getDeltaTime());
+            catcube->translate(catcube_movement * engine.getDeltaTime());
         }
 
         engine.process();
