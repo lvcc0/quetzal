@@ -4,8 +4,6 @@
 
 #include "scene/3d/node3d.h"
 
-// TODO: rotating children
-
 namespace qtzl
 {
     // Base class for every 3D node that can be drawn on the scene

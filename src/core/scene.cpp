@@ -141,7 +141,6 @@ std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(
 
     this->m_Nodes.push_back(node_sptr);
     this->m_PhysicsNodes.push_back(node_sptr);
-    this->m_VisualNodes.push_back(node_sptr->getVisiblePart());
 
     return node_sptr;
 }
@@ -159,7 +158,6 @@ std::shared_ptr<qtzl::SphereCollision> Scene::createSphereCollision(
 
     this->m_Nodes.push_back(node_sptr);
     this->m_PhysicsNodes.push_back(node_sptr);
-    this->m_VisualNodes.push_back(node_sptr->getVisiblePart());
 
     return node_sptr;
 }

@@ -11,13 +11,13 @@ namespace qtzl
     {
         if (!this->m_IntProperties.contains(property_name))
         {
-            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
+            std::cerr << "ERROR::qtzl::Object::set (int): no such property \"" << property_name << "\"." << std::endl;
             return;
         }
 
         if (this->m_EditingLimits.contains(property_name))
         {
-            this->m_IntProperties[property_name].value = std::min(std::max(value, (int)this->m_EditingLimits.at(property_name).x), (int)this->m_EditingLimits.at(property_name).y);
+            this->m_IntProperties[property_name].value = glm::clamp(value, (int)this->m_EditingLimits.at(property_name).x, (int)this->m_EditingLimits.at(property_name).y);
             return;
         }
 
@@ -28,13 +28,13 @@ namespace qtzl
     {
         if (!this->m_FloatProperties.contains(property_name))
         {
-            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
+            std::cerr << "ERROR::qtzl::Object::set (float): no such property \"" << property_name << "\"." << std::endl;
             return;
         }
 
         if (this->m_EditingLimits.contains(property_name))
         {
-            this->m_FloatProperties[property_name].value = std::min(std::max(value, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
+            this->m_FloatProperties[property_name].value = glm::clamp(value, this->m_EditingLimits.at(property_name).x, this->m_EditingLimits.at(property_name).y);
             return;
         }
 
@@ -45,7 +45,7 @@ namespace qtzl
     {
         if (!this->m_BoolProperties.contains(property_name))
         {
-            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
+            std::cerr << "ERROR::qtzl::Object::set (bool): no such property \"" << property_name << "\"." << std::endl;
             return;
         }
 
@@ -56,7 +56,7 @@ namespace qtzl
     {
         if (!this->m_StringProperties.contains(property_name))
         {
-            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
+            std::cerr << "ERROR::qtzl::Object::set (string): no such property \"" << property_name << "\"." << std::endl;
             return;
         }
 
@@ -67,15 +67,13 @@ namespace qtzl
     {
         if (!this->m_Vec3Properties.contains(property_name))
         {
-            std::cerr << "ERROR::qtzl::Object::set: no such property \"" << property_name << "\"." << std::endl;
+            std::cerr << "ERROR::qtzl::Object::set (vec3): no such property \"" << property_name << "\"." << std::endl;
             return;
         }
 
         if (this->m_EditingLimits.contains(property_name))
         {
-            this->m_Vec3Properties[property_name].value.x = std::min(std::max(value.x, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
-            this->m_Vec3Properties[property_name].value.y = std::min(std::max(value.y, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
-            this->m_Vec3Properties[property_name].value.z = std::min(std::max(value.z, this->m_EditingLimits.at(property_name).x), this->m_EditingLimits.at(property_name).y);
+            this->m_Vec3Properties[property_name].value = glm::clamp(value, this->m_EditingLimits.at(property_name).x, this->m_EditingLimits.at(property_name).y);
             return;
         }
 
@@ -180,24 +178,11 @@ namespace qtzl
 
     bool Object::has(const std::string& property_name) const
     {
-        // i think it's better to do it this way instead of "return <...> || <...> || ..."
-
-        if (this->m_IntProperties.contains(property_name))
-            return true;
-
-        if (this->m_FloatProperties.contains(property_name))
-            return true;
-
-        if (this->m_BoolProperties.contains(property_name))
-            return true;
-
-        if (this->m_StringProperties.contains(property_name))
-            return true;
-
-        if (this->m_Vec3Properties.contains(property_name))
-            return true;
-
-        return false;
+        return this->m_IntProperties.contains(property_name)    ||
+               this->m_FloatProperties.contains(property_name)  ||
+               this->m_BoolProperties.contains(property_name)   ||
+               this->m_StringProperties.contains(property_name) ||
+               this->m_Vec3Properties.contains(property_name);
     }
 
     Object::Type Object::getType() const
@@ -284,7 +269,7 @@ namespace qtzl
     {
         if (this->m_StringProperties.contains(property_name) || this->m_BoolProperties.contains(property_name))
         {
-            std::cerr << "ERROR::qtzl::Object::setPropertyLimits: you can't set limits for a string or bool property." << std::endl;
+            std::cerr << "ERROR::qtzl::Object::setPropertyLimits (float, float): you can't set limits for a string or bool property." << std::endl;
             return;
         }
 
@@ -295,7 +280,7 @@ namespace qtzl
     {
         if (this->m_StringProperties.contains(property_name) || this->m_BoolProperties.contains(property_name))
         {
-            std::cerr << "ERROR::qtzl::Object::setPropertyLimits: you can't set limits for a string or bool property." << std::endl;
+            std::cerr << "ERROR::qtzl::Object::setPropertyLimits (vec2): you can't set limits for a string or bool property." << std::endl;
             return;
         }
 

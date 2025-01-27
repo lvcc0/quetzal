@@ -3,6 +3,7 @@
 #include "core/scene.h"
 
 // TODO: function that predicts a collision with given velocity
+// NOTE: current collision takes wrong coordinates
 
 class Physics
 {

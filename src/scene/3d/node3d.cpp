@@ -15,6 +15,40 @@ namespace qtzl
         this->addProperty("Scale", glm::vec3(1.0f));
     }
 
+    void Node3D::set(const std::string& property_name, const glm::vec3& value)
+    {
+        if (!this->m_Vec3Properties.contains(property_name))
+        {
+            std::cerr << "ERROR::qtzl::Node3D::set (vec3): no such property \"" << property_name << "\"." << std::endl;
+            return;
+        }
+
+        // Change some children properties
+        if (property_name == "Global position")
+        {
+            for (auto& entry : this->m_Children)
+            {
+                entry.second->set("Global position", value + entry.second->getVec3("Global position") - this->getVec3("Global position"));
+            }
+        }
+        else if (property_name == "Global rotation")
+        {
+            for (auto& entry : this->m_Children)
+            {
+                entry.second->set("Global rotation", value + entry.second->getVec3("Global rotation") - this->getVec3("Global rotation"));
+            }
+        }
+
+        if (this->m_EditingLimits.contains(property_name))
+        {
+            this->m_Vec3Properties[property_name].value = glm::clamp(value, this->m_EditingLimits.at(property_name).x, this->m_EditingLimits.at(property_name).y);
+        }
+        else
+        {
+            this->m_Vec3Properties[property_name].value = value;
+        }
+    }
+
     void Node3D::setScale(const glm::vec3& scale)
     {
         this->set("Scale", scale);
@@ -38,31 +72,16 @@ namespace qtzl
     void Node3D::setGlobalPosition(const glm::vec3& position)
     {
         this->set("Global position", position);
-
-        for (auto& entry : this->m_Children)
-        {
-            entry.second->set("Global position", position + entry.second->getVec3("Global position"));
-        }
     }
 
     void Node3D::setGlobalRotation(const glm::vec3& radians)
     {
         this->set("Global rotation", radians);
-
-        for (auto& entry : this->m_Children)
-        {
-            entry.second->set("Global rotation", radians + entry.second->getVec3("Global rotation"));
-        }
     }
 
     void Node3D::setGlobalRotationDegrees(const glm::vec3& degrees)
     {
         this->set("Global rotation", glm::radians(degrees));
-
-        for (auto& entry : this->m_Children)
-        {
-            entry.second->set("Global rotation", glm::radians(degrees) + entry.second->getVec3("Global rotation"));
-        }
     }
 
     void Node3D::setVisible(bool visible)
@@ -70,7 +89,7 @@ namespace qtzl
         if (this->getBool("Visible") == visible)
             return;
 
-        this->set("Visible", visible);
+        Object::set("Visible", visible);
     }
 
     glm::vec3 Node3D::getScale() const
@@ -110,7 +129,7 @@ namespace qtzl
 
     bool Node3D::isVisible() const
     {
-        return this->getBool("Visible");;
+        return this->getBool("Visible");
     }
 
     void Node3D::show()

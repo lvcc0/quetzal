@@ -7,7 +7,9 @@
 #include "scene/main/node.h"
 
 // TODO: make children visibility depend on parent's visibility
+// TODO: rotating children
 // TODO: fix children moving after parents
+// TODO: other setters
 
 namespace qtzl
 {
@@ -17,6 +19,8 @@ namespace qtzl
     public:
         Node3D(const std::string& name);
         virtual ~Node3D() = default;
+
+        virtual void set(const std::string& property_name, const glm::vec3& value) override;
 
         virtual void setScale(const glm::vec3& scale);
 
