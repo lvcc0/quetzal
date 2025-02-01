@@ -13,7 +13,7 @@ namespace qtzl
         Skybox(const std::string& name, unsigned int texture);
         virtual ~Skybox() = default;
 
-        void render(const std::shared_ptr<ShaderProgram>& shader_program) override;
+        void render(const std::shared_ptr<ShaderProgram>& shader_program);
     
     private:
         const std::vector<float> m_Vertices =
@@ -67,5 +67,6 @@ namespace qtzl
         std::unique_ptr<VBO> m_VBO_uptr = nullptr;
 
         void setupRender() override;
+        void accept(NodeVisitor& visitor) override;
     };
 }

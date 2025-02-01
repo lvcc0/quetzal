@@ -92,9 +92,9 @@ int main()
     catcube->addChild(catcube_collision);
     second_catcube->addChild(second_catcube_collision);
 
-    first_scene->createDirectionalLight("dir_light0");
-    first_scene->createPointLight("point_light0", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
-    first_scene->createSpotLight("spot_light0", glm::vec3(-2.0f, -1.5f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.5f, 1.0f));
+    first_scene->createDirectionalLight("dirLights[0]");
+    first_scene->createPointLight("pointLights[0]", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
+    first_scene->createSpotLight("spotLights[0]", glm::vec3(-2.0f, -1.5f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.5f, 1.0f));
     
     Input::mapAction("left", GLFW_KEY_LEFT);
     Input::mapAction("right", GLFW_KEY_RIGHT);

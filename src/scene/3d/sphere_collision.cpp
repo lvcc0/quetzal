@@ -14,4 +14,8 @@ namespace qtzl
     {
         Object::set("Radius", radius);
     }
+    void SphereCollision::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

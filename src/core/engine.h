@@ -6,6 +6,8 @@
 #include "static/physics.h"
 
 #include "core/scene.h"
+#include "core/visitors/renderer_visitor.h"
+#include "core/visitors/physics_visitor.h"
 
 // Singleton
 class Engine
@@ -65,6 +67,10 @@ private:
     
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
+
+    // Visitors
+    RendererVisitor rendererVisitor;
+    PhysicsVisitor physicsVisitor;
 };
 
 // Callback static wrappers (because glfw doesn't know objects)

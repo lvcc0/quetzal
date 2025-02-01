@@ -76,6 +76,18 @@ std::tuple<bool, Physics::Direction, glm::vec3> Physics::areColliding(std::share
     return std::make_tuple(false, UP, glm::vec3(0.0f)); // just in case something goes wrong
 }
 
+void Physics::addPhysicsNode(qtzl::PhysicsNode3D* node)
+{
+    physicsNodes.push_back(node);
+}
+
+bool Physics::checkPhysicsNode(void* ref)
+{
+    auto it = std::find_if(physicsNodes.begin(), physicsNodes.end(),
+        [ref](qtzl::PhysicsNode3D* node_) {return ref == node_; });
+    return it != physicsNodes.end();
+}
+
 Physics::Direction Physics::getCollisionDirection(const glm::vec3& target)
 {
     glm::vec3 compass[] =

@@ -29,7 +29,10 @@ public:
     // Check if two nodes are colliding
     static std::tuple<bool, Direction, glm::vec3> areColliding(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shared_ptr<qtzl::PhysicsNode3D> second);
 
+    static void addPhysicsNode(qtzl::PhysicsNode3D* node);
+    static bool checkPhysicsNode(void* ref);
 private:
     // Returns snapped ro axis collision direction
     static Direction getCollisionDirection(const glm::vec3& target);
+    inline static std::vector<qtzl::PhysicsNode3D*> physicsNodes;
 };

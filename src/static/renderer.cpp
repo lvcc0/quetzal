@@ -5,6 +5,11 @@ glm::mat4 Renderer::getCurrentProjectionMatrix()
     return m_CurrentProjectionMatrix;
 }
 
+glm::mat4 Renderer::getCurrentViewMatrix()
+{
+    return m_CurrentViewMatrix;
+}
+
 std::map<ShaderProgram::Type, std::shared_ptr<ShaderProgram>> Renderer::getCurrentShaderPrograms()
 {
     return m_CurrentShaderPrograms;
@@ -21,7 +26,7 @@ void Renderer::setCurrentShaderProgram(const std::shared_ptr<ShaderProgram>&& sh
     m_CurrentShaderPrograms.emplace(shader_program->getType(), shader_program);
 }
 
-void Renderer::render(std::shared_ptr<Scene>& scene)
+void Renderer::renderBegin(std::shared_ptr<Scene>& scene)
 {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // setting bg color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clearing stuff in the default framebuffer
@@ -31,6 +36,7 @@ void Renderer::render(std::shared_ptr<Scene>& scene)
         scene->m_PostProcessing.deactivate();
 
     m_CurrentProjectionMatrix = glm::perspective(glm::radians(scene->m_Camera.m_FOV), (float)scene->m_Camera.m_Width / (float)scene->m_Camera.m_Height, 0.1f, 100.0f);
+    m_CurrentViewMatrix = scene->m_Camera.getViewMatrix();
 
     // kinda lengthy, maybe we'll rewrite it, but i kinda like it
     m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT)->activateProgram();
@@ -40,51 +46,10 @@ void Renderer::render(std::shared_ptr<Scene>& scene)
 
     m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT)->setMat4("projection", m_CurrentProjectionMatrix);
     m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT)->setMat4("view", scene->m_Camera.getViewMatrix());
+}
 
-    // Rendering lights' influence
-    if (!scene->getDirectionalLights().empty())
-    {
-        for (unsigned int i = 0; i < scene->getDirectionalLights().size(); i++)
-        {
-            scene->getDirectionalLights()[i]->updateUniforms(m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT), i);
-        }
-    }
-    if (!scene->getPointLights().empty())
-    {
-        for (unsigned int i = 0; i < scene->getPointLights().size(); i++)
-        {
-            scene->getPointLights()[i]->updateUniforms(m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT), i);
-        }
-    }
-    if (!scene->getSpotLights().empty())
-    {
-        for (unsigned int i = 0; i < scene->getSpotLights().size(); i++)
-        {
-            scene->getSpotLights()[i]->updateUniforms(m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT), i);
-        }
-    }
-
-    // Rendering renderable nodes
-    for (const auto& node : scene->getVisualNodes())
-    {
-        if (node->getBool("Visible"))
-        {
-            if (node->getType() == qtzl::Object::SKYBOX && m_CurrentShaderPrograms.contains(ShaderProgram::SKYBOX))
-            {
-                m_CurrentShaderPrograms.at(ShaderProgram::SKYBOX)->activateProgram();
-
-                m_CurrentShaderPrograms.at(ShaderProgram::SKYBOX)->setMat4("projection", m_CurrentProjectionMatrix);
-                m_CurrentShaderPrograms.at(ShaderProgram::SKYBOX)->setMat4("view", glm::mat4(glm::mat3(scene->m_Camera.getViewMatrix())));
-
-                node->render(m_CurrentShaderPrograms.at(ShaderProgram::SKYBOX));
-
-                continue;
-            }
-
-            node->render(m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT));
-        }
-    }
-
+void Renderer::renderEnd(std::shared_ptr<Scene>& scene)
+{
     if (scene->m_PostProcessing.isActive() && scene->m_IsPostProcessing)
         scene->m_PostProcessing.activate();
 }

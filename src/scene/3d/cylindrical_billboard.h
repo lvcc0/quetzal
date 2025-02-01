@@ -11,6 +11,8 @@ namespace qtzl
         CylindricalBillboard(const std::string& name, std::shared_ptr<Texture> texture);
         virtual ~CylindricalBillboard() = default;
 
-        void render(const std::shared_ptr<ShaderProgram>& shader_program) override;
+        void render(const std::shared_ptr<ShaderProgram>& shader_program);
+
+        void accept(NodeVisitor& visitor) override;
     };
 }

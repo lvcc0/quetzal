@@ -56,20 +56,22 @@ namespace qtzl
         }
     }
 
-    void PointLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const
+    void PointLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program) const
     {
-        std::string name = "pointLights[" + std::to_string(index) + "]";
+        shader_program->setVec3(m_Name + ".position", this->getVec3("Global position"));
 
-        shader_program->setVec3(name + ".position", this->getVec3("Global position"));
+        shader_program->setVec3(m_Name + ".ambient", this->getVec3("Ambient"));
+        shader_program->setVec3(m_Name + ".diffuse", this->getVec3("Diffuse"));
+        shader_program->setVec3(m_Name + ".specular", this->getVec3("Specular"));
 
-        shader_program->setVec3(name + ".ambient", this->getVec3("Ambient"));
-        shader_program->setVec3(name + ".diffuse", this->getVec3("Diffuse"));
-        shader_program->setVec3(name + ".specular", this->getVec3("Specular"));
+        shader_program->setFloat(m_Name + ".constant", this->getFloat("Constant"));
+        shader_program->setFloat(m_Name + ".linear", this->getFloat("Linear"));
+        shader_program->setFloat(m_Name + ".quadratic", this->getFloat("Quadratic"));
 
-        shader_program->setFloat(name + ".constant", this->getFloat("Constant"));
-        shader_program->setFloat(name + ".linear", this->getFloat("Linear"));
-        shader_program->setFloat(name + ".quadratic", this->getFloat("Quadratic"));
-
-        shader_program->setVec3(name + ".color", this->getBool("Enabled") ? this->getVec3("Color") : glm::vec3(0.0f));
+        shader_program->setVec3(m_Name + ".color", this->getBool("Enabled") ? this->getVec3("Color") : glm::vec3(0.0f));
+    }
+    void PointLight3D::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
     }
 }

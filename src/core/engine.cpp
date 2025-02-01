@@ -168,8 +168,12 @@ void Engine::process()
         this->scenes.at(this->currentScene)->update();
 
         // we don't wanna render the window if it isn't open
-        if (winWidth > 0 && winHeight > 0)
-            Renderer::render(this->scenes.at(this->currentScene));
+        if (winWidth > 0 && winHeight > 0) 
+        {
+            Renderer::renderBegin(this->scenes.at(this->currentScene));
+            this->scenes.at(this->currentScene)->getNodeContainer().performActions(rendererVisitor);
+            Renderer::renderEnd(this->scenes.at(this->currentScene));
+        }
     }
 
     ImGui::Render();

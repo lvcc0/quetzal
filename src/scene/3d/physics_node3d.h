@@ -13,5 +13,7 @@ namespace qtzl
     public:
         PhysicsNode3D(const std::string& name);
         virtual ~PhysicsNode3D() = default;
+
+        void accept(NodeVisitor& visitor) override;
     };
 }

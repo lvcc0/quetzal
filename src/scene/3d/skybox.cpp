@@ -40,4 +40,8 @@ namespace qtzl
 
         this->m_VAO_uptr->addBuffer(*this->m_VBO_uptr, layout, 3 * sizeof(float));
     }
+    void Skybox::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

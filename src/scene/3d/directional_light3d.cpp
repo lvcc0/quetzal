@@ -17,16 +17,18 @@ namespace qtzl
         this->addProperty("Direction", direction);
     }
 
-    void DirectionalLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program, int index) const
+    void DirectionalLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program) const
     {
-        std::string name = "dirLights[" + std::to_string(index) + "]";
+        shader_program->setVec3(m_Name + ".direction", this->getVec3("Direction"));
 
-        shader_program->setVec3(name + ".direction", this->getVec3("Direction"));
+        shader_program->setVec3(m_Name + ".ambient", this->getVec3("Ambient"));
+        shader_program->setVec3(m_Name + ".diffuse", this->getVec3("Diffuse"));
+        shader_program->setVec3(m_Name + ".specular", this->getVec3("Specular"));
 
-        shader_program->setVec3(name + ".ambient", this->getVec3("Ambient"));
-        shader_program->setVec3(name + ".diffuse", this->getVec3("Diffuse"));
-        shader_program->setVec3(name + ".specular", this->getVec3("Specular"));
-
-        shader_program->setVec3(name + ".color", this->getBool("Enabled") ? this->getVec3("Color") : glm::vec3(0.0f));
+        shader_program->setVec3(m_Name + ".color", this->getBool("Enabled") ? this->getVec3("Color") : glm::vec3(0.0f));
+    }
+    void DirectionalLight3D::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
     }
 }

@@ -48,5 +48,7 @@ namespace qtzl
 
         void show();
         void hide();
+
+        void accept(NodeVisitor& visitor) override;
     };
 }

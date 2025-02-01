@@ -86,4 +86,8 @@ namespace qtzl
             submesh->setup();
         }
     }
+    void RigidBody3D::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

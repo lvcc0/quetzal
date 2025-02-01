@@ -14,4 +14,8 @@ namespace qtzl
     {
         this->set("Size", size);
     }
+    void BoxCollision::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

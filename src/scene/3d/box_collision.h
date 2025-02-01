@@ -13,5 +13,7 @@ namespace qtzl
         virtual ~BoxCollision() = default;
 
         void setSize(const glm::vec3& size);
+
+        void accept(NodeVisitor& visitor) override;
     };
 }

@@ -56,4 +56,8 @@ namespace qtzl
             submesh->setup();
         }
     }
+    void StaticBody3D::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

@@ -9,7 +9,7 @@ namespace qtzl
         const glm::vec3& diffuse,
         const glm::vec3& specular
     )
-        : Node(name)
+        : Node(name), m_Name(name)
     {
         this->m_Type = Object::Type::LIGHT3D;
 
@@ -30,5 +30,9 @@ namespace qtzl
 
         this->setPropertyEditingLimits("Specular", 0.0f, 1.0f);
         this->setPropertyEditingSpeed("Specular", 0.01f);
+    }
+    void Light3D::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
     }
 }

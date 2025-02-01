@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/rendering/shader_program.h"
+#include "core/visitors/node_visitor.h"
 
 // TODO: change map key on set("Name")
 
@@ -20,6 +21,8 @@ namespace qtzl
 
         void addChild(std::shared_ptr<Node> node);
         void removeChild(const std::string& name);
+
+        virtual void accept(NodeVisitor& visitor) = 0;
 
     protected:
         std::shared_ptr<Node> m_Parent;

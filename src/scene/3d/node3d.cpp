@@ -141,4 +141,8 @@ namespace qtzl
     {
         this->setVisible(false);
     }
+    void Node3D::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

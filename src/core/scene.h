@@ -19,6 +19,8 @@
 #include "scene/3d/box_collision.h"
 #include "scene/3d/sphere_collision.h"
 
+#include "node_container.h"
+
 class Scene
 {
 public:
@@ -36,6 +38,8 @@ public:
     std::vector<std::shared_ptr<qtzl::Node>>          getNodes() const;
     std::vector<std::shared_ptr<qtzl::VisualNode3D>>  getVisualNodes() const;
     std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> getPhysicsNodes() const;
+
+    NodeContainer& getNodeContainer();
 
     // Gets called every frame in the engine class
     void update();
@@ -130,11 +134,8 @@ public:
     );
 
 private:
-    std::vector<std::shared_ptr<qtzl::DirectionalLight3D>> m_DirectionalLights; // NOTE: 3d
-    std::vector<std::shared_ptr<qtzl::PointLight3D>>       m_PointLights; // NOTE: 3d
-    std::vector<std::shared_ptr<qtzl::SpotLight3D>>        m_SpotLights; // NOTE: 3d
+    NodeContainer m_NodeContainer;
 
     std::vector<std::shared_ptr<qtzl::Node>>          m_Nodes; // all scene nodes
-    std::vector<std::shared_ptr<qtzl::VisualNode3D>>  m_VisualNodes; // all visible scene nodes NOTE: 3d
     std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> m_PhysicsNodes; // all scene nodes that can be affected by physics NOTE: 3d
 };

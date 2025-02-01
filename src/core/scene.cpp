@@ -5,34 +5,19 @@ Scene::Scene(int viewport_width, int viewport_height)
 {
 }
 
-std::vector<std::shared_ptr<qtzl::DirectionalLight3D>> Scene::getDirectionalLights() const
-{
-    return this->m_DirectionalLights;
-}
-
-std::vector<std::shared_ptr<qtzl::PointLight3D>> Scene::getPointLights() const
-{
-    return this->m_PointLights;
-}
-
-std::vector<std::shared_ptr<qtzl::SpotLight3D>> Scene::getSpotLights() const
-{
-    return this->m_SpotLights;
-}
-
 std::vector<std::shared_ptr<qtzl::Node>> Scene::getNodes() const
 {
     return this->m_Nodes;
 }
 
-std::vector<std::shared_ptr<qtzl::VisualNode3D>> Scene::getVisualNodes() const
-{
-    return this->m_VisualNodes;
-}
-
 std::vector<std::shared_ptr<qtzl::PhysicsNode3D>> Scene::getPhysicsNodes() const
 {
     return this->m_PhysicsNodes;
+}
+
+NodeContainer& Scene::getNodeContainer()
+{
+    return this->m_NodeContainer;
 }
 
 void Scene::update()
@@ -67,7 +52,7 @@ std::shared_ptr<qtzl::RigidBody3D> Scene::createRigidBody(
     node_sptr->setScale(scale);
 
     this->m_Nodes.push_back(node_sptr);
-    this->m_VisualNodes.push_back(node_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
 
     return node_sptr;
 }
@@ -87,7 +72,7 @@ std::shared_ptr<qtzl::StaticBody3D> Scene::createStaticBody(
     node_sptr->setScale(scale);
     
     this->m_Nodes.push_back(node_sptr);
-    this->m_VisualNodes.push_back(node_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
 
     return node_sptr;
 }
@@ -105,7 +90,7 @@ std::shared_ptr<qtzl::CylindricalBillboard> Scene::createCylindricalBillboard(
     node_sptr->setScale(glm::vec3(size.x, size.y, 1.0f));
 
     this->m_Nodes.push_back(node_sptr);
-    this->m_VisualNodes.push_back(node_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
     
     return node_sptr;
 }
@@ -123,7 +108,7 @@ std::shared_ptr<qtzl::SphericalBillboard> Scene::createSphericalBillboard(
     node_sptr->setScale(glm::vec3(size.x, size.y, 1.0f));
 
     this->m_Nodes.push_back(node_sptr);
-    this->m_VisualNodes.push_back(node_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
     
     return node_sptr;
 }
@@ -141,6 +126,7 @@ std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(
 
     this->m_Nodes.push_back(node_sptr);
     this->m_PhysicsNodes.push_back(node_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
 
     return node_sptr;
 }
@@ -158,6 +144,7 @@ std::shared_ptr<qtzl::SphereCollision> Scene::createSphereCollision(
 
     this->m_Nodes.push_back(node_sptr);
     this->m_PhysicsNodes.push_back(node_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
 
     return node_sptr;
 }
@@ -174,7 +161,7 @@ std::shared_ptr<qtzl::DirectionalLight3D> Scene::createDirectionalLight(
     std::shared_ptr<qtzl::DirectionalLight3D> node_sptr = std::make_shared<qtzl::DirectionalLight3D>(name, direction, color, ambient, diffuse, specular);
 
     this->m_Nodes.push_back(node_sptr);
-    this->m_DirectionalLights.push_back(node_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
 
     return node_sptr;
 }
@@ -194,10 +181,10 @@ std::shared_ptr<qtzl::PointLight3D> Scene::createPointLight(
     std::shared_ptr<qtzl::PointLight3D> node_sptr = std::make_shared<qtzl::PointLight3D>(name, position, color, ambient, diffuse, specular, constant, linear, quadratic);
 
     this->m_Nodes.push_back(node_sptr);
-    this->m_PointLights.push_back(node_sptr);
     
     std::shared_ptr<qtzl::SphericalBillboard> bb_sptr = this->createSphericalBillboard(name + "_bb", "textures/lightbulb.png", position, glm::vec3(0.5f, 0.5f, 1.0f));
     node_sptr->addChild(bb_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
 
     return node_sptr;
 }
@@ -220,10 +207,10 @@ std::shared_ptr<qtzl::SpotLight3D> Scene::createSpotLight(
     std::shared_ptr<qtzl::SpotLight3D> node_sptr = std::make_shared<qtzl::SpotLight3D>(name, position, direction, color, ambient, diffuse, specular, constant, linear, quadratic, inner_cutoff, outer_cutoff);
 
     this->m_Nodes.push_back(node_sptr);
-    this->m_SpotLights.push_back(node_sptr);
 
     std::shared_ptr<qtzl::SphericalBillboard> bb_sptr = this->createSphericalBillboard(name + "_bb", "textures/highlight.png", position, glm::vec3(0.5f, 0.5f, 1.0f));
     node_sptr->addChild(bb_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
 
     return node_sptr;
 }
@@ -236,7 +223,7 @@ std::shared_ptr<qtzl::Skybox> Scene::createSkybox(
     std::shared_ptr<qtzl::Skybox> node_sptr = std::make_shared<qtzl::Skybox>(name, texture);
 
     this->m_Nodes.push_back(node_sptr);
-    this->m_VisualNodes.push_back(node_sptr);
+    this->m_NodeContainer.addNode(node_sptr);
 
     return node_sptr;
 }

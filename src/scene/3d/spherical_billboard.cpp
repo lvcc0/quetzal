@@ -62,4 +62,8 @@ namespace qtzl
         glDrawArrays(GL_TRIANGLES, 0, 6);
         this->m_VAO_uptr->unbind();
     }
+    void SphericalBillboard::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

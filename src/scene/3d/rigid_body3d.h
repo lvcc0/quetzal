@@ -13,7 +13,7 @@ namespace qtzl
         RigidBody3D(const std::string& name, std::shared_ptr<Mesh> mesh_sptr);
         virtual ~RigidBody3D() = default;
 
-        void render(const std::shared_ptr<ShaderProgram>& shader_program) override;
+        void render(const std::shared_ptr<ShaderProgram>& shader_program);
 
         void translate(const glm::vec3& vector);
         void scale(const glm::vec3& vector);
@@ -30,5 +30,7 @@ namespace qtzl
         std::shared_ptr<Mesh> m_Mesh_sptr;
 
         void setupRender() override;
+
+        void accept(NodeVisitor& visitor) override;
     };
 }

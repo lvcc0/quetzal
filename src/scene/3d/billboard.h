@@ -20,7 +20,7 @@ namespace qtzl
         glm::vec3 getTarget() const;
         glm::mat4 getModelMatrix() const override;
 
-        void render(const std::shared_ptr<ShaderProgram>& shader_program) override;
+        void render(const std::shared_ptr<ShaderProgram>& shader_program);
 
     protected:
         std::shared_ptr<Texture> m_Texture;
@@ -46,5 +46,7 @@ namespace qtzl
         std::unique_ptr<VBO> m_VBO_uptr = nullptr;
 
         void setupRender() override;
+
+        void accept(NodeVisitor& visitor) override;
     };
 }

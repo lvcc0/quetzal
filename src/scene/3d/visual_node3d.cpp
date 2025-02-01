@@ -25,4 +25,8 @@ namespace qtzl
     {
         return this->m_ModelMatrix;
     }
+    void VisualNode3D::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

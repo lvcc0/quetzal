@@ -7,4 +7,8 @@ namespace qtzl
     {
         this->m_Type = Object::Type::PHYSICS_NODE3D;
     }
+    void PhysicsNode3D::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

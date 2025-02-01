@@ -81,4 +81,8 @@ namespace qtzl
 
         this->m_VAO_uptr->addBuffer(*this->m_VBO_uptr, layout);
     }
+    void Billboard::accept(NodeVisitor& visitor)
+    {
+        visitor.visit(*this);
+    }
 }

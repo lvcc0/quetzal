@@ -11,5 +11,7 @@ namespace qtzl
         virtual ~SphereCollision() = default;
 
         void setRadius(float radius);
+
+        void accept(NodeVisitor& visitor) override;
     };
 }
