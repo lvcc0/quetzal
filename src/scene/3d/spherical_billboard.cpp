@@ -7,26 +7,26 @@ namespace qtzl
     {
         this->m_Type = Object::Type::SPHERICAL_BILLBOARD;
 
-        this->setPropertyEditable("Global rotation", false);
-        this->setPropertyEditable("Rotation", false);
+        //this->setPropertyEditable("Global rotation", false);
+        //this->setPropertyEditable("Rotation", false);
     }
 
     void SphericalBillboard::render(const std::shared_ptr<ShaderProgram>& shader_program)
     {
-        glm::vec3 vectorToTarget = glm::normalize(this->m_Vec3Properties.at("Target").value - this->m_Vec3Properties.at("Global position").value); // vector to the target
+        glm::vec3 vectorToTarget = glm::normalize(m_Target - m_GlobalPosition); // vector to the target
 
         // Projection of vector to target in different planes
 
         glm::vec3 targetYZ = glm::normalize(glm::vec3(
             0.0f,
-            this->m_Vec3Properties.at("Target").value.y - this->m_Vec3Properties.at("Global position").value.y,
-            this->m_Vec3Properties.at("Target").value.z - this->m_Vec3Properties.at("Global position").value.z)
+            m_Target.y - m_GlobalPosition.y,
+            m_Target.z - m_GlobalPosition.z)
         ); // for X axis
 
         glm::vec3 targetXZ = glm::normalize(glm::vec3(
-            this->m_Vec3Properties.at("Target").value.x - this->m_Vec3Properties.at("Global position").value.x,
+            m_Target.x - m_GlobalPosition.x,
             0.0f,
-            this->m_Vec3Properties.at("Target").value.z - this->m_Vec3Properties.at("Global position").value.z)
+            m_Target.z - m_GlobalPosition.z)
         ); // for Y axis
         
         this->m_Up = glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), targetXZ); // flips the up vector if going the second half of the loop, so it's either {0.0f, 1.0f, 0.0f} or {0.0f, -1.0f, 0.0f}
@@ -40,10 +40,10 @@ namespace qtzl
         if (!(this->m_HorizontalAngle > 0 || this->m_HorizontalAngle < 3.15))
             this->m_HorizontalAngle = 0.0; // stability reasons
 
-        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, this->m_Vec3Properties.at("Global position").value);
+        this->m_ModelMatrix = glm::translate(this->m_ModelMatrix, m_GlobalPosition);
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_VerticalAngle, this->m_Up);
         this->m_ModelMatrix = glm::rotate(this->m_ModelMatrix, this->m_HorizontalAngle, this->m_Right);
-        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(this->m_Vec3Properties.at("Scale").value.x, this->m_Vec3Properties.at("Scale").value.y, 1.0f));
+        this->m_ModelMatrix = glm::scale(this->m_ModelMatrix, glm::vec3(m_Scale.x, m_Scale.y, 1.0f));
 
         shader_program->activateProgram();
 

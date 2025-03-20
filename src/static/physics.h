@@ -8,8 +8,10 @@
 // TODO: function that predicts a collision with given velocity
 // NOTE: some of current collisions take wrong coordinates
 
+class PhysicsVisitor;
 class Physics
 {
+    friend PhysicsVisitor;
 public:
     Physics() = delete;
     Physics(const Physics&) = delete;

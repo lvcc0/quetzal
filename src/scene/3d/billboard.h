@@ -4,6 +4,7 @@
 
 #include "scene/resources/texture.h"
 
+// TODO: MAKE SYSTEM FOR ALLOWING AND FORBIDDING EDITING VARS
 namespace qtzl
 {
     // Base class for Cylindrical and Spherical billboards ( NOTE: currently not renderable )
@@ -13,7 +14,7 @@ namespace qtzl
         Billboard(const std::string& name, std::shared_ptr<Texture> texture);
         virtual ~Billboard() = default;
         
-        void set(const std::string& property_name, const glm::vec3& value) override;
+        /*void set(const std::string& property_name, const glm::vec3& value) override;*/
 
         void setTarget(glm::vec3 target);
 
@@ -44,6 +45,8 @@ namespace qtzl
 
         std::unique_ptr<VAO> m_VAO_uptr = nullptr;
         std::unique_ptr<VBO> m_VBO_uptr = nullptr;
+
+        glm::vec3 m_Target;
 
         void setupRender() override;
 

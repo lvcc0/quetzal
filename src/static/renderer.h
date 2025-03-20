@@ -13,8 +13,11 @@
 #include "core/scene.h"
 #include "core/rendering/shader_program.h"
 
+class RendererVisitor;
+
 class Renderer
 {
+    friend RendererVisitor;
 public:
     Renderer() = delete;
     Renderer(const Renderer&) = delete;

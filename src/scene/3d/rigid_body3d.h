@@ -15,14 +15,14 @@ namespace qtzl
 
         void render(const std::shared_ptr<ShaderProgram>& shader_program);
 
-        void translate(const glm::vec3& vector);
-        void scale(const glm::vec3& vector);
+        //void translate(const glm::vec3& vector);
+        //void scale(const glm::vec3& vector);
 
-        void rotate(const glm::vec3& vector);
-        void rotate(float radians, const glm::vec3& vector);
+        //void rotate(const glm::vec3& vector);
+        //void rotate(float radians, const glm::vec3& vector);
 
-        void rotateDegrees(const glm::vec3& vector);
-        void rotateDegrees(float degrees, const glm::vec3& vector);
+        //void rotateDegrees(const glm::vec3& vector);
+        //void rotateDegrees(float degrees, const glm::vec3& vector);
 
         // TODO: override setters
 

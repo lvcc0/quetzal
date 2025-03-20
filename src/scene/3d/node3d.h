@@ -1,9 +1,5 @@
 #pragma once
 
-// thirdparty
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include "scene/main/node.h"
 
 // TODO: make children visibility depend on parent's visibility
@@ -13,6 +9,7 @@
 
 namespace qtzl
 {
+    enum INTERACTION{G_POS, G_ROT_DEGR, G_ROT, POS, ROT_DEGR, ROT, SCALE, TARGET};
     // Base class for every 3D node
     class Node3D : public Node
     {
@@ -20,19 +17,15 @@ namespace qtzl
         Node3D(const std::string& name);
         virtual ~Node3D() = default;
 
-        virtual void set(const std::string& property_name, const glm::vec3& value) override;
+        void setScale(const glm::vec3& scale);
 
-        virtual void setScale(const glm::vec3& scale);
-
-        virtual void setPosition(const glm::vec3& position);
-        virtual void setRotation(const glm::vec3& radians);
-        virtual void setRotationDegrees(const glm::vec3& degrees);
+        void setPosition(const glm::vec3& position);
+        void setRotation(const glm::vec3& radians);
+        void setRotationDegrees(const glm::vec3& degrees);
         
-        virtual void setGlobalPosition(const glm::vec3& position);
-        virtual void setGlobalRotation(const glm::vec3& radians);
-        virtual void setGlobalRotationDegrees(const glm::vec3& degrees);
-        
-        void setVisible(bool visible);
+        void setGlobalPosition(const glm::vec3& position);
+        void setGlobalRotation(const glm::vec3& radians);
+        void setGlobalRotationDegrees(const glm::vec3& degrees);
 
         glm::vec3 getScale() const;
 
@@ -50,5 +43,12 @@ namespace qtzl
         void hide();
 
         void accept(NodeVisitor& visitor) override;
+
+        bool m_IsVisible;
+        glm::vec3 m_GlobalPosition;
+        glm::vec3 m_GlobalRotation; // In degrees
+        glm::vec3 m_Position;
+        glm::vec3 m_Rotation; // In degrees
+        glm::vec3 m_Scale;
     };
 }

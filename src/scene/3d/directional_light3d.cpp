@@ -10,22 +10,20 @@ namespace qtzl
         const glm::vec3& diffuse,
         const glm::vec3& specular
     )
-        : Light3D(name, color, ambient, diffuse, specular)
+        : Light3D(name, color, ambient, diffuse, specular), m_Direction(direction)
     {
         this->m_Type = Object::Type::DIRECTIONAL_LIGHT3D;
-
-        this->addProperty("Direction", direction);
     }
 
     void DirectionalLight3D::updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program) const
     {
-        shader_program->setVec3(m_Name + ".direction", this->getVec3("Direction"));
+        shader_program->setVec3(m_Name + ".direction", m_Direction);
 
-        shader_program->setVec3(m_Name + ".ambient", this->getVec3("Ambient"));
-        shader_program->setVec3(m_Name + ".diffuse", this->getVec3("Diffuse"));
-        shader_program->setVec3(m_Name + ".specular", this->getVec3("Specular"));
+        shader_program->setVec3(m_Name + ".ambient", m_Ambient);
+        shader_program->setVec3(m_Name + ".diffuse", m_Diffuse);
+        shader_program->setVec3(m_Name + ".specular", m_Specular);
 
-        shader_program->setVec3(m_Name + ".color", this->getBool("Enabled") ? this->getVec3("Color") : glm::vec3(0.0f));
+        shader_program->setVec3(m_Name + ".color", m_IsEnabled ? m_Color : glm::vec3(0.0f));
     }
     void DirectionalLight3D::accept(NodeVisitor& visitor)
     {

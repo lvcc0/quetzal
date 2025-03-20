@@ -8,6 +8,8 @@
 #include "core/scene.h"
 #include "core/visitors/renderer_visitor.h"
 #include "core/visitors/physics_visitor.h"
+#include "core/visitors/gui_visitor.h"
+#include "core/visitors/camera_visitor.h"
 
 // Singleton
 class Engine
@@ -71,6 +73,8 @@ private:
     // Visitors
     RendererVisitor rendererVisitor;
     PhysicsVisitor physicsVisitor;
+    GuiVisitor guiVisitor;
+    CameraVisitor cameraVisitor;
 };
 
 // Callback static wrappers (because glfw doesn't know objects)

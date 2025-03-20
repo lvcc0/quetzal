@@ -15,5 +15,7 @@ namespace qtzl
         void setSize(const glm::vec3& size);
 
         void accept(NodeVisitor& visitor) override;
+
+        glm::vec3 m_Size;
     };
 }

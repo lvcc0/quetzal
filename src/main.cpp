@@ -3,62 +3,63 @@
 // TODO: separate scene scripts to separate files or smth
 
 // yeah it is supposed to be here
-static Physics::Direction doCollisions(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shared_ptr<qtzl::PhysicsNode3D> second, glm::vec3& movement)
-{
-    auto collision = Physics::areColliding(first, second);
-
-    if (std::get<0>(collision)) // collision detected
-    {
-        Physics::Direction direction = std::get<1>(collision);
-        glm::vec3 difference = std::get<2>(collision);
-
-        auto first_parent = first->getParent();
-
-        switch (direction)
-        {
-        case Physics::Direction::RIGHT:
-        {
-            movement.x = glm::min(movement.x, 0.0f);
-            first_parent->set("Global position", first_parent->getVec3("Global position") - glm::vec3(first->getVec3("Size").x / 2.0f - std::abs(difference.x), 0.0f, 0.0f));
-            break;
-        }
-        case Physics::Direction::LEFT:
-        {
-            movement.x = glm::max(movement.x, 0.0f);
-            first_parent->set("Global position", first_parent->getVec3("Global position") + glm::vec3(first->getVec3("Size").x / 2.0f - std::abs(difference.x), 0.0f, 0.0f));
-            break;
-        }
-        case Physics::Direction::UP:
-        {
-            movement.y = glm::min(movement.y, 0.0f);
-            first_parent->set("Global position", first_parent->getVec3("Global position") - glm::vec3(0.0f, first->getVec3("Size").y / 2.0f - std::abs(difference.y), 0.0f));
-            break;
-        }
-        case Physics::Direction::DOWN:
-        {
-            movement.y = glm::max(movement.y, 0.0f);
-            first_parent->set("Global position", first_parent->getVec3("Global position") + glm::vec3(0.0f, first->getVec3("Size").y / 2.0f - std::abs(difference.y), 0.0f));
-            break;
-        }
-        case Physics::Direction::FRONT:
-        {
-            movement.z = glm::min(movement.z, 0.0f);
-            first_parent->set("Global position", first_parent->getVec3("Global position") - glm::vec3(0.0f, 0.0f, first->getVec3("Size").z / 2.0f - std::abs(difference.z)));
-            break;
-        }
-        case Physics::Direction::BACK:
-        {
-            movement.z = glm::max(movement.z, 0.0f);
-            first_parent->set("Global position", first_parent->getVec3("Global position") + glm::vec3(0.0f, 0.0f, first->getVec3("Size").z / 2.0f - std::abs(difference.z)));
-            break;
-        }
-        } // switch (direction)   
-
-        return direction;
-    }
-
-    return Physics::Direction::NIL;
-}
+//static Physics::Direction doCollisions(std::shared_ptr<qtzl::PhysicsNode3D> first, std::shared_ptr<qtzl::PhysicsNode3D> second, glm::vec3& movement)
+//{
+//    auto collision = Physics::areColliding(first, second);
+//
+//    if (std::get<0>(collision)) // collision detected
+//    {
+//        Physics::Direction direction = std::get<1>(collision);
+//        glm::vec3 difference = std::get<2>(collision);
+//
+//        auto first_parent = first->getParent();
+//
+//        switch (direction)
+//        {
+//        case Physics::Direction::RIGHT:
+//        {
+//            movement.x = glm::min(movement.x, 0.0f);
+//            first_parent->set("Global position", first_parent->getVec3("Global position") - glm::vec3(first->getVec3("Size").x / 2.0f - std::abs(difference.x), 0.0f, 0.0f));
+//
+//            break;
+//        }
+//        case Physics::Direction::LEFT:
+//        {
+//            movement.x = glm::max(movement.x, 0.0f);
+//            first_parent->set("Global position", first_parent->getVec3("Global position") + glm::vec3(first->getVec3("Size").x / 2.0f - std::abs(difference.x), 0.0f, 0.0f));
+//            break;
+//        }
+//        case Physics::Direction::UP:
+//        {
+//            movement.y = glm::min(movement.y, 0.0f);
+//            first_parent->set("Global position", first_parent->getVec3("Global position") - glm::vec3(0.0f, first->getVec3("Size").y / 2.0f - std::abs(difference.y), 0.0f));
+//            break;
+//        }
+//        case Physics::Direction::DOWN:
+//        {
+//            movement.y = glm::max(movement.y, 0.0f);
+//            first_parent->set("Global position", first_parent->getVec3("Global position") + glm::vec3(0.0f, first->getVec3("Size").y / 2.0f - std::abs(difference.y), 0.0f));
+//            break;
+//        }
+//        case Physics::Direction::FRONT:
+//        {
+//            movement.z = glm::min(movement.z, 0.0f);
+//            first_parent->set("Global position", first_parent->getVec3("Global position") - glm::vec3(0.0f, 0.0f, first->getVec3("Size").z / 2.0f - std::abs(difference.z)));
+//            break;
+//        }
+//        case Physics::Direction::BACK:
+//        {
+//            movement.z = glm::max(movement.z, 0.0f);
+//            first_parent->set("Global position", first_parent->getVec3("Global position") + glm::vec3(0.0f, 0.0f, first->getVec3("Size").z / 2.0f - std::abs(difference.z)));
+//            break;
+//        }
+//        } // switch (direction)   
+//
+//        return direction;
+//    }
+//
+//    return Physics::Direction::NIL;
+//}
 
 int main()
 {
@@ -130,23 +131,23 @@ int main()
             if (y_momentum <= -8.0f)
                 y_momentum = -8.0f;
 
-            if (doCollisions(catcube_collision, floor_collision, catcube_movement) == Physics::Direction::DOWN)
-            {
-                y_momentum = 0.0f;
+            //if (doCollisions(catcube_collision, floor_collision, catcube_movement) == Physics::Direction::DOWN)
+            //{
+            //    y_momentum = 0.0f;
 
-                if (Input::isActionPressed("jump"))
-                    y_momentum = 8.0f;
-            }
+            //    if (Input::isActionPressed("jump"))
+            //        y_momentum = 8.0f;
+            //}
 
-            if (doCollisions(catcube_collision, second_catcube_collision, catcube_movement) == Physics::Direction::DOWN)
-            {
-                y_momentum = 0.0f;
+            //if (doCollisions(catcube_collision, second_catcube_collision, catcube_movement) == Physics::Direction::DOWN)
+            //{
+            //    y_momentum = 0.0f;
 
-                if (Input::isActionPressed("jump"))
-                    y_momentum = 8.0f;
-            }
+            //    if (Input::isActionPressed("jump"))
+            //        y_momentum = 8.0f;
+            //}
 
-            catcube->translate(catcube_movement * engine.getDeltaTime());
+            //catcube->translate(catcube_movement * engine.getDeltaTime());
         }
 
         engine.process();

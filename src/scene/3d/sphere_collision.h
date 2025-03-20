@@ -13,5 +13,7 @@ namespace qtzl
         void setRadius(float radius);
 
         void accept(NodeVisitor& visitor) override;
+
+        float m_Radius;
     };
 }

@@ -21,10 +21,14 @@ namespace qtzl
         );
         virtual ~Light3D() = default;
 
-        std::string m_Name;
-
         virtual void updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program) const = 0;
 
         void accept(NodeVisitor& visitor) override;
+
+        bool m_IsEnabled;
+        glm::vec3 m_Color;
+        glm::vec3 m_Ambient;
+        glm::vec3 m_Diffuse;
+        glm::vec3 m_Specular;
     };
 }

@@ -128,108 +128,13 @@ void GUI::showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> 
         if (m_NodeMgrShowType) ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 20.0f);
         ImGui::TableHeadersRow();
 
-        for (const auto& node : scene->getNodes())
+        for (const auto& node : scene->getNodeContainer().getNodes())
         {
             if (node->getParent() == nullptr)
                 displayNode(node);
         }
 
         ImGui::EndTable();
-    }
-
-    // Selected node config
-    if (m_CurrentNode_sptr != nullptr)
-    {
-        ImGui::SeparatorText(m_CurrentNode_sptr->getString("Name").c_str());
-
-        // Int properties
-        for (auto& entry : m_CurrentNode_sptr->getIntProperties())
-        {
-            if (!entry.second.editable)
-                ImGui::BeginDisabled();
-
-            ImGui::DragInt(
-                entry.first.c_str(),
-                &entry.second.value,
-                m_CurrentNode_sptr->getEditingSpeed(entry.first),
-                m_CurrentNode_sptr->getEditingLimits(entry.first).x,
-                m_CurrentNode_sptr->getEditingLimits(entry.first).y
-            );
-
-            if (ImGui::IsItemDeactivatedAfterEdit())
-                m_CurrentNode_sptr->set(entry.first, entry.second.value);
-
-            if (!entry.second.editable)
-                ImGui::EndDisabled();
-        }
-
-        // Float properties
-        for (auto& entry : m_CurrentNode_sptr->getFloatProperties())
-        {
-            if (!entry.second.editable)
-                ImGui::BeginDisabled();
-
-            ImGui::DragFloat(
-                entry.first.c_str(),
-                &entry.second.value,
-                m_CurrentNode_sptr->getEditingSpeed(entry.first),
-                m_CurrentNode_sptr->getEditingLimits(entry.first).x,
-                m_CurrentNode_sptr->getEditingLimits(entry.first).y
-            );
-
-            if (ImGui::IsItemDeactivatedAfterEdit())
-                m_CurrentNode_sptr->set(entry.first, entry.second.value);
-
-            if (!entry.second.editable)
-                ImGui::EndDisabled();
-        }
-
-        // Bool properties
-        for (auto& entry : m_CurrentNode_sptr->getBoolProperties())
-        {
-            if (!entry.second.editable)
-                ImGui::BeginDisabled();
-
-            ImGui::Checkbox(entry.first.c_str(), &entry.second.value);
-
-            if (ImGui::IsItemDeactivatedAfterEdit())
-                m_CurrentNode_sptr->set(entry.first, entry.second.value);
-
-            if (!entry.second.editable)
-                ImGui::EndDisabled();
-        }
-
-        // String properties
-        for (auto& entry : m_CurrentNode_sptr->getStringProperties())
-        {
-            if (!entry.second.editable)
-                ImGui::BeginDisabled();
-
-            char* text = (char*)entry.second.value.c_str();
-
-            ImGui::InputText(entry.first.c_str(), text, 32);
-
-            if (ImGui::IsItemDeactivatedAfterEdit())
-                m_CurrentNode_sptr->set(entry.first, (std::string)text);
-
-            if (!entry.second.editable)
-                ImGui::EndDisabled();
-        }
-
-        // Vec3 properties
-        for (auto& entry : m_CurrentNode_sptr->getVec3Properties())
-        {
-            if (!entry.second.editable)
-                ImGui::BeginDisabled();
-
-            float* data = glm::value_ptr(entry.second.value);
-
-            if (ImGui::DragFloat3(entry.first.c_str(), data, m_CurrentNode_sptr->getEditingSpeed(entry.first), m_CurrentNode_sptr->getEditingLimits(entry.first).x, m_CurrentNode_sptr->getEditingLimits(entry.first).y))
-                m_CurrentNode_sptr->set(entry.first, glm::make_vec3(data));
-
-            if (!entry.second.editable)
-                ImGui::EndDisabled();
-        }
     }
 
     ImGui::End();
@@ -282,9 +187,9 @@ void GUI::displayNode(std::shared_ptr<qtzl::Node> node)
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
 
-    if (node->getChildren().size() > 0)
+    if (node->getChildren().getNodes().size() > 0)
     {
-        bool open = ImGui::TreeNodeEx(node->getString("Name").c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick);
+        bool open = ImGui::TreeNodeEx(node->m_Name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick);
         
         if (ImGui::IsItemClicked())
             m_CurrentNode_sptr = node;
@@ -299,16 +204,16 @@ void GUI::displayNode(std::shared_ptr<qtzl::Node> node)
 
         if (open)
         {
-            for (const auto& entry : node->getChildren())
+            for (auto& entry : node->getChildren().getNodes())
             {
-                displayNode(entry.second);
+                displayNode(entry);
             }
             ImGui::TreePop();
         }
     }
     else
     {
-        ImGui::TreeNodeEx(node->getString("Name").c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+        ImGui::TreeNodeEx(node->m_Name.c_str(), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
 
         if (ImGui::IsItemClicked())
             m_CurrentNode_sptr = node;

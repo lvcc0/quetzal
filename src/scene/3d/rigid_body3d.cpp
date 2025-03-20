@@ -49,35 +49,35 @@ namespace qtzl
         }
     }
 
-    void RigidBody3D::translate(const glm::vec3& vector)
-    {
-        this->set("Global position", m_Vec3Properties.at("Global position").value + vector);
-    }
+    //void RigidBody3D::translate(const glm::vec3& vector)
+    //{
+    //    this->set("Global position", m_Vec3Properties.at("Global position").value + vector);
+    //}
 
-    void RigidBody3D::rotate(const glm::vec3& vector)
-    {
-        this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + vector);
-    }
+    //void RigidBody3D::rotate(const glm::vec3& vector)
+    //{
+    //    this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + vector);
+    //}
 
-    void RigidBody3D::rotate(float radians, const glm::vec3& vector)
-    {
-        this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + vector * radians);
-    }
+    //void RigidBody3D::rotate(float radians, const glm::vec3& vector)
+    //{
+    //    this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + vector * radians);
+    //}
 
-    void RigidBody3D::rotateDegrees(const glm::vec3& vector)
-    {
-        this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + glm::radians(vector));
-    }
+    //void RigidBody3D::rotateDegrees(const glm::vec3& vector)
+    //{
+    //    this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + glm::radians(vector));
+    //}
 
-    void RigidBody3D::rotateDegrees(float degrees, const glm::vec3& vector)
-    {
-        this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + vector * glm::radians(degrees));
-    }
+    //void RigidBody3D::rotateDegrees(float degrees, const glm::vec3& vector)
+    //{
+    //    this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + vector * glm::radians(degrees));
+    //}
 
-    void RigidBody3D::scale(const glm::vec3& vector)
-    {
-        this->set("Scale", this->m_Vec3Properties.at("Scale").value * vector);
-    }
+    //void RigidBody3D::scale(const glm::vec3& vector)
+    //{
+    //    this->set("Scale", this->m_Vec3Properties.at("Scale").value * vector);
+    //}
 
     void RigidBody3D::setupRender()
     {

@@ -154,7 +154,10 @@ void Engine::process()
     ImGui::NewFrame();
 
     if (this->shouldDrawGui)
+    {
         GUI::render(currentScene, scenes, this->deltaTime);
+        scenes.at(currentScene)->getNodeContainer().performActions(guiVisitor);
+    }
 
     float curFrame = (float)glfwGetTime();
     this->deltaTime = curFrame - lastFrame;
@@ -174,6 +177,10 @@ void Engine::process()
             this->scenes.at(this->currentScene)->getNodeContainer().performActions(rendererVisitor);
             Renderer::renderEnd(this->scenes.at(this->currentScene));
         }
+
+        // Facing billboards towards to the camera
+        cameraVisitor.setCameraState(scenes.at(currentScene)->m_Camera);
+        scenes.at(currentScene)->getNodeContainer().performActions(cameraVisitor);
     }
 
     ImGui::Render();

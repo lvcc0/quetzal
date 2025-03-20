@@ -21,5 +21,7 @@ namespace qtzl
         void updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program) const override;
 
         void accept(NodeVisitor& visitor) override;
+
+        glm::vec3 m_Direction;
     };
 }

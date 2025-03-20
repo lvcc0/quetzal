@@ -7,11 +7,11 @@ namespace qtzl
     {
         this->m_Type = Object::Type::SKYBOX;
 
-        this->removeProperty("Global position");
-        this->removeProperty("Global rotation");
-        this->removeProperty("Position");
-        this->removeProperty("Rotation");
-        this->removeProperty("Scale");
+        //this->removeProperty("Global position");
+        //this->removeProperty("Global rotation");
+        //this->removeProperty("Position");
+        //this->removeProperty("Rotation");
+        //this->removeProperty("Scale");
 
         this->setupRender();
     }

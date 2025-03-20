@@ -7,12 +7,12 @@ namespace qtzl
     {
         this->m_Type = Object::Type::SPHERE_COLLISION;
 
-        addProperty("Radius", 1.0f);
+        m_Radius = 1.0f;
     }
 
     void SphereCollision::setRadius(float radius)
     {
-        Object::set("Radius", radius);
+        m_Radius = radius;
     }
     void SphereCollision::accept(NodeVisitor& visitor)
     {

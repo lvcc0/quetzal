@@ -19,8 +19,12 @@
 // TODO: show actual loaded resource in the resource manager gui
 
 // This is the main part of scene GUI. It contains more than one window
+
+class GuiVisitor;
+
 class GUI
 {
+    friend GuiVisitor;
 public:
     GUI() = delete;
     GUI(const GUI&) = delete;

@@ -21,10 +21,15 @@ namespace qtzl
         );
         virtual ~PointLight3D() = default;
 
-        void set(const std::string& property_name, const glm::vec3& value) override;
+        /*void set(const std::string& property_name, const glm::vec3& value) override;*/
 
         void updateUniforms(const std::shared_ptr<ShaderProgram>& shader_program) const override;
 
         void accept(NodeVisitor& visitor) override;
+
+        glm::vec3 m_GlobalPosition;
+        float m_Constant;
+        float m_Linear;
+        float m_Quadratic;
     };
 }

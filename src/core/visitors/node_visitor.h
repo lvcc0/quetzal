@@ -1,5 +1,11 @@
 #pragma once
 
+#include <functional>
+
+// thirdparty
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 namespace qtzl 
 {
 	class Node;
@@ -18,7 +24,10 @@ namespace qtzl
 	class Billboard;
 	class SphericalBillboard;
 	class CylindricalBillboard;
+
+	enum INTERACTION;
 }
+// Maybe make system which would be alerting if visit func not overloaded in some visitor
 class NodeVisitor
 {
 public:
