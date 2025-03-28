@@ -1,6 +1,6 @@
 #version 330 core
 
-#define NR_DIR_LIGHTS 1
+#define NR_DIR_LIGHTS 2
 #define NR_POINT_LIGHTS 1
 #define NR_SPOT_LIGHTS 1
 

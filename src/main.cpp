@@ -111,6 +111,17 @@ int main()
 
     // --- //
 
+    // --- second_scene stuff --- //
+    
+    second_scene->createSkybox("forest_skybox", ResourceManager::loadCubemap("textures/forest_skybox"));
+
+    auto ena = second_scene->createRigidBody("ena", "objects/ena/ena.obj");
+    auto bepis = second_scene->createCylindricalBillboard("bepis", "textures/bepis.jpg", glm::vec3(5.0f, 5.0f, 0.0f));
+
+    second_scene->createDirectionalLight("dir_light1");
+
+    // --- //
+
     // Main loop
     while (engine.isRunning())
     {
@@ -147,6 +158,16 @@ int main()
             }
 
             catcube->translate(catcube_movement * engine.getDeltaTime());
+        }
+
+        if (engine.currentScene == "second_scene")
+        {
+            ena->rotate(glm::vec3(0.0f, 1.0f, 0.0f) * engine.getDeltaTime());
+
+            if (Input::isActionPressed("left"))
+                ena->translate(glm::vec3(5.0f, 0.0f, 0.0f) * engine.getDeltaTime());
+            if (Input::isActionPressed("right"))
+                ena->translate(glm::vec3(-5.0f, 0.0f, 0.0f) * engine.getDeltaTime());
         }
 
         engine.process();

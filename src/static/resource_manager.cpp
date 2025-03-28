@@ -191,6 +191,10 @@ unsigned int ResourceManager::loadCubemap(const std::string& dir_path)
     unsigned int i = 0;
     for (const auto& entry : std::filesystem::directory_iterator(pathString))
     {
+        // Do not load non-image file
+        if (std::find(TEXTURE_FILE_EXTENSIONS.begin(), TEXTURE_FILE_EXTENSIONS.end(), entry.path().extension().string()) == TEXTURE_FILE_EXTENSIONS.end())
+            continue;
+
         // We load only the first 6 images in the given directory
         if (i >= 6)
             break;
