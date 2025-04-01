@@ -28,6 +28,8 @@ void GUI::render(std::string& scene_name, const std::map<std::string, std::share
         showNodeManager(scene_name, scenes.at(scene_name));
     if (m_ResourceMgrVisible)
         showResourceManager();
+    if (m_DebuggerVisible)
+        showDebugger();
 }
 
 void GUI::showSceneConfig(std::string& scene_name, const std::map<std::string, std::shared_ptr<Scene>>& scenes, GLfloat delta_time)
@@ -39,6 +41,7 @@ void GUI::showSceneConfig(std::string& scene_name, const std::map<std::string, s
 
     ImGui::Checkbox("Show node manager", &m_NodeMgrVisible);
     ImGui::Checkbox("Show resource manager", &m_ResourceMgrVisible);
+    ImGui::Checkbox("Show debugger", &m_DebuggerVisible);
 
     ImGui::Separator();
 
@@ -160,6 +163,33 @@ void GUI::showResourceManager()
         ImGui::EndTable();
     }
 
+    ImGui::End();
+}
+
+void GUI::showDebugger()
+{
+    ImGui::Begin("Debugger", 0);
+
+    if (ImGui::BeginTable("Classes", 3, ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody))
+    {
+        ImGui::TableSetupColumn("Class", ImGuiTableColumnFlags_NoHide);
+        ImGui::TableSetupColumn("Polymorphic", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 8.0f);
+        ImGui::TableSetupColumn("Inherited from Node", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 8.0f);
+        ImGui::TableHeadersRow();
+
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+
+        if (Debugger::m_MapOfClasses.size() > 0)
+        {
+            for (const auto& [name, cl] : Debugger::m_MapOfClasses)
+            {
+                SHOW_CLASS_INFO(name, cl);
+            }
+        }
+
+        ImGui::EndTable();
+    }
     ImGui::End();
 }
 

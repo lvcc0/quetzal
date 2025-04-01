@@ -181,6 +181,11 @@ void Engine::process()
         // Facing billboards towards to the camera
         cameraVisitor.setCameraState(scenes.at(currentScene)->m_Camera);
         scenes.at(currentScene)->getNodeContainer().performActions(cameraVisitor);
+
+        // Adding physics for each object
+        scenes.at(currentScene)->getNodeContainer().performActions(physicsVisitor);
+        // Prepare for new tick
+        physicsVisitor.clearPhysNodes();
     }
 
     ImGui::Render();

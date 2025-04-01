@@ -15,10 +15,20 @@
 
 #include "static/renderer.h"
 #include "core/scene.h"
+#include "core/debugger.h"
 
 // TODO: show actual loaded resource in the resource manager gui
 
 // This is the main part of scene GUI. It contains more than one window
+
+#define SHOW_CLASS_INFO(name, cl) \
+    ImGui::TextUnformatted(name.c_str());\
+    ImGui::TableNextColumn();\
+    ImGui::TextUnformatted(cl.is_polymorphic ? "True" : "False");\
+    ImGui::TableNextColumn();\
+    ImGui::TextUnformatted(cl.is_basedOnNode ? "True" : "False");\
+    ImGui::TableNextColumn();
+
 
 class GuiVisitor;
 
@@ -39,6 +49,8 @@ public:
     static void showNodeManager(const std::string& scene_name, std::shared_ptr<Scene> scene);
     static void showResourceManager();
 
+    static void showDebugger();
+
     // TODO: repurpose this stuff
     static void onClick(const std::shared_ptr<qtzl::Node3D> node);
     
@@ -53,6 +65,7 @@ private:
 
     inline static bool m_NodeMgrVisible = true;
     inline static bool m_ResourceMgrVisible = true;
+    inline static bool m_DebuggerVisible = false;
 
     inline static bool m_VSyncCur = true;
     inline static bool m_VSyncOld = m_VSyncCur;

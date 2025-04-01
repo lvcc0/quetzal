@@ -1,4 +1,6 @@
+#pragma once
 #include "core/engine.h"
+#include "core/debugger.h"
 
 // TODO: separate scene scripts to separate files or smth
 
@@ -63,6 +65,10 @@
 
 int main()
 {
+    // Set all classes into this macro
+    DEBUGGER_ADD_CLASSES(qtzl::Billboard, qtzl::BoxCollision, qtzl::DirectionalLight3D, qtzl::VisualNode3D, qtzl::PhysicsNode3D);
+    DEBUGGER_ADD_CLASSES(qtzl::Light3D, qtzl::CylindricalBillboard, qtzl::Resource);
+
     Engine& engine = Engine::instance(1280, 720);
     ResourceManager::preloadResources();
 
