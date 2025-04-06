@@ -10,7 +10,6 @@
 
 #define PHYSICS_RET_TYPE std::tuple<bool, Physics::Direction, glm::vec3>
 
-
 class Physics
 {
 public:

@@ -14,12 +14,12 @@ template <class... Fs> Overload(Fs...) -> Overload<Fs...>;
 
 class PhysicsVisitor : public NodeVisitor
 {
-	std::vector<PHYSICS_TYPES_VARIANT> physicsNodes;
+	std::vector<PHYSICS_TYPES_VARIANT> vecOfNodes3DPhysical;
 
 	void visit(qtzl::BoxCollision& node) override;
 	void visit(qtzl::SphereCollision& node) override;
 
 	static void placeholder(PHYSICS_RET_TYPE) { };
 public:
-	inline void clearPhysNodes() { physicsNodes.clear(); };
+	inline void clearPhysNodes() { vecOfNodes3DPhysical.clear(); };
 };

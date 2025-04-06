@@ -119,6 +119,26 @@ namespace qtzl
         return glm::degrees(m_GlobalRotation);
     }
 
+    void Node3D::scale(const glm::vec3& scale)
+    {
+        m_Scale += scale;
+    }
+
+    void Node3D::translate(const glm::vec3& position)
+    {
+        m_Position += position;
+    }
+
+    void Node3D::rotate(const glm::vec3& radians)
+    {
+        m_Rotation += radians;
+    }
+
+    void Node3D::rotateDegrees(const glm::vec3& degrees)
+    {
+        m_Rotation += glm::radians(degrees);
+    }
+
     bool Node3D::isVisible() const
     {
         return m_IsVisible;

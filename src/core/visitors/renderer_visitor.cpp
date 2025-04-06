@@ -58,3 +58,9 @@ void RendererVisitor::visit(qtzl::SphericalBillboard& node)
     if (node.isVisible())
         node.render(Renderer::m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT));
 }
+
+void RendererVisitor::visit(qtzl::Model3D& node)
+{
+    if (node.isVisible())
+        node.render(Renderer::m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT));
+}

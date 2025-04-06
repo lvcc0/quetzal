@@ -24,6 +24,7 @@ namespace qtzl
 	class Billboard;
 	class SphericalBillboard;
 	class CylindricalBillboard;
+	class Model3D;
 
 	enum INTERACTION;
 }
@@ -49,4 +50,5 @@ public:
 	virtual void visit(qtzl::Billboard& node) {};
 	virtual void visit(qtzl::SphericalBillboard& node) {};
 	virtual void visit(qtzl::CylindricalBillboard& node) {};
+	virtual void visit(qtzl::Model3D& node) {};
 };

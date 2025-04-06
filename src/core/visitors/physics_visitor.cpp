@@ -2,28 +2,28 @@
 
 void PhysicsVisitor::visit(qtzl::BoxCollision& node)
 {
-	for (PHYSICS_TYPES_VARIANT item : physicsNodes)
-	{
-        std::visit(
-            Overload{
-				[node](qtzl::BoxCollision* second) {placeholder(Physics::areColliding(node, *second)); },
-				[node](qtzl::SphereCollision* second) {placeholder(Physics::areColliding(node, *second)); }
-            },
-            item);
-	}
-	physicsNodes.push_back(&node);
-}
-
-void PhysicsVisitor::visit(qtzl::SphereCollision& node)
-{
-	for (PHYSICS_TYPES_VARIANT item : physicsNodes)
+	for (const auto& phys_node : vecOfNodes3DPhysical)
 	{
 		std::visit(
 			Overload{
 				[node](qtzl::BoxCollision* second) {placeholder(Physics::areColliding(node, *second)); },
 				[node](qtzl::SphereCollision* second) {placeholder(Physics::areColliding(node, *second)); }
 			},
-			item);
+			phys_node);
 	}
-	physicsNodes.push_back(&node);
+	vecOfNodes3DPhysical.push_back(&node);
+}
+
+void PhysicsVisitor::visit(qtzl::SphereCollision& node)
+{
+	for (const auto& phys_node : vecOfNodes3DPhysical)
+	{
+		std::visit(
+			Overload{
+				[node](qtzl::BoxCollision* second) {placeholder(Physics::areColliding(node, *second)); },
+				[node](qtzl::SphereCollision* second) {placeholder(Physics::areColliding(node, *second)); }
+			},
+			phys_node);
+	}
+	vecOfNodes3DPhysical.push_back(&node);
 }

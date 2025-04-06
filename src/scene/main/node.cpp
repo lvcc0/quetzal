@@ -48,7 +48,7 @@ void NodeContainer::deleteNode(const std::string name)
 
 void NodeContainer::performActions(NodeVisitor& visitor) const
 {
-    for (auto node : m_Nodes)
+    for (auto& node : m_Nodes)
         node->accept(visitor);
 }
 

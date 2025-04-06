@@ -1,35 +1,41 @@
 #pragma once
 
-#include "scene/3d/visual_node3d.h"
+#include "scene/3d/model3d.h"
+#include "scene/3d/sphere_collision.h"
+#include "scene/3d/box_collision.h"
 
 #include "scene/resources/mesh.h"
+
+class PhysicsVisitor;
 
 namespace qtzl
 {
     // 3D body that can be affected by external forces
-    class RigidBody3D : public VisualNode3D
+    class RigidBody3D: public Node3D
     {
+        friend PhysicsVisitor;
     public:
-        RigidBody3D(const std::string& name, std::shared_ptr<Mesh> mesh_sptr);
+        RigidBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr);
         virtual ~RigidBody3D() = default;
 
-        void render(const std::shared_ptr<ShaderProgram>& shader_program);
+        void setScale(const glm::vec3& scale) override;
 
-        //void translate(const glm::vec3& vector);
-        //void scale(const glm::vec3& vector);
+        void setPosition(const glm::vec3& position) override;
+        void setRotation(const glm::vec3& radians) override;
+        void setRotationDegrees(const glm::vec3& degrees) override;
 
-        //void rotate(const glm::vec3& vector);
-        //void rotate(float radians, const glm::vec3& vector);
+        void setGlobalPosition(const glm::vec3& position) override;
+        void setGlobalRotation(const glm::vec3& radians) override;
+        void setGlobalRotationDegrees(const glm::vec3& degrees) override;
 
-        //void rotateDegrees(const glm::vec3& vector);
-        //void rotateDegrees(float degrees, const glm::vec3& vector);
-
-        // TODO: override setters
+        void scale(const glm::vec3& scale) override;
+        void translate(const glm::vec3& position) override;
+        void rotate(const glm::vec3& radians) override;
+        void rotateDegrees(const glm::vec3& degrees) override;
 
     private:
-        std::shared_ptr<Mesh> m_Mesh_sptr;
-
-        void setupRender() override;
+        std::shared_ptr<Model3D> m_Model_sptr;
+        std::shared_ptr<PhysicsNode3D> m_Physics_sptr;
 
         void accept(NodeVisitor& visitor) override;
     };

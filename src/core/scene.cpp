@@ -35,6 +35,24 @@ std::shared_ptr<qtzl::RigidBody3D> Scene::createRigidBody(
     return node_sptr;
 }
 
+std::shared_ptr<qtzl::Model3D> Scene::createModel3D(
+    std::string name,
+    std::string mesh_path,
+    glm::vec3 position,
+    glm::vec3 rotation,
+    glm::vec3 scale)
+{
+    std::shared_ptr<qtzl::Model3D> node_sptr = std::make_shared<qtzl::Model3D>(name, ResourceManager::getMesh(mesh_path));
+
+    node_sptr->setGlobalPosition(position);
+    node_sptr->setGlobalRotation(rotation);
+    node_sptr->setScale(scale);
+
+    this->m_NodeContainer.addNode(node_sptr);
+
+    return node_sptr;
+}
+
 std::shared_ptr<qtzl::StaticBody3D> Scene::createStaticBody(
     std::string name,
     std::string mesh_path,

@@ -2,60 +2,71 @@
 
 namespace qtzl
 {
-    StaticBody3D::StaticBody3D(const std::string& name, std::shared_ptr<Mesh> mesh_sptr)
-        : VisualNode3D(name), m_Mesh_sptr(mesh_sptr)
+    StaticBody3D::StaticBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr)
+        : Node3D(name), m_Model_sptr(model_sptr)
     {
         this->m_Type = Object::Type::STATIC_BODY3D;
-
-        this->setupRender();
+        m_Physics_sptr->m_PhysParentObject = std::make_shared<StaticBody3D>(*this);
     }
 
-    void StaticBody3D::render(const std::shared_ptr<ShaderProgram>& shader_program)
+    void StaticBody3D::setScale(const glm::vec3& scale)
     {
-        for (const auto& submesh : this->m_Mesh_sptr->getSubMeshes())
-        {
-            // bind appropriate textures
-            unsigned int diffuseNr = 1;
-            unsigned int specularNr = 1;
-
-            shader_program->activateProgram();
-
-            for (unsigned int i = 0; i < submesh->getTextures().size(); i++)
-            {
-                glActiveTexture(GL_TEXTURE0 + i);
-
-                std::string number;
-                std::string type = submesh->getTextures()[i].getType();
-
-                if (type == "texture_diffuse")
-                    number = std::to_string(diffuseNr++);
-                else if (type == "texture_specular")
-                    number = std::to_string(specularNr++);
-
-                shader_program->setInt((type + number).c_str(), i);
-                glBindTexture(GL_TEXTURE_2D, submesh->getTextures()[i].getID());
-            }
-
-            // Convert local coordinates to world coordinates
-            shader_program->setMat4("model", this->m_ModelMatrix);
-            shader_program->setMat4("inversed", glm::inverse(this->m_ModelMatrix));
-
-            // Draw mesh
-            submesh->bindVAO();
-            glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(submesh->getIndices().size()), GL_UNSIGNED_INT, 0);
-            submesh->unbindVAO();
-
-            glActiveTexture(GL_TEXTURE0);
-        }
+        m_Model_sptr->setScale(scale);
+        m_Physics_sptr->setScale(scale);
     }
 
-    void StaticBody3D::setupRender()
+    void StaticBody3D::setPosition(const glm::vec3& position)
     {
-        for (auto& submesh : this->m_Mesh_sptr->getSubMeshes())
-        {
-            submesh->setup();
-        }
+        m_Model_sptr->setPosition(position);
+        m_Physics_sptr->setPosition(position);
     }
+
+    void StaticBody3D::setRotation(const glm::vec3& radians)
+    {
+        m_Model_sptr->setRotation(radians);
+        m_Physics_sptr->setRotation(radians);
+    }
+
+    void StaticBody3D::setRotationDegrees(const glm::vec3& degrees)
+    {
+        m_Model_sptr->setRotationDegrees(degrees);
+        m_Physics_sptr->setRotationDegrees(degrees);
+    }
+
+    void StaticBody3D::setGlobalPosition(const glm::vec3& position)
+    {
+        m_Model_sptr->setGlobalPosition(position);
+        m_Physics_sptr->setGlobalPosition(position);
+    }
+
+    void StaticBody3D::setGlobalRotation(const glm::vec3& radians)
+    {
+        m_Model_sptr->setGlobalRotation(radians);
+        m_Physics_sptr->setGlobalRotation(radians);
+    }
+
+    void StaticBody3D::setGlobalRotationDegrees(const glm::vec3& degrees)
+    {
+        m_Model_sptr->setGlobalRotationDegrees(degrees);
+        m_Physics_sptr->setGlobalRotationDegrees(degrees);
+    }
+
+    void StaticBody3D::scale(const glm::vec3& scale)
+    {
+    }
+
+    void StaticBody3D::translate(const glm::vec3& position)
+    {
+    }
+
+    void StaticBody3D::rotate(const glm::vec3& radians)
+    {
+    }
+
+    void StaticBody3D::rotateDegrees(const glm::vec3& degrees)
+    {
+    }
+
     void StaticBody3D::accept(NodeVisitor& visitor)
     {
         visitor.visit(*this);

@@ -50,7 +50,7 @@ namespace qtzl
 
         std::string m_Name;
     protected:
-        std::shared_ptr<Node> m_Parent;
+        std::shared_ptr<Node> m_Parent; // Weak ptr is better
         NodeContainer m_Children;
     };
 }

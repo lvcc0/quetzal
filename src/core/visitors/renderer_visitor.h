@@ -13,4 +13,5 @@ class RendererVisitor : public NodeVisitor
 	void visit(qtzl::SpotLight3D& node) override;
 	void visit(qtzl::CylindricalBillboard& node) override;
 	void visit(qtzl::SphericalBillboard& node) override;
+	void visit(qtzl::Model3D& node) override;
 };

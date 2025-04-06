@@ -33,6 +33,7 @@ namespace qtzl
                     BILLBOARD,
                         CYLINDRICAL_BILLBOARD,
                         SPHERICAL_BILLBOARD,
+                    MODEL3D,
                     RIGID_BODY3D,
                     STATIC_BODY3D,
             LIGHT3D,

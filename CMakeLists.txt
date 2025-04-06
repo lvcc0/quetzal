@@ -66,7 +66,7 @@ else()
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0) 
 endif()
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${QTZL_SOURCE} "src/core/visitors/physics_visitor.h" "src/core/visitors/physics_visitor.cpp"    "src/core/visitors/gui_visitor.h" "src/core/visitors/camera_visitor.h" "src/core/visitors/camera_visitor.cpp" "src/core/debugger.h" )
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${QTZL_SOURCE} "src/core/visitors/physics_visitor.h" "src/core/visitors/physics_visitor.cpp"    "src/core/visitors/gui_visitor.h" "src/core/visitors/camera_visitor.h" "src/core/visitors/camera_visitor.cpp" "src/core/debugger.h"  "src/scene/3d/model3d.h" "src/scene/3d/model3d.cpp")
 
 if(MSVC AND PRODUCTION_BUILD)
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)

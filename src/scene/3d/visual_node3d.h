@@ -14,15 +14,20 @@ namespace qtzl
         virtual ~VisualNode3D() = default;
 
         //void set(const std::string& property_name, const glm::vec3& value);
-        void setScale(const glm::vec3& scale);
+        void setScale(const glm::vec3& scale)  override;
 
-        void setPosition(const glm::vec3& position);
-        void setRotation(const glm::vec3& radians);
-        void setRotationDegrees(const glm::vec3& degrees);
+        void setPosition(const glm::vec3& position) override;
+        void setRotation(const glm::vec3& radians)  override;
+        void setRotationDegrees(const glm::vec3& degrees)  override;
 
-        void setGlobalPosition(const glm::vec3& position);
-        void setGlobalRotation(const glm::vec3& radians);
-        void setGlobalRotationDegrees(const glm::vec3& degrees);
+        void setGlobalPosition(const glm::vec3& position)  override;
+        void setGlobalRotation(const glm::vec3& radians)  override;
+        void setGlobalRotationDegrees(const glm::vec3& degrees)  override;
+
+        void scale(const glm::vec3& scale)  override;
+        void translate(const glm::vec3& position)  override;
+        void rotate(const glm::vec3& radians)  override;
+        void rotateDegrees(const glm::vec3& degrees)  override;
 
         virtual glm::mat4 getModelMatrix() const;
 

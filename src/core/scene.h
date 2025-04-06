@@ -5,6 +5,7 @@
 
 #include "scene/3d/skybox.h"
 
+#include "scene/3d/model3d.h"
 #include "scene/3d/rigid_body3d.h"
 #include "scene/3d/static_body3d.h"
 
@@ -35,6 +36,13 @@ public:
     void update();
 
     // Node creating
+    std::shared_ptr<qtzl::Model3D> createModel3D(
+        std::string name,
+        std::string mesh_path,
+        glm::vec3 position = glm::vec3(0.0f),
+        glm::vec3 rotation = glm::vec3(0.0f),
+        glm::vec3 scale = glm::vec3(1.0f)
+    );
 
     std::shared_ptr<qtzl::StaticBody3D> createStaticBody(
         std::string name,

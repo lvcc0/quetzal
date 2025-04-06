@@ -50,6 +50,30 @@ namespace qtzl
         updateMatrix();
     }
 
+    void VisualNode3D::scale(const glm::vec3& scale)
+    {
+        m_Scale += scale;
+        updateMatrix();
+    }
+
+    void VisualNode3D::translate(const glm::vec3& position)
+    {
+        m_Position += position;
+        updateMatrix();
+    }
+
+    void VisualNode3D::rotate(const glm::vec3& radians)
+    {
+        m_Rotation += radians;
+        updateMatrix();
+    }
+
+    void VisualNode3D::rotateDegrees(const glm::vec3& degrees)
+    {
+        m_Rotation += glm::radians(degrees);
+        updateMatrix();
+    }
+
     glm::mat4 VisualNode3D::getModelMatrix() const
     {
         return this->m_ModelMatrix;

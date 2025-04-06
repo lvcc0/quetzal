@@ -17,15 +17,16 @@ namespace qtzl
         Node3D(const std::string& name);
         virtual ~Node3D() = default;
 
-        void setScale(const glm::vec3& scale);
+        // For setting scene
+        virtual void setScale(const glm::vec3& scale);
 
-        void setPosition(const glm::vec3& position);
-        void setRotation(const glm::vec3& radians);
-        void setRotationDegrees(const glm::vec3& degrees);
+        virtual void setPosition(const glm::vec3& position);
+        virtual void setRotation(const glm::vec3& radians);
+        virtual void setRotationDegrees(const glm::vec3& degrees);
         
-        void setGlobalPosition(const glm::vec3& position);
-        void setGlobalRotation(const glm::vec3& radians);
-        void setGlobalRotationDegrees(const glm::vec3& degrees);
+        virtual void setGlobalPosition(const glm::vec3& position);
+        virtual void setGlobalRotation(const glm::vec3& radians);
+        virtual void setGlobalRotationDegrees(const glm::vec3& degrees);
 
         glm::vec3 getScale() const;
 
@@ -36,6 +37,12 @@ namespace qtzl
         glm::vec3 getGlobalPosition() const;
         glm::vec3 getGlobalRotation() const;
         glm::vec3 getGlobalRotationDegrees() const;
+
+        // For gaming
+        virtual void scale(const glm::vec3& scale);
+        virtual void translate(const glm::vec3& position);
+        virtual void rotate(const glm::vec3& radians);
+        virtual void rotateDegrees(const glm::vec3& degrees);
 
         bool isVisible() const;
 

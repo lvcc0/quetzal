@@ -1,0 +1,35 @@
+﻿#pragma once
+
+#include "scene/3d/visual_node3d.h"
+
+#include "scene/resources/mesh.h"
+
+namespace qtzl
+{
+    // 3D body that cant affect or be affected (in physics)
+    class Model3D : public VisualNode3D
+    {
+    public:
+        Model3D(const std::string& name, std::shared_ptr<Mesh> mesh_sptr);
+        virtual ~Model3D() = default;
+
+        void render(const std::shared_ptr<ShaderProgram>& shader_program);
+
+        //void translate(const glm::vec3& vector);
+        //void scale(const glm::vec3& vector);
+
+        //void rotate(const glm::vec3& vector);
+        //void rotate(float radians, const glm::vec3& vector);
+
+        //void rotateDegrees(const glm::vec3& vector);
+        //void rotateDegrees(float degrees, const glm::vec3& vector);
+
+        // TODO: override setters
+    private:
+        std::shared_ptr<Mesh> m_Mesh_sptr;
+
+        void setupRender() override;
+
+        void accept(NodeVisitor& visitor) override;
+    };
+}

@@ -2,90 +2,79 @@
 
 namespace qtzl
 {
-    RigidBody3D::RigidBody3D(const std::string& name, std::shared_ptr<Mesh> mesh_sptr)
-        : VisualNode3D(name), m_Mesh_sptr(mesh_sptr)
+    RigidBody3D::RigidBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr)
+        : Node3D(name), m_Model_sptr(model_sptr)
     {
         this->m_Type = Object::Type::RIGID_BODY3D;
-
-        this->setupRender();
+        m_Physics_sptr->m_PhysParentObject = std::make_shared<RigidBody3D>(*this);
     }
 
-    void RigidBody3D::render(const std::shared_ptr<ShaderProgram>& shader_program)
+    void RigidBody3D::setScale(const glm::vec3& scale)
     {
-        for (const auto& submesh : this->m_Mesh_sptr->getSubMeshes())
-        {
-            // bind appropriate textures
-            unsigned int diffuseNr = 1;
-            unsigned int specularNr = 1;
-
-            shader_program->activateProgram();
-
-            for (unsigned int i = 0; i < submesh->getTextures().size(); i++)
-            {
-                glActiveTexture(GL_TEXTURE0 + i);
-
-                std::string number;
-                std::string type = submesh->getTextures()[i].getType();
-
-                if (type == "texture_diffuse")
-                    number = std::to_string(diffuseNr++);
-                else if (type == "texture_specular")
-                    number = std::to_string(specularNr++);
-
-                shader_program->setInt((type + number).c_str(), i);
-                glBindTexture(GL_TEXTURE_2D, submesh->getTextures()[i].getID());
-            }
-
-            // Convert local coordinates to world coordinates
-            shader_program->setMat4("model", this->m_ModelMatrix);
-            shader_program->setMat4("inversed", glm::inverse(this->m_ModelMatrix));
-
-            // Draw mesh
-            submesh->bindVAO();
-            glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(submesh->getIndices().size()), GL_UNSIGNED_INT, 0);
-            submesh->unbindVAO();
-
-            glActiveTexture(GL_TEXTURE0);
-        }
+        m_Model_sptr->setScale(scale);
+        m_Physics_sptr->setScale(scale);
     }
 
-    //void RigidBody3D::translate(const glm::vec3& vector)
-    //{
-    //    this->set("Global position", m_Vec3Properties.at("Global position").value + vector);
-    //}
-
-    //void RigidBody3D::rotate(const glm::vec3& vector)
-    //{
-    //    this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + vector);
-    //}
-
-    //void RigidBody3D::rotate(float radians, const glm::vec3& vector)
-    //{
-    //    this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + vector * radians);
-    //}
-
-    //void RigidBody3D::rotateDegrees(const glm::vec3& vector)
-    //{
-    //    this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + glm::radians(vector));
-    //}
-
-    //void RigidBody3D::rotateDegrees(float degrees, const glm::vec3& vector)
-    //{
-    //    this->set("Global rotation", m_Vec3Properties.at("Global rotation").value + vector * glm::radians(degrees));
-    //}
-
-    //void RigidBody3D::scale(const glm::vec3& vector)
-    //{
-    //    this->set("Scale", this->m_Vec3Properties.at("Scale").value * vector);
-    //}
-
-    void RigidBody3D::setupRender()
+    void RigidBody3D::setPosition(const glm::vec3& position)
     {
-        for (auto& submesh : this->m_Mesh_sptr->getSubMeshes())
-        {
-            submesh->setup();
-        }
+        m_Model_sptr->setPosition(position);
+        m_Physics_sptr->setPosition(position);
     }
+
+    void RigidBody3D::setRotation(const glm::vec3& radians)
+    {
+        m_Model_sptr->setRotation(radians);
+        m_Physics_sptr->setRotation(radians);
+    }
+
+    void RigidBody3D::setRotationDegrees(const glm::vec3& degrees)
+    {
+        m_Model_sptr->setRotationDegrees(degrees);
+        m_Physics_sptr->setRotationDegrees(degrees);
+    }
+
+    void RigidBody3D::setGlobalPosition(const glm::vec3& position)
+    {
+        m_Model_sptr->setGlobalPosition(position);
+        m_Physics_sptr->setGlobalPosition(position);
+    }
+
+    void RigidBody3D::setGlobalRotation(const glm::vec3& radians)
+    {
+        m_Model_sptr->setGlobalRotation(radians);
+        m_Physics_sptr->setGlobalRotation(radians);
+    }
+
+    void RigidBody3D::setGlobalRotationDegrees(const glm::vec3& degrees)
+    {
+        m_Model_sptr->setGlobalRotationDegrees(degrees);
+        m_Physics_sptr->setGlobalRotationDegrees(degrees);
+    }
+
+    void RigidBody3D::scale(const glm::vec3& scale)
+    {
+        m_Model_sptr->scale(scale);
+        m_Physics_sptr->scale(scale);
+    }
+
+    void RigidBody3D::translate(const glm::vec3& position)
+    {
+        m_Model_sptr->translate(position);
+        m_Physics_sptr->translate(position);
+    }
+
+    void RigidBody3D::rotate(const glm::vec3& radians)
+    {
+        m_Model_sptr->rotate(radians);
+        m_Physics_sptr->rotate(radians);
+    }
+
+    void RigidBody3D::rotateDegrees(const glm::vec3& degrees)
+    {
+        m_Model_sptr->rotateDegrees(degrees);
+        m_Physics_sptr->rotateDegrees(degrees);
+    }
+
     void RigidBody3D::accept(NodeVisitor& visitor)
     {
         visitor.visit(*this);

@@ -21,6 +21,7 @@ class GuiVisitor: public NodeVisitor{
 	void visit(qtzl::Billboard& node) override;
 	void visit(qtzl::SphericalBillboard& node) override;
 	void visit(qtzl::CylindricalBillboard& node) override;
+	void visit(qtzl::Model3D& node) override;
 
 	void showNode3D(qtzl::Node3D& node);
 	void showNode3D(qtzl::VisualNode3D& node); // It is necessary because simple node doesnt update its model matrix(We dont update matrix every tick)

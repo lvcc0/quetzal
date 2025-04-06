@@ -165,6 +165,18 @@ void GuiVisitor::visit(qtzl::CylindricalBillboard& node)
 {
 }
 
+void GuiVisitor::visit(qtzl::Model3D& node)
+{
+    if (&(*GUI::m_CurrentNode_sptr) != &node)
+        return;
+
+    ImGui::Begin(node.m_Name.c_str());
+    ImGui::SeparatorText(node.m_Name.c_str());
+
+    showNode3D(node);
+    ImGui::End();
+}
+
 void GuiVisitor::showNode3D(qtzl::Node3D& node)
 {
     ImGui::Checkbox("Visible", &node.m_IsVisible);
