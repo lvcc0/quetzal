@@ -49,7 +49,8 @@ public:
         std::string mesh_path,
         glm::vec3 position = glm::vec3(0.0f),
         glm::vec3 rotation = glm::vec3(0.0f),
-        glm::vec3 scale = glm::vec3(1.0f)
+        glm::vec3 scale = glm::vec3(1.0f),
+        unsigned int streangth = 100000000
     );
 
     std::shared_ptr<qtzl::RigidBody3D> createRigidBody(
@@ -57,7 +58,8 @@ public:
         std::string mesh_path,
         glm::vec3 position = glm::vec3(0.0f),
         glm::vec3 rotation = glm::vec3(0.0f),
-        glm::vec3 scale = glm::vec3(1.0f)
+        glm::vec3 scale = glm::vec3(1.0f),
+        unsigned int streangth = 1
     );
     
     std::shared_ptr<qtzl::Billboard> createBillboard(
@@ -81,13 +83,15 @@ public:
     std::shared_ptr<qtzl::BoxCollision> createBoxCollision(
         std::string name,
         glm::vec3 position = glm::vec3(0.0f),
-        glm::vec3 size = glm::vec3(1.0f)
+        glm::vec3 size = glm::vec3(1.0f), 
+        unsigned int streangth = 1
     );
 
     std::shared_ptr<qtzl::SphereCollision> createSphereCollision(
         std::string name,
         glm::vec3 position = glm::vec3(0.0f),
-        float radius = 1.0f
+        float radius = 1.0f,
+        unsigned int streangth = 1
     );
 
     std::shared_ptr<qtzl::DirectionalLight3D> createDirectionalLight(

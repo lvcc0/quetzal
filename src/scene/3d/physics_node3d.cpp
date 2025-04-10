@@ -2,8 +2,8 @@
 
 namespace qtzl
 {
-    PhysicsNode3D::PhysicsNode3D(const std::string& name)
-        : Node3D(name)
+    PhysicsNode3D::PhysicsNode3D(const std::string& name, unsigned int streangth)
+        : Node3D(name), m_Streangth(streangth)
     {
         this->m_Type = Object::Type::PHYSICS_NODE3D;
     }

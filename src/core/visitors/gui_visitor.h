@@ -25,5 +25,7 @@ class GuiVisitor: public NodeVisitor{
 
 	void showNode3D(qtzl::Node3D& node);
 	void showNode3D(qtzl::VisualNode3D& node); // It is necessary because simple node doesnt update its model matrix(We dont update matrix every tick)
+	void showNode3D(qtzl::RigidBody3D& node);
+	void showNode3D(qtzl::StaticBody3D& node);
 	void showLight3D(qtzl::Light3D& node);
 };

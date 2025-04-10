@@ -15,7 +15,7 @@ namespace qtzl
     {
         friend PhysicsVisitor;
     public:
-        StaticBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr);
+        StaticBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr, std::shared_ptr<PhysicsNode3D> phys_sptr);
         virtual ~StaticBody3D() = default;
 
         void setScale(const glm::vec3& scale) override;
@@ -33,9 +33,13 @@ namespace qtzl
         void rotate(const glm::vec3& radians) override;
         void rotateDegrees(const glm::vec3& degrees) override;
 
+        inline std::shared_ptr<PhysicsNode3D>& getPhysicsSptr() { return m_Physics_sptr; }
+        inline std::shared_ptr<Model3D>& getModelSptr() { return m_Model_sptr; }
+
+        void updateDependentParts();
     private:
         std::shared_ptr<Model3D> m_Model_sptr;
-        std::shared_ptr<qtzl::PhysicsNode3D> m_Physics_sptr;
+        std::shared_ptr<PhysicsNode3D> m_Physics_sptr;
 
         void accept(NodeVisitor& visitor) override;
     };

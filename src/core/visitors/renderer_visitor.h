@@ -5,8 +5,6 @@
 
 class RendererVisitor : public NodeVisitor
 {
-	void visit(qtzl::StaticBody3D& node) override;
-	void visit(qtzl::RigidBody3D& node) override;
 	void visit(qtzl::Skybox& node) override;
 	void visit(qtzl::PointLight3D& node) override;
 	void visit(qtzl::DirectionalLight3D& node) override;

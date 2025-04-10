@@ -5,6 +5,7 @@
 #include "scene/3d/box_collision.h"
 
 #include "scene/resources/mesh.h"
+#include "core/debugger.h"
 
 class PhysicsVisitor;
 
@@ -15,7 +16,7 @@ namespace qtzl
     {
         friend PhysicsVisitor;
     public:
-        RigidBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr);
+        RigidBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr, std::shared_ptr<PhysicsNode3D> phys_sptr);
         virtual ~RigidBody3D() = default;
 
         void setScale(const glm::vec3& scale) override;
@@ -33,6 +34,10 @@ namespace qtzl
         void rotate(const glm::vec3& radians) override;
         void rotateDegrees(const glm::vec3& degrees) override;
 
+        inline std::shared_ptr<PhysicsNode3D>& getPhysicsSptr() { return m_Physics_sptr; }
+        inline std::shared_ptr<Model3D>& getModelSptr() { return m_Model_sptr; }
+
+        void updateDependentParts();
     private:
         std::shared_ptr<Model3D> m_Model_sptr;
         std::shared_ptr<PhysicsNode3D> m_Physics_sptr;

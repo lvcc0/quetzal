@@ -2,8 +2,8 @@
 
 namespace qtzl
 {
-    BoxCollision::BoxCollision(const std::string& name)
-        : PhysicsNode3D(name)
+    BoxCollision::BoxCollision(const std::string& name, unsigned int streangth)
+        : PhysicsNode3D(name, streangth)
     {
         this->m_Type = Object::Type::BOX_COLLISION;
 
@@ -17,5 +17,9 @@ namespace qtzl
     void BoxCollision::accept(NodeVisitor& visitor)
     {
         visitor.visit(*this);
+    }
+    void BoxCollision::setScale(const glm::vec3& scale)
+    {
+        m_Size = scale;
     }
 }

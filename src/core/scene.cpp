@@ -21,10 +21,12 @@ std::shared_ptr<qtzl::RigidBody3D> Scene::createRigidBody(
     std::string mesh_path,
     glm::vec3 position,
     glm::vec3 rotation,
-    glm::vec3 scale
+    glm::vec3 scale, 
+    unsigned int streangth
 )
 {
-    std::shared_ptr<qtzl::RigidBody3D> node_sptr = std::make_shared<qtzl::RigidBody3D>(name, ResourceManager::getMesh(mesh_path));
+    std::shared_ptr<qtzl::PhysicsNode3D> phys_node = createBoxCollision(name, position, scale, streangth);
+    std::shared_ptr<qtzl::RigidBody3D> node_sptr = std::make_shared<qtzl::RigidBody3D>(name, createModel3D(name, mesh_path), phys_node);
     
     node_sptr->setGlobalPosition(position);
     node_sptr->setGlobalRotation(rotation);
@@ -58,10 +60,12 @@ std::shared_ptr<qtzl::StaticBody3D> Scene::createStaticBody(
     std::string mesh_path,
     glm::vec3 position,
     glm::vec3 rotation,
-    glm::vec3 scale
+    glm::vec3 scale,
+    unsigned int streangth
 )
 {
-    std::shared_ptr<qtzl::StaticBody3D> node_sptr = std::make_shared<qtzl::StaticBody3D>(name, ResourceManager::getMesh(mesh_path));
+    std::shared_ptr<qtzl::PhysicsNode3D> phys_node = createBoxCollision(name, position, scale, streangth);
+    std::shared_ptr<qtzl::StaticBody3D> node_sptr = std::make_shared<qtzl::StaticBody3D>(name, createModel3D(name, mesh_path), phys_node);
     
     node_sptr->setGlobalPosition(position);
     node_sptr->setGlobalRotation(rotation);
@@ -109,10 +113,11 @@ std::shared_ptr<qtzl::SphericalBillboard> Scene::createSphericalBillboard(
 std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(
     std::string name,
     glm::vec3 position,
-    glm::vec3 size
+    glm::vec3 size,
+    unsigned int streangth
 )
 {
-    std::shared_ptr<qtzl::BoxCollision> node_sptr = std::make_shared<qtzl::BoxCollision>(name);
+    std::shared_ptr<qtzl::BoxCollision> node_sptr = std::make_shared<qtzl::BoxCollision>(name, streangth);
 
     node_sptr->setGlobalPosition(position);
     node_sptr->setSize(size);
@@ -125,10 +130,11 @@ std::shared_ptr<qtzl::BoxCollision> Scene::createBoxCollision(
 std::shared_ptr<qtzl::SphereCollision> Scene::createSphereCollision(
     std::string name,
     glm::vec3 position,
-    float radius
+    float radius,
+    unsigned int streangth
 )
 {
-    std::shared_ptr<qtzl::SphereCollision> node_sptr = std::make_shared<qtzl::SphereCollision>(name);
+    std::shared_ptr<qtzl::SphereCollision> node_sptr = std::make_shared<qtzl::SphereCollision>(name, streangth);
 
     node_sptr->setGlobalPosition(position);
     node_sptr->setRadius(radius);

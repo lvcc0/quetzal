@@ -65,7 +65,7 @@ void GuiVisitor::visit(qtzl::BoxCollision& node)
     if (&(*GUI::m_CurrentNode_sptr) != &node)
         return;
 
-    ImGui::Begin(node.m_Name.c_str());
+    ImGui::Begin((node.m_Name + "_col").c_str());
     ImGui::SeparatorText(node.m_Name.c_str());
 
     showNode3D(node);
@@ -77,7 +77,7 @@ void GuiVisitor::visit(qtzl::SphereCollision& node)
     if (&(*GUI::m_CurrentNode_sptr) != &node)
         return;
 
-    ImGui::Begin(node.m_Name.c_str());
+    ImGui::Begin((node.m_Name + "_col").c_str());
     ImGui::SeparatorText(node.m_Name.c_str());
 
     showNode3D(node);
@@ -170,7 +170,7 @@ void GuiVisitor::visit(qtzl::Model3D& node)
     if (&(*GUI::m_CurrentNode_sptr) != &node)
         return;
 
-    ImGui::Begin(node.m_Name.c_str());
+    ImGui::Begin((node.m_Name + "_model").c_str());
     ImGui::SeparatorText(node.m_Name.c_str());
 
     showNode3D(node);
@@ -199,6 +199,34 @@ void GuiVisitor::showNode3D(qtzl::VisualNode3D& node)
     ImGui::DragFloat3("Scale", glm::value_ptr(node.m_Scale));
 
     node.updateMatrix();
+}
+
+void GuiVisitor::showNode3D(qtzl::RigidBody3D& node)
+{
+    ImGui::Checkbox("Visible", &node.m_IsVisible);
+
+    ImGui::DragFloat3("Global Position", glm::value_ptr(node.m_GlobalPosition));
+    ImGui::DragFloat3("Global Rotation", glm::value_ptr(node.m_GlobalRotation));
+    ImGui::DragFloat3("Relative Position", glm::value_ptr(node.m_Position));
+    ImGui::DragFloat3("Relative Rotation", glm::value_ptr(node.m_Rotation));
+    ImGui::DragFloat3("Scale", glm::value_ptr(node.m_Scale));
+
+    node.updateDependentParts();
+    node.getModelSptr()->updateMatrix();
+}
+
+void GuiVisitor::showNode3D(qtzl::StaticBody3D& node)
+{
+    ImGui::Checkbox("Visible", &node.m_IsVisible);
+
+    ImGui::DragFloat3("Global Position", glm::value_ptr(node.m_GlobalPosition));
+    ImGui::DragFloat3("Global Rotation", glm::value_ptr(node.m_GlobalRotation));
+    ImGui::DragFloat3("Relative Position", glm::value_ptr(node.m_Position));
+    ImGui::DragFloat3("Relative Rotation", glm::value_ptr(node.m_Rotation));
+    ImGui::DragFloat3("Scale", glm::value_ptr(node.m_Scale));
+
+    node.updateDependentParts();
+    node.getModelSptr()->updateMatrix();
 }
 
 void GuiVisitor::showLight3D(qtzl::Light3D& node)

@@ -1,6 +1,5 @@
 #pragma once
 #include "core/engine.h"
-#include "core/debugger.h"
 
 // TODO: separate scene scripts to separate files or smth
 
@@ -63,6 +62,7 @@
 //    return Physics::Direction::NIL;
 //}
 
+
 int main()
 {
     // Set all classes into this macro
@@ -92,13 +92,6 @@ int main()
     auto second_catcube = first_scene->createRigidBody("second_catcube", "objects/catcube/catcube.obj", glm::vec3(-2.0f, -1.5f, 0.0f));
     auto floor = first_scene->createStaticBody("floor", "objects/catcube/catcube.obj", glm::vec3(0.0f, -3.0f, 0.0f), glm::vec3(0.0f), glm::vec3(10.0f, 2.0f, 2.0f));
 
-    auto catcube_collision = first_scene->createBoxCollision("catcube_collision", catcube->getGlobalPosition(), catcube->getScale());
-    auto second_catcube_collision = first_scene->createBoxCollision("catsphere_collision", second_catcube->getGlobalPosition(), second_catcube->getScale());
-    auto floor_collision = first_scene->createBoxCollision("floor_collision", floor->getGlobalPosition(), floor->getScale());
-
-    catcube->addChild(catcube_collision);
-    second_catcube->addChild(second_catcube_collision);
-
     first_scene->createDirectionalLight("dirLights[0]");
     first_scene->createPointLight("pointLights[0]", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
     first_scene->createSpotLight("spotLights[0]", glm::vec3(-2.0f, -1.5f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.5f, 1.0f));
@@ -114,8 +107,6 @@ int main()
 
     float gravity_acceleration = 0.4f;
 
-    int counter = 0;
-
     // --- //
 
     // Main loop
@@ -123,19 +114,19 @@ int main()
     {
         if (engine.currentScene == "first_scene")
         {
-            catcube_movement = glm::vec3(0.0f);
+            //catcube_movement = glm::vec3(0.0f);
 
-            if (Input::isActionPressed("left"))
-                catcube_movement.x -= catcube_velocity;
-            if (Input::isActionPressed("right"))
-                catcube_movement.x += catcube_velocity;
+            //if (Input::isActionPressed("left"))
+            //    catcube_movement.x -= catcube_velocity;
+            //if (Input::isActionPressed("right"))
+            //    catcube_movement.x += catcube_velocity;
 
-            catcube_movement.y += y_momentum;
+            //catcube_movement.y += y_momentum;
 
-            y_momentum -= gravity_acceleration;
+            //y_momentum -= gravity_acceleration;
 
-            if (y_momentum <= -8.0f)
-                y_momentum = -8.0f;
+            //if (y_momentum <= -8.0f)
+            //    y_momentum = -8.0f;
 
             //if (doCollisions(catcube_collision, floor_collision, catcube_movement) == Physics::Direction::DOWN)
             //{

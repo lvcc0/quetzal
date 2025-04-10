@@ -180,9 +180,9 @@ void GUI::showDebugger()
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
 
-        if (Debugger::m_MapOfClasses.size() > 0)
+        if (debugger::m_MapOfClasses.size() > 0)
         {
-            for (const auto& [name, cl] : Debugger::m_MapOfClasses)
+            for (const auto& [name, cl] : debugger::m_MapOfClasses)
             {
                 SHOW_CLASS_INFO(name, cl);
             }

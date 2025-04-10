@@ -1,17 +1,5 @@
 #include "renderer_visitor.h"
 
-void RendererVisitor::visit(qtzl::StaticBody3D& node)
-{
-    if (node.isVisible())
-        node.render(Renderer::getCurrentShaderPrograms().at(ShaderProgram::DEFAULT));
-}
-
-void RendererVisitor::visit(qtzl::RigidBody3D& node)
-{
-    if (node.isVisible())
-        node.render(Renderer::m_CurrentShaderPrograms.at(ShaderProgram::DEFAULT));
-}
-
 void RendererVisitor::visit(qtzl::Skybox& node)
 {
     if (node.isVisible()) 

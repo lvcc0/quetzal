@@ -2,8 +2,8 @@
 
 namespace qtzl
 {
-    SphereCollision::SphereCollision(const std::string& name)
-        : PhysicsNode3D(name)
+    SphereCollision::SphereCollision(const std::string& name, unsigned int streangth)
+        : PhysicsNode3D(name, streangth)
     {
         this->m_Type = Object::Type::SPHERE_COLLISION;
 
@@ -17,5 +17,9 @@ namespace qtzl
     void SphereCollision::accept(NodeVisitor& visitor)
     {
         visitor.visit(*this);
+    }
+    void SphereCollision::setScale(const glm::vec3& scale)
+    {
+        m_Radius = std::max(std::max(scale.x, scale.y), scale.z);
     }
 }

@@ -3,13 +3,17 @@
 #include <type_traits>
 #include <iostream>
 #include <map>
+#include <initializer_list>
+
 #include "scene/main/node.h"
 #include "static/physics.h"
 
-#define DEBUGGER_ADD_CLASSES(...) Debugger::checkClasses<__VA_ARGS__>()
+// Note: without using inline with functions and variables program wouldnt compile 
 
+#define DEBUGGER_ADD_CLASSES(...) debugger::checkClasses<__VA_ARGS__>()
+#define DEBUGGER_PRINT_IN_CONSOLE(...) debugger::printMessageInConsole(__VA_ARGS__)
 
-class Debugger
+namespace debugger
 {
 	// If you added new property in class info, rework macro in gui.h and function in gui.cpp
 	struct ClassInfo
@@ -18,15 +22,19 @@ class Debugger
 		bool is_basedOnNode;
 		bool is_physical;
 	};
-public:
-	static inline std::map<std::string, ClassInfo> m_MapOfClasses;
+
+	inline std::map<std::string, ClassInfo> m_MapOfClasses;
 
 	template<class... C>
-	static constexpr void checkClasses();
-};
+	inline constexpr void checkClasses()
+	{
+		(void(m_MapOfClasses[typeid(C).name()] = { std::is_polymorphic_v<C>, std::is_base_of_v<qtzl::Node, C>, is_physical_object<C> }), ...);
+	}
 
-template<class... C>
-constexpr void Debugger::checkClasses()
-{
-	(void(m_MapOfClasses[typeid(C).name()] = { std::is_polymorphic_v<C>, std::is_base_of_v<qtzl::Node, C>, is_physical_object<C> }), ...);
+	template<class... T>
+	inline constexpr void printMessageInConsole(T... values)
+	{
+		(void(std::cout << values << ' '), ...);
+		std::cout << '\n';
+	}
 }
