@@ -2,12 +2,13 @@
 
 namespace qtzl
 {
-    RigidBody3D::RigidBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr, std::shared_ptr<PhysicsNode3D> phys_sptr)
+    // You have to set parent to phys_ptr via shared ptr with ref to this object, you have to do it in scene
+    RigidBody3D::RigidBody3D(const std::string& name, glm::vec3 pos, std::shared_ptr<Model3D> model_sptr, std::shared_ptr<PhysicsNode3D> phys_sptr)
         : Node3D(name), m_Model_sptr(model_sptr)
     {
+        m_GlobalPosition = pos;
         this->m_Type = Object::Type::RIGID_BODY3D;
         m_Physics_sptr = phys_sptr;
-        m_Physics_sptr->getPhysParent() = std::make_shared<RigidBody3D>(*this);
     }
 
     void RigidBody3D::setScale(const glm::vec3& scale)
@@ -71,7 +72,6 @@ namespace qtzl
         m_GlobalPosition += position;
         m_Model_sptr->translate(position);
         m_Physics_sptr->translate(position);
-        DEBUGGER_PRINT_IN_CONSOLE(m_Name, m_GlobalPosition.x, m_GlobalPosition.y, m_GlobalPosition.z);
     }
 
     void RigidBody3D::rotate(const glm::vec3& radians)

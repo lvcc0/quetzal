@@ -90,7 +90,7 @@ int main()
 
     auto catcube = first_scene->createRigidBody("catcube", "objects/catcube/catcube.obj", glm::vec3(0.0f, 3.0f, 0.0f));
     auto second_catcube = first_scene->createRigidBody("second_catcube", "objects/catcube/catcube.obj", glm::vec3(-2.0f, -1.5f, 0.0f));
-    auto floor = first_scene->createStaticBody("floor", "objects/catcube/catcube.obj", glm::vec3(0.0f, -3.0f, 0.0f), glm::vec3(0.0f), glm::vec3(10.0f, 2.0f, 2.0f));
+    //auto floor = first_scene->createStaticBody("floor", "objects/catcube/catcube.obj", glm::vec3(0.0f, -3.0f, 0.0f), glm::vec3(0.0f), glm::vec3(10.0f, 2.0f, 2.0f));
 
     first_scene->createDirectionalLight("dirLights[0]");
     first_scene->createPointLight("pointLights[0]", glm::vec3(2.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.5f, 0.0f));
@@ -112,6 +112,7 @@ int main()
     // Main loop
     while (engine.isRunning())
     {
+        DEBUGGER_PRINT_IN_CONSOLE("catcube", catcube->m_GlobalPosition.x, catcube->m_GlobalPosition.y, catcube->m_GlobalPosition.z);
         if (engine.currentScene == "first_scene")
         {
             //catcube_movement = glm::vec3(0.0f);

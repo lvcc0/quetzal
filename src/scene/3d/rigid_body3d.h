@@ -16,7 +16,7 @@ namespace qtzl
     {
         friend PhysicsVisitor;
     public:
-        RigidBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr, std::shared_ptr<PhysicsNode3D> phys_sptr);
+        RigidBody3D(const std::string& name, glm::vec3 pos, std::shared_ptr<Model3D> model_sptr, std::shared_ptr<PhysicsNode3D> phys_sptr);
         virtual ~RigidBody3D() = default;
 
         void setScale(const glm::vec3& scale) override;

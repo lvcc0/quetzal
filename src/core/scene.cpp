@@ -26,7 +26,8 @@ std::shared_ptr<qtzl::RigidBody3D> Scene::createRigidBody(
 )
 {
     std::shared_ptr<qtzl::PhysicsNode3D> phys_node = createBoxCollision(name, position, scale, streangth);
-    std::shared_ptr<qtzl::RigidBody3D> node_sptr = std::make_shared<qtzl::RigidBody3D>(name, createModel3D(name, mesh_path), phys_node);
+    std::shared_ptr<qtzl::RigidBody3D> node_sptr = std::make_shared<qtzl::RigidBody3D>(name, position, createModel3D(name, mesh_path), phys_node);
+    phys_node->setPhysParent(node_sptr);// Yes, its here (and now it MUST be here)
     
     node_sptr->setGlobalPosition(position);
     node_sptr->setGlobalRotation(rotation);
@@ -65,8 +66,9 @@ std::shared_ptr<qtzl::StaticBody3D> Scene::createStaticBody(
 )
 {
     std::shared_ptr<qtzl::PhysicsNode3D> phys_node = createBoxCollision(name, position, scale, streangth);
-    std::shared_ptr<qtzl::StaticBody3D> node_sptr = std::make_shared<qtzl::StaticBody3D>(name, createModel3D(name, mesh_path), phys_node);
-    
+    std::shared_ptr<qtzl::StaticBody3D> node_sptr = std::make_shared<qtzl::StaticBody3D>(name, position, createModel3D(name, mesh_path), phys_node);
+    phys_node->setPhysParent(node_sptr); // Yes, its here (and now it MUST be here)
+
     node_sptr->setGlobalPosition(position);
     node_sptr->setGlobalRotation(rotation);
     node_sptr->setScale(scale);

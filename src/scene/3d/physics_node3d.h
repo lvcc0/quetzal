@@ -18,12 +18,13 @@ namespace qtzl
         PhysicsNode3D(const std::string& name, unsigned int streangth);
         virtual ~PhysicsNode3D() = default;
 
-        inline std::shared_ptr<Node3D>& getPhysParent() { return m_PhysParentObject; }
+        inline std::shared_ptr<Node3D> getPhysParent() { return m_PhysParentObject.lock(); }
+        inline void setPhysParent(std::shared_ptr<Node3D> obj) { m_PhysParentObject = obj; }
 
         unsigned int m_Streangth;
 
         void accept(NodeVisitor& visitor) override;
     private:
-        std::shared_ptr<Node3D> m_PhysParentObject = nullptr; // Its necessary for physics_visitor(yeah, it must be Node3D)
+        std::weak_ptr<Node3D> m_PhysParentObject; // Its necessary for physics_visitor(yeah, it must be Node3D)
     };
 }

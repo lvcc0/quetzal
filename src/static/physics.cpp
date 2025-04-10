@@ -88,19 +88,19 @@ Physics::Direction Physics::doCollisions(qtzl::BoxCollision& first, qtzl::BoxCol
 
         // Get weaker object (it could be any Node3D inheritor or collision)
         qtzl::PhysicsNode3D* weak_col = first.m_Streangth > second.m_Streangth ? phys_second : phys_first;
-        qtzl::Node3D* weak_node = weak_col->getPhysParent().get() != nullptr ? weak_col->getPhysParent().get() : weak_col;
-        glm::vec3 weak_diff = &first == weak_node ? difference.first : difference.second;
+        qtzl::Node3D& weak_node = weak_col->getPhysParent() != nullptr ? *(weak_col->getPhysParent()) : *weak_col;
+        glm::vec3 weak_diff = first.m_Streangth > second.m_Streangth ? difference.first : difference.second;
 
         // Get stronger object (it could be any Node3D inheritor or collision)
         qtzl::PhysicsNode3D* strong_col = first.m_Streangth > second.m_Streangth ? phys_first : phys_second;
-        qtzl::Node3D* strong_node = strong_col->getPhysParent().get() != nullptr ? strong_col->getPhysParent().get() : strong_col;
-        glm::vec3 strong_diff = &first == strong_node ? difference.first : difference.second;
+        qtzl::Node3D& strong_node = strong_col->getPhysParent() != nullptr ? *(strong_col->getPhysParent()) : *strong_col;
+        glm::vec3 strong_diff = first.m_Streangth > second.m_Streangth ? difference.first : difference.second;
 
         //weak_diff = glm::vec3(weak_diff.x * 3, weak_diff.y * 3, weak_diff.z * 3);
         //strong_diff = glm::vec3(strong_diff.x * 3, strong_diff.y * 3, strong_diff.z * 3);
 
         // Simple interaction(stronger object moving weaker)
-        weak_node->translate(strong_diff);
+        weak_node.translate(strong_diff);
 
         return direction;
     }
@@ -129,21 +129,22 @@ Physics::Direction Physics::doCollisions(qtzl::BoxCollision& first, qtzl::Sphere
             return direction;
         }
 
+
         // Get weaker object (it could be any Node3D inheritor or collision)
         qtzl::PhysicsNode3D* weak_col = first.m_Streangth > second.m_Streangth ? phys_second : phys_first;
-        qtzl::Node3D* weak_node = weak_col->getPhysParent().get() != nullptr ? weak_col->getPhysParent().get() : weak_col;
-        glm::vec3 weak_diff = &first == weak_node ? difference.first : difference.second;
+        qtzl::Node3D& weak_node = weak_col->getPhysParent() != nullptr ? *(weak_col->getPhysParent()) : *weak_col;
+        glm::vec3 weak_diff = first.m_Streangth > second.m_Streangth ? difference.first : difference.second;
 
         // Get stronger object (it could be any Node3D inheritor or collision)
-        qtzl::PhysicsNode3D* strong_col = first.m_Streangth >= second.m_Streangth ? phys_first : phys_second;
-        qtzl::Node3D* strong_node = strong_col->getPhysParent().get() != nullptr ? strong_col->getPhysParent().get() : strong_col;
-        glm::vec3 strong_diff = &first == strong_node ? difference.first : difference.second;
+        qtzl::PhysicsNode3D* strong_col = first.m_Streangth > second.m_Streangth ? phys_first : phys_second;
+        qtzl::Node3D& strong_node = strong_col->getPhysParent() != nullptr ? *(strong_col->getPhysParent()) : *strong_col;
+        glm::vec3 strong_diff = first.m_Streangth > second.m_Streangth ? difference.first : difference.second;
 
         //weak_diff = glm::vec3(weak_diff.x * 3, weak_diff.y * 3, weak_diff.z * 3);
         //strong_diff = glm::vec3(strong_diff.x * 3, strong_diff.y * 3, strong_diff.z * 3);
 
         // Simple interaction(stronger object moving weaker)
-        weak_node->translate(strong_diff);
+        weak_node.translate(strong_diff);
 
         return direction;
     }
@@ -172,21 +173,22 @@ Physics::Direction Physics::doCollisions(qtzl::SphereCollision& first, qtzl::Box
             return direction;
         }
 
+
         // Get weaker object (it could be any Node3D inheritor or collision)
         qtzl::PhysicsNode3D* weak_col = first.m_Streangth > second.m_Streangth ? phys_second : phys_first;
-        qtzl::Node3D* weak_node = weak_col->getPhysParent().get() != nullptr ? weak_col->getPhysParent().get() : weak_col;
-        glm::vec3 weak_diff = &first == weak_node ? difference.first : difference.second;
+        qtzl::Node3D& weak_node = weak_col->getPhysParent() != nullptr ? *(weak_col->getPhysParent()) : *weak_col;
+        glm::vec3 weak_diff = first.m_Streangth > second.m_Streangth ? difference.first : difference.second;
 
         // Get stronger object (it could be any Node3D inheritor or collision)
-        qtzl::PhysicsNode3D* strong_col = first.m_Streangth >= second.m_Streangth ? phys_first : phys_second;
-        qtzl::Node3D* strong_node = strong_col->getPhysParent().get() != nullptr ? strong_col->getPhysParent().get() : strong_col;
-        glm::vec3 strong_diff = &first == strong_node ? difference.first : difference.second;
+        qtzl::PhysicsNode3D* strong_col = first.m_Streangth > second.m_Streangth ? phys_first : phys_second;
+        qtzl::Node3D& strong_node = strong_col->getPhysParent() != nullptr ? *(strong_col->getPhysParent()) : *strong_col;
+        glm::vec3 strong_diff = first.m_Streangth > second.m_Streangth ? difference.first : difference.second;
 
         //weak_diff = glm::vec3(weak_diff.x * 3, weak_diff.y * 3, weak_diff.z * 3);
         //strong_diff = glm::vec3(strong_diff.x * 3, strong_diff.y * 3, strong_diff.z * 3);
 
         // Simple interaction(stronger object moving weaker)
-        weak_node->translate(strong_diff);
+        weak_node.translate(strong_diff);
 
         return direction;
     }
@@ -215,21 +217,22 @@ Physics::Direction Physics::doCollisions(qtzl::SphereCollision& first, qtzl::Sph
             return direction;
         }
 
+
         // Get weaker object (it could be any Node3D inheritor or collision)
         qtzl::PhysicsNode3D* weak_col = first.m_Streangth > second.m_Streangth ? phys_second : phys_first;
-        qtzl::Node3D* weak_node = weak_col->getPhysParent().get() != nullptr ? weak_col->getPhysParent().get() : weak_col;
-        glm::vec3 weak_diff = &first == weak_node ? difference.first : difference.second;
+        qtzl::Node3D& weak_node = weak_col->getPhysParent() != nullptr ? *(weak_col->getPhysParent()) : *weak_col;
+        glm::vec3 weak_diff = first.m_Streangth > second.m_Streangth ? difference.first : difference.second;
 
         // Get stronger object (it could be any Node3D inheritor or collision)
-        qtzl::PhysicsNode3D* strong_col = first.m_Streangth >= second.m_Streangth ? phys_first : phys_second;
-        qtzl::Node3D* strong_node = strong_col->getPhysParent().get() != nullptr ? strong_col->getPhysParent().get() : strong_col;
-        glm::vec3 strong_diff = &first == strong_node ? difference.first : difference.second;
+        qtzl::PhysicsNode3D* strong_col = first.m_Streangth > second.m_Streangth ? phys_first : phys_second;
+        qtzl::Node3D& strong_node = strong_col->getPhysParent() != nullptr ? *(strong_col->getPhysParent()) : *strong_col;
+        glm::vec3 strong_diff = first.m_Streangth > second.m_Streangth ? difference.first : difference.second;
 
         //weak_diff = glm::vec3(weak_diff.x * 3, weak_diff.y * 3, weak_diff.z * 3);
         //strong_diff = glm::vec3(strong_diff.x * 3, strong_diff.y * 3, strong_diff.z * 3);
 
         // Simple interaction(stronger object moving weaker)
-        weak_node->translate(strong_diff);
+        weak_node.translate(strong_diff);
 
         return direction;
     }

@@ -2,12 +2,13 @@
 
 namespace qtzl
 {
-    StaticBody3D::StaticBody3D(const std::string& name, std::shared_ptr<Model3D> model_sptr, std::shared_ptr<PhysicsNode3D> phys_sptr)
+    // You have to set parent to phys_ptr via shared ptr with ref to this object, you have to do it in scene
+    StaticBody3D::StaticBody3D(const std::string& name, glm::vec3 pos, std::shared_ptr<Model3D> model_sptr, std::shared_ptr<PhysicsNode3D> phys_sptr)
         : Node3D(name), m_Model_sptr(model_sptr)
     {
+        m_GlobalPosition = pos;
         this->m_Type = Object::Type::STATIC_BODY3D;
         m_Physics_sptr = phys_sptr;
-        m_Physics_sptr->getPhysParent() = std::make_shared<StaticBody3D>(*this);
     }
 
     void StaticBody3D::setScale(const glm::vec3& scale)
